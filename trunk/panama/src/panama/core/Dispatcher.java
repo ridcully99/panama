@@ -66,8 +66,8 @@ public class Dispatcher implements Filter {
 	
 	public final static String PREFIX = "panama";
 
-	public final static String PARAM_LANGUAGES = "supported-languages";
-	public final static String PARAM_MAXFILEUPLOADSIZE = "maxfileuploadsize";
+	public final static String PARAM_LANGUAGES = PREFIX+".languages";
+	public final static String PARAM_MAXFILEUPLOADSIZE = PREFIX+".maxfileuploadsize";
 
 	/* keys for objects put in request context */
 	public final static String CONTEXT_KEY = "context";
