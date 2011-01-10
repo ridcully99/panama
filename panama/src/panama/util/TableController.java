@@ -40,7 +40,7 @@ public class TableController extends BaseController {
 	/**
 	 * Key used to store DefaultTable-Map in Session-Scope
 	 */
-	public final static String TABLEMAP_KEY = "Pandora_TableMap";	
+	public final static String TABLEMAP_KEY = "panama_tablemap";	
 	
 	/**
 	 * This action sets sorting parameters in a table

@@ -1,6 +1,6 @@
 <!-- 
 	All of the framework's tools.
-	These are automatically added to ViewToolManager instance in PandoraFilter#init()
+	These are automatically added to ViewToolManager instance in Dispatcher#init()
 -->
 <tools>
     <toolbox scope="request">

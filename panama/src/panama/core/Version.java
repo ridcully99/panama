@@ -16,7 +16,7 @@
 package panama.core;
 
 /**
- * This class contains the current version of Pandora.
+ * This class contains the current version of Panama.
  * @author Ridcully
  *
  */

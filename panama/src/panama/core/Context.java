@@ -42,7 +42,8 @@ import org.grlea.log.SimpleLogger;
  */
 public class Context {
 	
-	private final static String LOCALE_KEY = "Pandora_Locale";	// access via getLocale / setLocale
+	private final static String LOCALE_KEY = Dispatcher.PREFIX + "_locale";	// access via getLocale / setLocale
+	private final static String TOKEN_VALUE_KEY = Dispatcher.PREFIX + "_token_values";
 	
 	/*
 	 * public wrappers for easier access and more readable code
@@ -379,10 +380,10 @@ public class Context {
 		
 		@SuppressWarnings("unchecked")
 		private Map<String, String> getTokenValues() {
-			Map<String, String> values = (Map<String, String>)session.get("Pandora_Token_Values");
+			Map<String, String> values = (Map<String, String>)session.get(TOKEN_VALUE_KEY);
 			if (values == null) {
 				values = new HashMap<String, String>();
-				session.put("Pandora_Token_Values", values);
+				session.put(TOKEN_VALUE_KEY, values);
 			}
 			return values;
 		}

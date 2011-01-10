@@ -22,6 +22,7 @@ import panama.annotations.Controller;
 import panama.collections.Tree;
 import panama.core.BaseController;
 import panama.core.Context;
+import panama.core.Dispatcher;
 import panama.core.Target;
 import panama.exceptions.ForceTargetException;
 
@@ -34,10 +35,8 @@ import panama.exceptions.ForceTargetException;
 @Controller
 public class TreeController extends BaseController {
 
-	/**
-	 * Key used to store DefaultTree-Map in Session-Scope
-	 */
-	public final static String TREEMAP_KEY = "Pandora_TreeMap";
+	/** Key used to store DefaultTree-Map in Session-Scope */
+	public final static String TREEMAP_KEY = Dispatcher.PREFIX + "treemap";
 		
 	/**
 	 * This actions toggles the open/closed state of one node of a DefaultTree
