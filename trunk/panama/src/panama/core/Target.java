@@ -20,8 +20,7 @@ import org.grlea.log.SimpleLogger;
 
 /**
  * Targets are returned by Controller#render() and Controller#redirect()
- * and by the execute() method specified in the PandoraAction interface.
- * The target is interpreted by the PandoraServlet
+ * The target is interpreted by the Dispatcher
  * @author Robert
  */
 public abstract class Target {

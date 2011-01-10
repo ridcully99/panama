@@ -66,6 +66,9 @@ public class Dispatcher implements Filter {
 	
 	public final static String PREFIX = "panama";
 
+	/* key for app name (i.e. filtername) in application context */
+	public final static String APP_NAME_KEY = PREFIX+"_application_name";
+	
 	public final static String PARAM_LANGUAGES = PREFIX+".languages";
 	public final static String PARAM_MAXFILEUPLOADSIZE = PREFIX+".maxfileuploadsize";
 
@@ -105,7 +108,7 @@ public class Dispatcher implements Filter {
 	
 	/** Startup time */
 	private Date startupAt = new Date();
-	
+
 	/**
 	 * Gets init-params from web.xml
 	 * This is called synchronized by the servlet container.
@@ -113,6 +116,7 @@ public class Dispatcher implements Filter {
 	public void init(FilterConfig filterConfig) {
 		System.out.println(Version.LOGO_ASCIIART);		
 		applicationContext = filterConfig.getServletContext();
+		applicationContext.setAttribute(APP_NAME_KEY, filterConfig.getFilterName());
 		
 		Enumeration names = filterConfig.getInitParameterNames();
 		while(names.hasMoreElements()) {
@@ -568,7 +572,7 @@ public class Dispatcher implements Filter {
 	}	
 	
 	public void destroy() {
-		System.out.println("Good Bye and Good Luck. Pandora was up for "+getFormattedUptime()+".");
+		System.out.println("Good Bye and Good Luck. "+applicationContext.getAttribute(APP_NAME_KEY)+" was up for "+getFormattedUptime()+".");
 	}
 	
 	/**

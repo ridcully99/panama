@@ -49,7 +49,7 @@ public class TileTool {
 	 *
 	 * @param controllerName The name of the controller to use.
 	 * @param actionName The name of the action to execute.
-	 * @see PandoraServlet#handleAction(Context, String)
+	 * @see Dispatcher#handleAction(Context, String)
 	 */
 	public void embed(String controllerName, String actionName) throws Exception {
 		Context ctx = Context.getInstance();

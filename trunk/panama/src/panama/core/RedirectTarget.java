@@ -18,8 +18,6 @@ package panama.core;
 import java.io.IOException;
 
 /**
- * Target information returned by Controller#render() and Controller#redirect()
- * Should be returned by each action method and is interpreted by the PandoraServlet
  * @author Robert
  */
 public class RedirectTarget extends Target {

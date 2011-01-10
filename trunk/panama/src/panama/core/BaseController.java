@@ -40,7 +40,7 @@ import panama.util.TreeController;
 
 
 /**
- * Base class for all PandoraServlet controllers.
+ * Base class for all controllers.
  * 
  * @author Robert
  */
