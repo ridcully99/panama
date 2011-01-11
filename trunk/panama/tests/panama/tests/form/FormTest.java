@@ -5,7 +5,7 @@
 package panama.tests.form;
 
 import panama.form.Form;
-import panama.util.BeanSupport;
+import panama.util.DynaBeanUtils;
 import junit.framework.TestCase;
 
 public class FormTest extends TestCase {
@@ -16,7 +16,7 @@ public class FormTest extends TestCase {
 
 	public void testAllProperties() {
 		TestBean b = new TestBean();
-		String[] list = BeanSupport.getPropertyNames(b);
+		String[] list = DynaBeanUtils.getPropertyNames(b);
 		assertEquals(10, list.length);
 	}
 	

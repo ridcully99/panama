@@ -19,7 +19,7 @@ import java.util.Arrays;
 import java.util.List;
 import java.util.Map;
 
-import panama.util.BeanSupport;
+import panama.util.DynaBeanUtils;
 
 
 import com.avaje.ebean.Ebean;
@@ -79,7 +79,7 @@ public class PropertyComparator extends Filter {
 		for (String name : properties) {
 			boolean match = false;
 			try {
-				Object value = BeanSupport.getProperty(object, name);
+				Object value = DynaBeanUtils.getProperty(object, name);
 				FilterExtension extension = filterExtensions != null ? (FilterExtension)filterExtensions.get(name) : null;
 				match = extension == null ? matchProperty(name, value) : extension.matchProperty(name, value, pattern);
 				all = all && match;

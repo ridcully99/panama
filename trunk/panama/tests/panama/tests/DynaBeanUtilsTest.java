@@ -1,9 +1,9 @@
 package panama.tests;
 
-import panama.util.BeanSupport;
+import panama.util.DynaBeanUtils;
 import junit.framework.TestCase;
 
-public class BeanSupportTest extends TestCase {
+public class DynaBeanUtilsTest extends TestCase {
 
 	private BeanSupportTestBean b;
 	
@@ -14,14 +14,14 @@ public class BeanSupportTest extends TestCase {
 	}
 	
 	public void testSetProperty1() {
-		BeanSupport.setProperty(b, "string", "foobar");
-		BeanSupport.setProperty(b, "number", new Long(42));
+		DynaBeanUtils.setProperty(b, "string", "foobar");
+		DynaBeanUtils.setProperty(b, "number", new Long(42));
 		assertEquals("foobar", b.getString());
 		assertEquals(new Long(42), b.getNumber());
 	}
 	
 	public void testSetProperty2() {
-		BeanSupport.setProperty(b, "strings", new String[] {"foo", "bar"});
+		DynaBeanUtils.setProperty(b, "strings", new String[] {"foo", "bar"});
 		assertEquals(2, b.getStrings().length);
 	}
 	

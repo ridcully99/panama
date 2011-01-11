@@ -25,7 +25,7 @@ import java.util.Map;
 import org.grlea.log.SimpleLogger;
 
 import panama.persistence.PersistentBean;
-import panama.util.BeanSupport;
+import panama.util.DynaBeanUtils;
 
 
 
@@ -97,7 +97,7 @@ public class Form {
 	public void addFields(Class<?> clazz, int method, String... properties) {
 		try {
 			Object bean = clazz.newInstance();
-			List<String> allProperties = Arrays.asList(BeanSupport.getPropertyNames(bean));
+			List<String> allProperties = Arrays.asList(DynaBeanUtils.getPropertyNames(bean));
 			List<String> props = Arrays.asList(properties == null ? new String[0] : properties);
 			if (!allProperties.containsAll(props)) {
 				List<String> hlp = new ArrayList<String>(props);
@@ -110,7 +110,7 @@ public class Form {
 				props = hlp;
 			}
 			for (String name : props) {
-				Class<?> valueClass = BeanSupport.getPropertyClass(bean, name);
+				Class<?> valueClass = DynaBeanUtils.getPropertyClass(bean, name);
 				if (valueClass.isArray()) {									// for arrays we create a Field for it's component type (formdata allows multiple inputs for it then)
 					valueClass = valueClass.getComponentType();
 				}

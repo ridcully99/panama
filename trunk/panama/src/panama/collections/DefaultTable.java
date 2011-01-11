@@ -35,7 +35,7 @@ import org.grlea.log.SimpleLogger;
 import panama.core.Context;
 import panama.filter.Filter;
 import panama.filter.FilterExtension;
-import panama.util.BeanSupport;
+import panama.util.DynaBeanUtils;
 import panama.util.TableController;
 
 
@@ -226,7 +226,7 @@ public class DefaultTable implements Table, Comparator, Serializable {
 	
 	/**
 	 * Tries to get a value from specified object.
-	 * If the sortByGetter is null BeanSupport.getProperty() is used, Otherwise the predefined sortByGetter
+	 * If the sortByGetter is null DynaBeanUtils.getProperty() is used, Otherwise the predefined sortByGetter
 	 * is used.
 	 * This happens if the object is not from exactly the same class as the one the sortByGetter is created from.
 	 * At last, if the value is instanceof String it is converted to lowercase for case-insensitive sorting 
@@ -238,7 +238,7 @@ public class DefaultTable implements Table, Comparator, Serializable {
 		if (o == null) { return null; }
 		try {
 			if (sortByGetter == null) {
-				v = (Comparable)BeanSupport.getProperty(o, getSortBy());
+				v = (Comparable)DynaBeanUtils.getProperty(o, getSortBy());
 			} else {
 				v = (Comparable)sortByGetter.invoke(o);
 			}

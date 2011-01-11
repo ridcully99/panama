@@ -20,8 +20,6 @@ import java.lang.reflect.Method;
 import java.util.HashSet;
 import java.util.Set;
 
-import javax.persistence.Version;
-
 import panama.exceptions.PropertyNotFoundException;
 import panama.exceptions.WrongValueTypeException;
 
@@ -32,7 +30,7 @@ import panama.exceptions.WrongValueTypeException;
  * 
  * @author Ridcully
  */
-public class BeanSupport {
+public class DynaBeanUtils {
 
 	/**
 	 * Gets value of property of this object (using reflection)
@@ -58,7 +56,7 @@ public class BeanSupport {
         try {
             Method getterMethod = c.getMethod(getterName);
             value = getterMethod.invoke(bean);
-            if (subProperty != null && value != null && value instanceof BeanSupport) {
+            if (subProperty != null && value != null && value instanceof DynaBeanUtils) {
             	value = getProperty(value, subProperty); 
             }
         }

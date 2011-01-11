@@ -31,7 +31,7 @@ import org.grlea.log.SimpleLogger;
 
 import panama.exceptions.NoSuchFieldException;
 import panama.exceptions.ValidatorException;
-import panama.util.BeanSupport;
+import panama.util.DynaBeanUtils;
 
 
 /**
@@ -111,7 +111,7 @@ public class FormData {
 	public void setInput(Object bean) {
 		for (String fieldName : form.getFields().keySet()) {
 			try {
-				Object value = BeanSupport.getProperty(bean, fieldName);
+				Object value = DynaBeanUtils.getProperty(bean, fieldName);
 				setInput(fieldName, value);
 			} catch (Exception e) {	// PropertyNotFoundException etc.
 				/* simply do not set a value for this field in input map */
@@ -192,7 +192,7 @@ public class FormData {
 	 * @param method wether to set the specified or all _but_ the specified properties. Value should be one of Form.INCLUDE_PROPERTIES or Form.EXCLUDE_PROPERTIES 
 	 */
 	public void applyTo(Object bean, String[] properties, int method) {
-		List<String> allProperties = Arrays.asList(BeanSupport.getPropertyNames(bean));
+		List<String> allProperties = Arrays.asList(DynaBeanUtils.getPropertyNames(bean));
 		List<String> props = Arrays.asList(properties == null ? new String[0] : properties);
 		if (!allProperties.containsAll(props)) {
 			List<String> hlp = new ArrayList<String>(props); 	// must create a real list here, the 'asList' arrays do not support the removeAll method
@@ -207,15 +207,15 @@ public class FormData {
 		}
 		for (String propertyName : props) {
 			try {
-				Class<?> propertyClass = BeanSupport.getPropertyClass(bean, propertyName);
+				Class<?> propertyClass = DynaBeanUtils.getPropertyClass(bean, propertyName);
 				if (propertyClass.isArray()) {
 					// got to create an array of appropriate type
 					Object[] values = getValues(propertyName);
 					Object arr = Array.newInstance(propertyClass.getComponentType(), values.length);
 					System.arraycopy(values, 0, arr, 0, values.length);
-					BeanSupport.setProperty(bean, propertyName, arr);
+					DynaBeanUtils.setProperty(bean, propertyName, arr);
 				} else {
-					BeanSupport.setProperty(bean, propertyName, getValue(propertyName));
+					DynaBeanUtils.setProperty(bean, propertyName, getValue(propertyName));
 				}
 			} catch (Exception e) {
 				/* NOP - continue; the error is already added to the errors-list. */
