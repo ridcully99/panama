@@ -1,0 +1,43 @@
+Canvas.drawVertices!
+
+
+
+
+
+
+2011-01-07
+Begonnen mit Smudge -- Als Basis diente das LunarLander Beispiel
+Probleme mit Flackern
+
+2011-01-08
+Eintrag im Internet gefunden der das Flackern erklärt (Double Buffering) und beschreibt wie man es los wird (in Bitmap rendern und das in den SurfaceView kopieren)
+http://groups.google.com/group/android-developers/msg/8d1243c33f9b7b6e
+
+2011-01-09
+Zeichnen geht jetzt richtig. Mit Linien, solange bis abgesetzt wird. Und rund statt eckig.
+TODO: Immer im Portraitmodus bleiben (Titel ausblenden) damit beim Drehen nicht die Bitmap gelöscht wird?
+
+2011-01-10
+Linie wird jetzt immer schwächer solange nicht abgesetzt wird.
+
+Ideen (gereiht nach Priorität):
+-- Multitouch Unterstützung
+-- Menü --> Palette mit Farben, Pipette und verschiedenen Pinselgrößen;
+--          Profifunktion ... statt Farben was zum Aufhellen und Abdunkeln (i.e. weiss bzw. schwarz und mit alpha = 128 beginnen, oder Metapher mit Wasserbecher und so das Anfangs-Alpha verringern) 
+
+-- "Papier" ... leicht gemusterte Bitmap als Hintergrund ... Farbe mit Alpha-Anteil --> Papierstruktur auch im Bild leicht sichtbar
+-- Menüfunktionen: 
+   -- neues Bild -> Papier wählen (verschiedene Farben, jeweils mit Papierstruktur)
+   -- Farbe wählen ... aus anderem Screen mit einer Reihe von Farbtöpfen (keine RGB Regler o.ä.)
+   --              ... aus aktuellem Bild
+   -- Speichern, Laden von  Bildern
+-- Zeichnen ... je schneller die Bewegung desto heller (mehr Transparenz) und eventuell auch dünner der Strich.
+-- Zeichnen ... Multitouch (ev. im Menü aktivierbar)
+-- Schmieren ... 
+
+Idee ... Effekt verwenden um Ecken zu vermeiden http://developer.android.com/reference/android/graphics/CornerPathEffect.html
+         unnötig.
+         
+Idee ... Wenn neues Bild begonnen wird, altes automatisch speichern (in App's Filesystem).
+Idee ... Radiergummi
+Idee ... Menü --> Palette mit Farb- und Pinselauswahl
