@@ -86,9 +86,14 @@ public class FingerColorsView3 extends View {
     }
     
     private void touch_move(float x, float y, int p, float s) {
+    	mCanvas.save();
+    	Path circle = new Path();
+    	circle.addCircle(lastX, lastY, lastSize/2f, Path.Direction.CCW);
+    	mCanvas.clipPath(circle, Region.Op.DIFFERENCE);
     	mPaint.setStrokeWidth(s);
     	mPaint.setColor(Color.argb(p, red, green, blue));
         mCanvas.drawLine(lastX, lastY, x, y, mPaint);
+        mCanvas.restore();    	
     }
     
     private void touch_up() {
@@ -121,10 +126,6 @@ public class FingerColorsView3 extends View {
             	float deltaP = (p - lastPressure)/historySize;
             	float deltaS = (s - lastSize)/historySize;
             	for (int i = 0; i < historySize; i++) {
-                	mCanvas.save();
-                	Path circle = new Path();
-                	circle.addCircle(lastX, lastY, lastSize/2f, Path.Direction.CCW);
-                	mCanvas.clipPath(circle, Region.Op.DIFFERENCE);
             		pTemp += deltaP;
             		sTemp += deltaS;
             		float historicalX = event.getHistoricalX(i);
@@ -132,14 +133,8 @@ public class FingerColorsView3 extends View {
                     touch_move(historicalX, historicalY, (int)(pTemp * alpha), sTemp);
                     lastX = historicalX;
                     lastY = historicalY;
-                    mCanvas.restore();
             	}
-            	mCanvas.save();
-            	Path circle = new Path();
-            	circle.addCircle(lastX, lastY, lastSize/2f, Path.Direction.CCW);
-            	mCanvas.clipPath(circle, Region.Op.DIFFERENCE);
                 touch_move(x, y, (int)(p * alpha), s);
-                mCanvas.restore();
                 invalidate();
                 break;
             case MotionEvent.ACTION_UP:
