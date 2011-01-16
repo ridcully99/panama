@@ -21,6 +21,9 @@ import android.graphics.Canvas;
 import android.graphics.Color;
 import android.graphics.Paint;
 import android.graphics.Path;
+import android.graphics.Bitmap.Config;
+import android.graphics.Rect;
+import android.graphics.Region;
 import android.util.AttributeSet;
 import android.util.Log;
 import android.view.KeyEvent;
@@ -38,6 +41,8 @@ public class FingerColorsView3 extends View {
     private Path    mPath;
     private Paint   mBitmapPaint;
     private Paint	mPaint;
+    
+    private int		mPaperColor = 0xFFAAAAAA;
     
     public FingerColorsView3(Context c, AttributeSet attrs) {
         super(c, attrs);
@@ -66,13 +71,13 @@ public class FingerColorsView3 extends View {
     
     @Override
     protected void onDraw(Canvas canvas) {
-        canvas.drawColor(0xFFAAAAAA);
+        canvas.drawColor(mPaperColor);
         canvas.drawBitmap(mBitmap, 0, 0, mBitmapPaint);
     }
 
     private float lastX, lastY, lastSize, lastPressure;
-    private static final float TOUCH_TOLERANCE = 2;
-    private int alpha = 200, red = 0, green = 0, blue = 0;	/* paint color */
+    private static final float TOUCH_TOLERANCE = 1;
+    private int alpha = 255, red = 0, green = 0, blue = 0;	/* paint color */
     
     private void touch_start(float x, float y, int p, float s) {
     	mPaint.setStrokeWidth(s);
@@ -109,19 +114,32 @@ public class FingerColorsView3 extends View {
                 invalidate();
                 break;
             case MotionEvent.ACTION_MOVE:
+            	//mCanvas.clipRect(new Rect(0, 0, mBitmap.getWidth(), mBitmap.getHeight()));
             	int historySize = event.getHistorySize();
             	float pTemp = lastPressure;
             	float sTemp = lastSize;
             	float deltaP = (p - lastPressure)/historySize;
             	float deltaS = (s - lastSize)/historySize;
             	for (int i = 0; i < historySize; i++) {
+                	mCanvas.save();
+                	Path circle = new Path();
+                	circle.addCircle(lastX, lastY, lastSize/2f, Path.Direction.CCW);
+                	mCanvas.clipPath(circle, Region.Op.DIFFERENCE);
             		pTemp += deltaP;
             		sTemp += deltaS;
             		float historicalX = event.getHistoricalX(i);
             		float historicalY = event.getHistoricalY(i);
                     touch_move(historicalX, historicalY, (int)(pTemp * alpha), sTemp);
+                    lastX = historicalX;
+                    lastY = historicalY;
+                    mCanvas.restore();
             	}
+            	mCanvas.save();
+            	Path circle = new Path();
+            	circle.addCircle(lastX, lastY, lastSize/2f, Path.Direction.CCW);
+            	mCanvas.clipPath(circle, Region.Op.DIFFERENCE);
                 touch_move(x, y, (int)(p * alpha), s);
+                mCanvas.restore();
                 invalidate();
                 break;
             case MotionEvent.ACTION_UP:
@@ -140,7 +158,7 @@ public class FingerColorsView3 extends View {
     public boolean onTrackballEvent(MotionEvent event) {
     	Log.i(FingerColorsApp.LOG_TAG, "trackball-event");
     	super.onTrackballEvent(event);
-    	setColor(200, (int)(Math.random()*255), (int)(Math.random()*255), (int)(Math.random()*255));
+    	setColor(255, (int)(Math.random()*255), (int)(Math.random()*255), (int)(Math.random()*255));
     	return false;
     }
     
@@ -148,5 +166,10 @@ public class FingerColorsView3 extends View {
     public boolean onKeyDown(int keyCode, KeyEvent event) {
     	Log.i(FingerColorsApp.LOG_TAG, "keydown-event");
     	return super.onKeyDown(keyCode, event);
+    }
+    
+    public void clear() {
+    	mBitmap.eraseColor(mPaperColor);
+    	invalidate();
     }
 }

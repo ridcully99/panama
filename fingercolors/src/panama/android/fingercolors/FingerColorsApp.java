@@ -20,7 +20,8 @@ public class FingerColorsApp extends Activity {
 
 	@Override
 	public void onBackPressed() {
-		//FingerColorsView sv = (FingerColorsView) findViewById(R.id.canvas);
+		FingerColorsView3 sv = (FingerColorsView3)findViewById(R.id.canvas);
+		sv.clear();
 		//sv.getThread().setColor(255, (int)(Math.random()*255), (int)(Math.random()*255), (int)(Math.random()*255));
 	}
 	
