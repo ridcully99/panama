@@ -15,12 +15,12 @@ public class FingerColorsApp extends Activity {
 	public void onCreate(Bundle savedInstanceState) {
 		super.onCreate(savedInstanceState);
 		setContentView(R.layout.main);
-		//setContentView(new FingerColorsView3(this));
+		//setContentView(new FingerColorsView(this));
 	}
 
 	@Override
 	public void onBackPressed() {
-		FingerColorsView3 sv = (FingerColorsView3)findViewById(R.id.canvas);
+		FingerColorsView sv = (FingerColorsView)findViewById(R.id.canvas);
 		sv.clear();
 		//sv.getThread().setColor(255, (int)(Math.random()*255), (int)(Math.random()*255), (int)(Math.random()*255));
 	}

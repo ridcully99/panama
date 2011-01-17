@@ -34,7 +34,7 @@ import android.view.View;
  * @author ridcully
  *
  */
-public class FingerColorsView3 extends View {
+public class FingerColorsView extends View {
 
     private Bitmap  mBitmap;
     private Canvas  mCanvas;
@@ -44,7 +44,7 @@ public class FingerColorsView3 extends View {
     
     private int		mPaperColor = 0xFFAAAAAA;
     
-    public FingerColorsView3(Context c, AttributeSet attrs) {
+    public FingerColorsView(Context c, AttributeSet attrs) {
         super(c, attrs);
         setFocusableInTouchMode(true);
         mBitmap = Bitmap.createBitmap(320, 480, Bitmap.Config.ARGB_8888);
@@ -75,25 +75,30 @@ public class FingerColorsView3 extends View {
         canvas.drawBitmap(mBitmap, 0, 0, mBitmapPaint);
     }
 
-    private float lastX, lastY, lastSize, lastPressure;
+    private float lastX, lastY, lastSize;
     private static final float TOUCH_TOLERANCE = 1;
     private int alpha = 255, red = 0, green = 0, blue = 0;	/* paint color */
+    private int currAlpha = alpha;
+    private float currSize = 12;
     
-    private void touch_start(float x, float y, int p, float s) {
-    	mPaint.setStrokeWidth(s);
-    	mPaint.setColor(Color.argb(p, red, green, blue));
-        mCanvas.drawPoint(x, y, mPaint);
-    }
-    
-    private void touch_move(float x, float y, int p, float s) {
+    private void touch_move(float x, float y) {
+    	if (currAlpha <= 0) {
+    		return;
+    	}
+    	float dx = x - lastX;
+    	float dy = y - lastY; 
+    	double dist = Math.sqrt((double)(dx*dx+dy*dy));
+    	currAlpha -= (int)dist/2;
+    	if (currAlpha < 0) {
+    		currAlpha = 0;
+    	}
     	mCanvas.save();
     	Path circle = new Path();
-    	circle.addCircle(lastX, lastY, lastSize/2f, Path.Direction.CCW);
+    	circle.addCircle(lastX, lastY, currSize/2f, Path.Direction.CCW);
     	mCanvas.clipPath(circle, Region.Op.DIFFERENCE);
-    	mPaint.setStrokeWidth(s);
-    	mPaint.setColor(Color.argb(p, red, green, blue));
+    	mPaint.setColor(Color.argb(currAlpha, red, green, blue));
         mCanvas.drawLine(lastX, lastY, x, y, mPaint);
-        mCanvas.restore();    	
+        mCanvas.restore();
     }
     
     private void touch_up() {
@@ -115,26 +120,30 @@ public class FingerColorsView3 extends View {
         
         switch (event.getAction()) {
             case MotionEvent.ACTION_DOWN:
-                touch_start(x, y, (int)(p * alpha), s);
+            	currSize = s;
+            	if (p < 0.1) {
+            		currAlpha = (int)(alpha * 0.33);
+            	} else if (p < 0.175) {
+            		currAlpha = (int)(alpha * 0.66);
+            	} else {
+            		currAlpha = alpha;
+            	}
+                Log.i(FingerColorsApp.LOG_TAG, "Pressure: "+p+", size="+event.getSize()+", currAlpha: "+currAlpha);
+            	mPaint.setColor(Color.argb(currAlpha, red, green, blue));
+            	mPaint.setStrokeWidth(currSize);
+                mCanvas.drawPoint(x, y, mPaint);
                 invalidate();
                 break;
             case MotionEvent.ACTION_MOVE:
-            	//mCanvas.clipRect(new Rect(0, 0, mBitmap.getWidth(), mBitmap.getHeight()));
             	int historySize = event.getHistorySize();
-            	float pTemp = lastPressure;
-            	float sTemp = lastSize;
-            	float deltaP = (p - lastPressure)/historySize;
-            	float deltaS = (s - lastSize)/historySize;
             	for (int i = 0; i < historySize; i++) {
-            		pTemp += deltaP;
-            		sTemp += deltaS;
             		float historicalX = event.getHistoricalX(i);
             		float historicalY = event.getHistoricalY(i);
-                    touch_move(historicalX, historicalY, (int)(pTemp * alpha), sTemp);
+                    touch_move(historicalX, historicalY);
                     lastX = historicalX;
                     lastY = historicalY;
             	}
-                touch_move(x, y, (int)(p * alpha), s);
+                touch_move(x, y);
                 invalidate();
                 break;
             case MotionEvent.ACTION_UP:
@@ -144,7 +153,6 @@ public class FingerColorsView3 extends View {
         }
         lastX = x;
         lastY = y;
-        lastPressure = p;
         lastSize = s;
         return true;
     }

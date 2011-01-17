@@ -19,6 +19,9 @@ Inzwischen auf Basis von TouchPaint ... Alpha abhängig von Pressure und Liniens
 Fullscreen-App damit beim Malen nicht versehentlich der Infobereich runtergezogen wird.
 
 
+2011-01-16
+Versuch: Alpha aus Druck bei Touchdown nehmen und dann für den Rest der Linie beibehalten; die Linie als Path zeichnen.
+
 Ideen (gereiht nach Priorität):
 -- Multitouch Unterstützung
 -- Menü --> Palette mit Farben, Pipette und verschiedenen Pinselgrößen;
