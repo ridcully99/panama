@@ -22,6 +22,14 @@ Fullscreen-App damit beim Malen nicht versehentlich der Infobereich runtergezoge
 2011-01-16
 Versuch: Alpha aus Druck bei Touchdown nehmen und dann für den Rest der Linie beibehalten; die Linie als Path zeichnen.
 
+
+2011-01-20
+Verlaufszeug verworfen, normales Linienzeichnen mit Path und invalidate nur der dirty regions ... recht schnell
+
+  Idee --> "Fat Touch Events, z.B. Daumen" erkennen und für Radierfunktion verwenden (i.e. temporär Papierfarbe und alpha=255)
+  
+
+
 Ideen (gereiht nach Priorität):
 -- Multitouch Unterstützung
 -- Menü --> Palette mit Farben, Pipette und verschiedenen Pinselgrößen;
@@ -43,3 +51,7 @@ Idee ... Effekt verwenden um Ecken zu vermeiden http://developer.android.com/ref
 Idee ... Wenn neues Bild begonnen wird, altes automatisch speichern (in App's Filesystem).
 Idee ... Radiergummi
 Idee ... Menü --> Palette mit Farb- und Pinselauswahl
+
+
+
+TODO: API-Level 9 (Android 2.3) ---> InputDevice#getMotionRange() abfragen der Bereiche für z.B. Pressure oder Size --> genaueres Mapping auf Alpha möglich

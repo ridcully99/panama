@@ -17,12 +17,13 @@ package panama.android.fingercolors;
 
 import android.content.Context;
 import android.graphics.Bitmap;
-import android.graphics.BlurMaskFilter;
 import android.graphics.Canvas;
-import android.graphics.MaskFilter;
+import android.graphics.Color;
 import android.graphics.Paint;
 import android.graphics.Path;
+import android.graphics.Bitmap.Config;
 import android.graphics.Rect;
+import android.graphics.Region;
 import android.util.AttributeSet;
 import android.util.Log;
 import android.view.KeyEvent;
@@ -33,35 +34,24 @@ import android.view.View;
  * @author ridcully
  *
  */
-public class FingerColorsView extends View {
+public class CopyOfFingerColorsView_withFadeout extends View {
 
-	private final static String LOG_TAG = "FingerColors";
-	
     private Bitmap  mBitmap;
     private Canvas  mCanvas;
     private Path    mPath;
     private Paint   mBitmapPaint;
     private Paint	mPaint;
     
-    //private MaskFilter mBlur;
-    
     private int		mPaperColor = 0xFFAAAAAA;
     
-    private float lastX, lastY, lastSize;
-    private static final float TOUCH_TOLERANCE = 1;
-    private int alpha = 255, red = 0, green = 0, blue = 0;	/* paint color */
-    private float size = 12;
-    private Rect mDirtyRegion = new Rect(0,0,0,0);
-    
-    public FingerColorsView(Context c, AttributeSet attrs) {
+    public CopyOfFingerColorsView_withFadeout(Context c, AttributeSet attrs) {
         super(c, attrs);
+        setFocusableInTouchMode(true);
         mBitmap = Bitmap.createBitmap(320, 480, Bitmap.Config.ARGB_8888);
         mCanvas = new Canvas(mBitmap);
         mPath = new Path();
         mBitmapPaint = new Paint(Paint.DITHER_FLAG);
 
-        //mBlur = new BlurMaskFilter(8, BlurMaskFilter.Blur.SOLID);
-        
         mPaint = new Paint();
         mPaint.setAntiAlias(true);
         mPaint.setDither(true);
@@ -69,10 +59,7 @@ public class FingerColorsView extends View {
         mPaint.setStyle(Paint.Style.STROKE);
         mPaint.setStrokeJoin(Paint.Join.ROUND);
         mPaint.setStrokeCap(Paint.Cap.ROUND);
-        mPaint.setStrokeWidth(size);        
-        //mPaint.setMaskFilter(mBlur);
-
-        setFocusableInTouchMode(true);
+        mPaint.setStrokeWidth(24);        
     }
 
     @Override
@@ -86,66 +73,35 @@ public class FingerColorsView extends View {
     protected void onDraw(Canvas canvas) {
         canvas.drawColor(mPaperColor);
         canvas.drawBitmap(mBitmap, 0, 0, mBitmapPaint);
-        canvas.drawPath(mPath, mPaint);
     }
 
-    @Override
-    public boolean onTouchEvent(MotionEvent event) {
-        float x = event.getX();
-        float y = event.getY();
-        
-        switch (event.getAction()) {
-        	case MotionEvent.ACTION_DOWN:
-        		mPath.reset();
-        		mPath.moveTo(x, y);
-        		mPath.lineTo(x+0.5f, y+0.5f);
-        		mDirtyRegion.set((int)x, (int)y, (int)x, (int)y);
-            	adjustDirtyRegion(x, y);
-                invalidate(mDirtyRegion);
-                break;
-            case MotionEvent.ACTION_MOVE:
-            	int historySize = event.getHistorySize();
-            	for (int i = 0; i < historySize; i++) {
-            		float historicalX = event.getHistoricalX(i);
-            		float historicalY = event.getHistoricalY(i);
-            		mPath.lineTo(historicalX, historicalY);
-            		adjustDirtyRegion(historicalX, historicalY);
-            	}
-            	mPath.lineTo(x, y);
-            	adjustDirtyRegion(x, y);
-                invalidate(mDirtyRegion);
-                break;
-            case MotionEvent.ACTION_UP:
-            	mCanvas.drawPath(mPath, mPaint);
-            	mPath.reset();
-                invalidate(mDirtyRegion);
-                break;
-        }
-        lastX = x;
-        lastY = y;
-        return true;
-    }
+    private float lastX, lastY, lastSize;
+    private static final float TOUCH_TOLERANCE = 1;
+    private int alpha = 255, red = 0, green = 0, blue = 0;	/* paint color */
+    private int currAlpha = alpha;
+    private float currSize = 12;
     
-    @Override
-    public boolean onTrackballEvent(MotionEvent event) {
-    	Log.i(FingerColorsApp.LOG_TAG, "trackball-event");
-    	super.onTrackballEvent(event);
-    	setColor((int)(Math.random()*255), (int)(Math.random()*255), (int)(Math.random()*255), (int)(Math.random()*255));
-    	return false;
-    }
-    
-    @Override
-    public boolean onKeyDown(int keyCode, KeyEvent event) {
-    	Log.i(FingerColorsApp.LOG_TAG, "keydown-event");
-    	if (keyCode == KeyEvent.KEYCODE_BACK) {
-    		clear();
+    private void touch_move(float x, float y) {
+    	if (currAlpha <= 0) {
+    		return;
     	}
-    	return true;
+    	float dx = x - lastX;
+    	float dy = y - lastY; 
+    	double dist = Math.sqrt((double)(dx*dx+dy*dy));
+    	currAlpha -= (int)dist/2;
+    	if (currAlpha < 0) {
+    		currAlpha = 0;
+    	}
+    	mCanvas.save();
+    	Path circle = new Path();
+    	circle.addCircle(lastX, lastY, currSize/2f, Path.Direction.CCW);
+    	mCanvas.clipPath(circle, Region.Op.DIFFERENCE);
+    	mPaint.setColor(Color.argb(currAlpha, red, green, blue));
+        mCanvas.drawLine(lastX, lastY, x, y, mPaint);
+        mCanvas.restore();
     }
     
-    public void clear() {
-    	mBitmap.eraseColor(mPaperColor);
-    	invalidate();
+    private void touch_up() {
     }
     
     private void setColor(int a, int r, int g, int b) {
@@ -153,17 +109,71 @@ public class FingerColorsView extends View {
     	red = r;
     	green = g;
     	blue = b;
-    	mPaint.setARGB(a, r, g, b);
     }
     
-    private void adjustDirtyRegion(float fx, float fy) {
-    	int x = (int)fx;
-    	int y = (int)fy;
-    	int strokeWidthHalf = (int)(size/2f)+2;	// Hälfte der Strichbreite + 2 zur Sicherheit wg. Antialias ... bei Blur usw. entsprechend erweitern
-    	mDirtyRegion.left = Math.min(mDirtyRegion.left, x-strokeWidthHalf);
-    	mDirtyRegion.right = Math.max(mDirtyRegion.right, x+strokeWidthHalf);
-    	mDirtyRegion.top = Math.min(mDirtyRegion.top, y-strokeWidthHalf);
-    	mDirtyRegion.bottom = Math.max(mDirtyRegion.bottom, y+strokeWidthHalf);
-    	Log.i(LOG_TAG, mDirtyRegion.toString());
+    @Override
+    public boolean onTouchEvent(MotionEvent event) {
+        float x = event.getX();
+        float y = event.getY();
+        float p = event.getPressure();
+        float s = getWidth()*event.getSize();
+        
+        switch (event.getAction()) {
+        	case MotionEvent.ACTION_DOWN:
+            	currSize = s;
+            	// empirisches Mapping von p-->alpha // ab API-Level 9 (Android 2.3) ---> InputDevice#getMotionRange() abfragen der Bereiche für z.B. Pressure oder Size --> genaueres Mapping auf Alpha möglich
+            	if (p < 0.1) {
+            		currAlpha = (int)(alpha * 0.33);
+            	} else if (p < 0.175) {
+            		currAlpha = (int)(alpha * 0.66);
+            	} else {
+            		currAlpha = alpha;
+            	}
+                Log.i(FingerColorsApp.LOG_TAG, "Pressure: "+p+", size="+event.getSize()+", currAlpha: "+currAlpha);
+            	mPaint.setColor(Color.argb(currAlpha, red, green, blue));
+            	mPaint.setStrokeWidth(currSize);
+                mCanvas.drawPoint(x, y, mPaint);
+                invalidate();
+                break;
+            case MotionEvent.ACTION_MOVE:
+            	int historySize = event.getHistorySize();
+            	for (int i = 0; i < historySize; i++) {
+            		float historicalX = event.getHistoricalX(i);
+            		float historicalY = event.getHistoricalY(i);
+                    touch_move(historicalX, historicalY);
+                    lastX = historicalX;
+                    lastY = historicalY;
+            	}
+                touch_move(x, y);
+                invalidate();
+                break;
+            case MotionEvent.ACTION_UP:
+                touch_up();
+                invalidate();
+                break;
+        }
+        lastX = x;
+        lastY = y;
+        lastSize = s;
+        return true;
+    }
+    
+    @Override
+    public boolean onTrackballEvent(MotionEvent event) {
+    	Log.i(FingerColorsApp.LOG_TAG, "trackball-event");
+    	super.onTrackballEvent(event);
+    	setColor(255, (int)(Math.random()*255), (int)(Math.random()*255), (int)(Math.random()*255));
+    	return false;
+    }
+    
+    @Override
+    public boolean onKeyDown(int keyCode, KeyEvent event) {
+    	Log.i(FingerColorsApp.LOG_TAG, "keydown-event");
+    	return super.onKeyDown(keyCode, event);
+    }
+    
+    public void clear() {
+    	mBitmap.eraseColor(mPaperColor);
+    	invalidate();
     }
 }
