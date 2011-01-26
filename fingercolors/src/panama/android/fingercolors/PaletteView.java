@@ -19,9 +19,12 @@ import android.content.Context;
 import android.graphics.Bitmap;
 import android.graphics.Canvas;
 import android.graphics.Color;
+import android.graphics.LinearGradient;
 import android.graphics.Paint;
 import android.graphics.Paint.Style;
 import android.graphics.Path;
+import android.graphics.Shader;
+import android.graphics.Shader.TileMode;
 import android.util.AttributeSet;
 import android.util.Log;
 import android.view.MotionEvent;
@@ -33,12 +36,10 @@ import android.view.View;
  */
 public class PaletteView extends View {
 
-	private final static int[] COLOR_GRADES = new int[] {
-		0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 
-		0x33, 0x66, 0x99, 0xCC, 
-		0xFF, 0xFF, 0xFF, 0xFF, 0xFF, 0xFF, 0xFF, 0xFF, 0xFF, 0xFF, 0xFF,
-		0xCC, 0x99, 0x66, 0x33
-	};
+	private final static int GRAY_BAND_HEIGHT = 16;
+	private final static int COLOR_BAND_HEIGHT = 128;
+	private final static int[] COLORS = new int[] { 0xFF0000FF, 0xFF00FFFF, 0xFF00FF00, 0xFFFFFF00, 0xFFFF0000, 0xFFFF00FF, 0xFF0000FF};
+	
 	
     private Bitmap  mBitmap;
     private Canvas  mCanvas;
@@ -67,18 +68,18 @@ public class PaletteView extends View {
         mBitmap = Bitmap.createBitmap(w, h, Bitmap.Config.ARGB_8888);
         mCanvas = new Canvas(mBitmap);
         mPaint.setStyle(Style.FILL);
-        int boxWidth = w / COLOR_GRADES.length;
-        int boxHeight = 2;
-        for (int light = 255, top = 0; light>= -255; light -= 8, top += boxHeight) {
-	        for (int i=0, left = 0; i < COLOR_GRADES.length; i++, left += boxWidth) {
-	        	int r = Math.max(0, Math.min(255, COLOR_GRADES[i]+light));
-	        	int g = Math.max(0, Math.min(255, COLOR_GRADES[(i+10)%COLOR_GRADES.length]+light));
-	        	int b = Math.max(0, Math.min(255, COLOR_GRADES[(i+20)%COLOR_GRADES.length]+light));
-	        	Log.i(Main.LOG_TAG, r+","+g+","+b);
-	        	mPaint.setARGB(255, r, g, b);
-	            mCanvas.drawRect(left, top, left+boxWidth, top+boxHeight, mPaint);
-	        }
-        }
+        // horizontal gray band
+        mPaint.setShader(new LinearGradient(0, 0, w-1, 0, 0xFFFFFFFF, 0xFF000000, TileMode.CLAMP));
+        mCanvas.drawRect(0, 0, w, GRAY_BAND_HEIGHT, mPaint);
+        // horizontal rainbow gradient
+        mPaint.setShader(new LinearGradient(0, 0, w-1, 0, COLORS, null, TileMode.CLAMP));
+        mCanvas.drawRect(0, GRAY_BAND_HEIGHT, w, h, mPaint);
+        // vertical white to invisible gradient to half
+        mPaint.setShader(new LinearGradient(0, GRAY_BAND_HEIGHT, 0, GRAY_BAND_HEIGHT+COLOR_BAND_HEIGHT/2, 0xFFFFFFFF, 0x00FFFFFF, TileMode.CLAMP));
+        mCanvas.drawRect(0, GRAY_BAND_HEIGHT, w, GRAY_BAND_HEIGHT+COLOR_BAND_HEIGHT/2, mPaint);
+        // vertical invisible to black gradient form half
+        mPaint.setShader(new LinearGradient(0, GRAY_BAND_HEIGHT+COLOR_BAND_HEIGHT/2, 0, h, 0x00000000, 0xFF000000, TileMode.CLAMP));
+        mCanvas.drawRect(0, GRAY_BAND_HEIGHT+COLOR_BAND_HEIGHT/2, w, h, mPaint);
     }
     
     @Override
@@ -91,17 +92,17 @@ public class PaletteView extends View {
     protected void onMeasure(int widthMeasureSpec, int heightMeasureSpec) {
         int parentWidth = MeasureSpec.getSize(widthMeasureSpec);
         int parentHeight = MeasureSpec.getSize(heightMeasureSpec);
-    	setMeasuredDimension(parentWidth, 128);
+    	setMeasuredDimension(parentWidth, GRAY_BAND_HEIGHT+COLOR_BAND_HEIGHT);
     }
     
     @Override
     public boolean onTouchEvent(MotionEvent event) {
         int x = (int)event.getX();
         int y = (int)event.getY();
-        if (x < 0 || x >= mBitmap.getWidth() || y < 0 || y >= mBitmap.getHeight()) {
-        	return false;
-        }
-        
+        x = Math.max(0, x);
+        x = Math.min(x, mBitmap.getWidth()-1);
+        y = Math.max(0, y);
+        y = Math.min(y, mBitmap.getHeight()-1);
         switch (event.getAction()) {
         	case MotionEvent.ACTION_DOWN:
             case MotionEvent.ACTION_MOVE:
@@ -117,4 +118,5 @@ public class PaletteView extends View {
         }
         return true;
     }
+
 }

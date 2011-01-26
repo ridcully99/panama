@@ -41,6 +41,7 @@ public class ToolsView extends View {
     private Path    mPath;
     private Paint   mBitmapPaint;
     private Paint	mPaint;
+    private Paint	mOutlinePaint;
     
     private int 	mMaxBrushSize = 1;
     
@@ -54,6 +55,11 @@ public class ToolsView extends View {
         
         mPaint = new Paint();
         mPaint.setDither(true);
+        mPaint.setAntiAlias(true);
+        mOutlinePaint = new Paint(mPaint);
+        mOutlinePaint.setStyle(Style.STROKE);
+        mOutlinePaint.setColor(Color.DKGRAY);
+        mOutlinePaint.setStrokeWidth(0);	// hairline
         setFocusableInTouchMode(true);
 	}
 	
@@ -75,7 +81,7 @@ public class ToolsView extends View {
     protected void onMeasure(int widthMeasureSpec, int heightMeasureSpec) {
         int parentWidth = MeasureSpec.getSize(widthMeasureSpec);
         int parentHeight = MeasureSpec.getSize(heightMeasureSpec);
-    	mMaxBrushSize = parentHeight/8;
+    	mMaxBrushSize = parentWidth/8;
     	setMeasuredDimension(parentWidth, mMaxBrushSize+2*PADDING);
     }
     
@@ -109,6 +115,7 @@ public class ToolsView extends View {
     	mPaint.setColor(color);
     	for (float f = 1, x = PADDING+mMaxBrushSize/2; f >= 0.25; f -= 0.25, x += mMaxBrushSize + PADDING) {
     		mCanvas.drawCircle(x, PADDING+mMaxBrushSize/2, (mMaxBrushSize/2)*f, mPaint);
+    		mCanvas.drawCircle(x, PADDING+mMaxBrushSize/2, (mMaxBrushSize/2)*f, mOutlinePaint);
     	}
     	invalidate();
     }
