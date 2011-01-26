@@ -33,9 +33,7 @@ import android.view.View;
  * @author ridcully
  *
  */
-public class FingerColorsView extends View {
-
-	private final static String LOG_TAG = "FingerColors";
+public class CanvasView extends View {
 	
     private Bitmap  mBitmap;
     private Canvas  mCanvas;
@@ -53,7 +51,7 @@ public class FingerColorsView extends View {
     private float size = 12;
     private Rect mDirtyRegion = new Rect(0,0,0,0);
     
-    public FingerColorsView(Context c, AttributeSet attrs) {
+    public CanvasView(Context c, AttributeSet attrs) {
         super(c, attrs);
         mBitmap = Bitmap.createBitmap(320, 480, Bitmap.Config.ARGB_8888);
         mCanvas = new Canvas(mBitmap);
@@ -65,7 +63,7 @@ public class FingerColorsView extends View {
         mPaint = new Paint();
         mPaint.setAntiAlias(true);
         mPaint.setDither(true);
-        mPaint.setColor(0xFFFF0000);
+        mPaint.setColor(0xFF000000);
         mPaint.setStyle(Paint.Style.STROKE);
         mPaint.setStrokeJoin(Paint.Join.ROUND);
         mPaint.setStrokeCap(Paint.Cap.ROUND);
@@ -126,34 +124,26 @@ public class FingerColorsView extends View {
         return true;
     }
     
-    @Override
-    public boolean onTrackballEvent(MotionEvent event) {
-    	Log.i(FingerColorsApp.LOG_TAG, "trackball-event");
-    	super.onTrackballEvent(event);
-    	setColor((int)(Math.random()*255), (int)(Math.random()*255), (int)(Math.random()*255), (int)(Math.random()*255));
-    	return false;
-    }
-    
-    @Override
-    public boolean onKeyDown(int keyCode, KeyEvent event) {
-    	Log.i(FingerColorsApp.LOG_TAG, "keydown-event");
-    	if (keyCode == KeyEvent.KEYCODE_BACK) {
-    		clear();
-    	}
-    	return true;
-    }
-    
     public void clear() {
     	mBitmap.eraseColor(mPaperColor);
     	invalidate();
     }
     
-    private void setColor(int a, int r, int g, int b) {
+    public void setColor(int a, int r, int g, int b) {
     	alpha = a;
     	red = r;
     	green = g;
     	blue = b;
     	mPaint.setARGB(a, r, g, b);
+    }
+    
+    public void setColor(int color) {
+    	mPaint.setColor(color);
+    }
+    
+    public void setBrushSize(int size) {
+    	this.size = size;
+    	mPaint.setStrokeWidth(size);
     }
     
     private void adjustDirtyRegion(float fx, float fy) {
@@ -164,6 +154,6 @@ public class FingerColorsView extends View {
     	mDirtyRegion.right = Math.max(mDirtyRegion.right, x+strokeWidthHalf);
     	mDirtyRegion.top = Math.min(mDirtyRegion.top, y-strokeWidthHalf);
     	mDirtyRegion.bottom = Math.max(mDirtyRegion.bottom, y+strokeWidthHalf);
-    	Log.i(LOG_TAG, mDirtyRegion.toString());
+    	Log.i(Main.LOG_TAG, mDirtyRegion.toString());
     }
 }
