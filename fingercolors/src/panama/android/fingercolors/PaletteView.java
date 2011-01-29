@@ -103,17 +103,16 @@ public class PaletteView extends View {
         x = Math.min(x, mBitmap.getWidth()-1);
         y = Math.max(0, y);
         y = Math.min(y, mBitmap.getHeight()-1);
+    	CanvasView canvas = (CanvasView)((Main)this.getContext()).findViewById(R.id.canvas);
         switch (event.getAction()) {
         	case MotionEvent.ACTION_DOWN:
             case MotionEvent.ACTION_MOVE:
             	mSelectedColor = mBitmap.getPixel(x, y);
-                //invalidate();
-            	ToolsView tools = (ToolsView)((Main)this.getContext()).findViewById(R.id.tools);
-            	tools.renderBrushes(mSelectedColor);
+            	canvas.setColor(mSelectedColor);
                 break;
             case MotionEvent.ACTION_UP:
-            	CanvasView canvas = (CanvasView)((Main)this.getContext()).findViewById(R.id.canvas);
             	canvas.setColor(mSelectedColor);
+            	setVisibility(INVISIBLE);
                 break;
         }
         return true;
