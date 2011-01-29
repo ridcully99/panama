@@ -24,9 +24,11 @@ import android.graphics.MaskFilter;
 import android.graphics.Paint;
 import android.graphics.Path;
 import android.graphics.Rect;
+import android.text.style.BackgroundColorSpan;
 import android.util.AttributeSet;
 import android.util.Log;
 import android.view.Gravity;
+import android.view.KeyEvent;
 import android.view.LayoutInflater;
 import android.view.MotionEvent;
 import android.view.View;
@@ -39,7 +41,8 @@ import android.widget.Toast;
  */
 public class CanvasView extends View {
 	
-	private final static int BLUR_FACTOR = 8;	/* size/BLUR_FACTOR */
+	private final static int BLUR_FACTOR = 16;	/* size/BLUR_FACTOR */
+	private final static int UNDO_BUFFERS = 10;
 	
     private Bitmap  	mBitmap;
     private Canvas  	mCanvas;
@@ -57,12 +60,15 @@ public class CanvasView extends View {
     private int 		mSize = 16;
     private Rect 		mDirtyRegion = new Rect(0,0,0,0);
     
+    private Bitmap[]	mUndoBitmaps = new Bitmap[UNDO_BUFFERS];
+    private int			mStep = 0, mOldestUndo = 0;
+    
     public CanvasView(Context context, AttributeSet attrs) {
         super(context, attrs);
         mBitmap = Bitmap.createBitmap(320, 480, Bitmap.Config.ARGB_8888);
         mCanvas = new Canvas(mBitmap);
         mPath = new Path();
-        mBitmapPaint = new Paint(Paint.DITHER_FLAG);
+        mBitmapPaint = new Paint();
 
         mPaint = new Paint(Paint.DITHER_FLAG);
         mPaint.setAntiAlias(true);
@@ -101,6 +107,27 @@ public class CanvasView extends View {
         canvas.drawPath(mPath, mPaint);
     }
 
+	@Override
+	public boolean onKeyDown(int keyCode, KeyEvent event) {
+		switch (keyCode) {
+			case KeyEvent.KEYCODE_BACK:
+				if (mStep > mOldestUndo) {
+					mStep--;
+					mCanvas.drawColor(mPaperColor);
+					mCanvas.drawBitmap(mUndoBitmaps[mStep%UNDO_BUFFERS], 0, 0, mBitmapPaint);
+					//mCanvas.drawLine(0,0, 100, 100*(mStep%UNDO_BUFFERS), mBitmapPaint);
+					invalidate();
+				}
+				return true;
+			case KeyEvent.KEYCODE_SEARCH:
+				remember();
+				clear();
+				return true;
+		}
+		return false;
+	}
+    
+    
     @Override
     public boolean onTouchEvent(MotionEvent event) {
         float x = event.getX();
@@ -130,6 +157,7 @@ public class CanvasView extends View {
                 invalidate(mDirtyRegion);
                 break;
             case MotionEvent.ACTION_UP:
+            	remember();
             	mCanvas.drawPath(mPath, mPaint);
             	mPath.reset();
                 invalidate(mDirtyRegion);
@@ -223,7 +251,7 @@ public class CanvasView extends View {
     		mPaint.setMaskFilter(mBlur);
     	}
     }
-    
+
     private void adjustDirtyRegion(float fx, float fy) {
     	int x = (int)fx;
     	int y = (int)fy;
@@ -233,5 +261,16 @@ public class CanvasView extends View {
     	mDirtyRegion.top = Math.min(mDirtyRegion.top, y-strokeWidthHalf);
     	mDirtyRegion.bottom = Math.max(mDirtyRegion.bottom, y+strokeWidthHalf);
     	Log.i(Main.LOG_TAG, mDirtyRegion.toString());
+    }
+
+    /**
+     * remember for undo
+     */
+    private void remember() {
+    	mUndoBitmaps[mStep % UNDO_BUFFERS] = Bitmap.createBitmap(mBitmap);
+    	mStep++;
+    	if (mOldestUndo+UNDO_BUFFERS < mStep) {
+    		mOldestUndo++;
+    	}
     }
 }

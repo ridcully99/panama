@@ -78,9 +78,6 @@ public class Main extends Activity {
 			case KeyEvent.KEYCODE_VOLUME_UP:
 			case KeyEvent.KEYCODE_VOLUME_DOWN:
 				return true;	// avoid changing any sound volumes
-			case KeyEvent.KEYCODE_BACK:
-				mCanvas.clear();
-				return true;
 		}
 		return false;
 	}
