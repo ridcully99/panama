@@ -64,7 +64,7 @@ public class BrushView extends View {
 		//int luminance = (int)(0.3f*Color.red(color) + 0.59f*Color.green(color) + 0.11f*Color.blue(color));	// brightness
 		//mBackgroundPaint.setColor(luminance < 128 ? 0xFFFFFFFF : 0xFF000000);
 		//mBackgroundPaint.setAlpha(Color.alpha(color));
-		mBackgroundPaint.setShader(new LinearGradient(0, 0, mBackgroundRect.right, 0, 0xFF333333, 0xFFCCCCCC, TileMode.CLAMP));
+		mBackgroundPaint.setShader(new LinearGradient(0, 0, mBackgroundRect.right, 0, 0xFF666666, 0xFFFFFFFF, TileMode.CLAMP));
 		canvas.drawRoundRect(mBackgroundRect, PADDING, PADDING, mBackgroundPaint);
 		canvas.drawLine(PADDING+size/2, mBackgroundRect.centerY(), mBackgroundRect.right-size/2-PADDING, mBackgroundRect.centerY(), mBrushPaint);
 	}
