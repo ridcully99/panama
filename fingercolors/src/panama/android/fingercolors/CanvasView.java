@@ -15,6 +15,8 @@
  */
 package panama.android.fingercolors;
 
+import java.util.Date;
+
 import android.content.Context;
 import android.graphics.Bitmap;
 import android.graphics.BlurMaskFilter;
@@ -24,7 +26,6 @@ import android.graphics.MaskFilter;
 import android.graphics.Paint;
 import android.graphics.Path;
 import android.graphics.Rect;
-import android.text.style.BackgroundColorSpan;
 import android.util.AttributeSet;
 import android.util.Log;
 import android.view.Gravity;
@@ -59,9 +60,10 @@ public class CanvasView extends View {
     private int			mAlpha = 255;
     private int 		mSize = 16;
     private Rect 		mDirtyRegion = new Rect(0,0,0,0);
+    private int			mLastX = -1, mLastY = -1;
     
     private Bitmap[]	mUndoBitmaps = new Bitmap[UNDO_BUFFERS];
-    private int			mStep = 0, mOldestUndo = 0;
+    private int			mUndoNext = 0, mUndoOldest = 0;
     
     public CanvasView(Context context, AttributeSet attrs) {
         super(context, attrs);
@@ -102,6 +104,7 @@ public class CanvasView extends View {
     
     @Override
     protected void onDraw(Canvas canvas) {
+    	Log.i(Main.LOG_TAG, "onDraw "+new Date().getTime());
         canvas.drawColor(mPaperColor);
         canvas.drawBitmap(mBitmap, 0, 0, mBitmapPaint);
         canvas.drawPath(mPath, mPaint);
@@ -111,17 +114,12 @@ public class CanvasView extends View {
 	public boolean onKeyDown(int keyCode, KeyEvent event) {
 		switch (keyCode) {
 			case KeyEvent.KEYCODE_BACK:
-				if (mStep > mOldestUndo) {
-					mStep--;
+				if (mUndoNext > mUndoOldest) {
+					mUndoNext--;
 					mCanvas.drawColor(mPaperColor);
-					mCanvas.drawBitmap(mUndoBitmaps[mStep%UNDO_BUFFERS], 0, 0, mBitmapPaint);
-					//mCanvas.drawLine(0,0, 100, 100*(mStep%UNDO_BUFFERS), mBitmapPaint);
+					mCanvas.drawBitmap(mUndoBitmaps[mUndoNext%UNDO_BUFFERS], 0, 0, mBitmapPaint);
 					invalidate();
 				}
-				return true;
-			case KeyEvent.KEYCODE_SEARCH:
-				remember();
-				clear();
 				return true;
 		}
 		return false;
@@ -132,41 +130,62 @@ public class CanvasView extends View {
     public boolean onTouchEvent(MotionEvent event) {
         float x = event.getX();
         float y = event.getY();
+        int ix = (int)x;
+        int iy = (int)y;
         
         mBrushToast.cancel();
-        
+
         switch (event.getAction()) {
         	case MotionEvent.ACTION_DOWN:
         		mPath.reset();
         		mPath.moveTo(x, y);
         		mPath.lineTo(x+0.5f, y+0.5f);
-        		mDirtyRegion.set((int)x, (int)y, (int)x, (int)y);
-            	adjustDirtyRegion(x, y);
+        		mDirtyRegion.set(ix, iy, ix, iy);
+            	adjustDirtyRegion(ix, iy);
                 invalidate(mDirtyRegion);
+                mLastX = (int)x;
+                mLastY = (int)y;
                 break;
             case MotionEvent.ACTION_MOVE:
+            	boolean redraw = false;	// only invalidate if actually something gets drawn
             	int historySize = event.getHistorySize();
             	for (int i = 0; i < historySize; i++) {
             		float historicalX = event.getHistoricalX(i);
             		float historicalY = event.getHistoricalY(i);
-            		mPath.lineTo(historicalX, historicalY);
-            		adjustDirtyRegion(historicalX, historicalY);
+            		int ihx = (int)historicalX;
+            		int ihy = (int)historicalY;
+                    if (ihx != mLastX || ihy != mLastY) {
+                    	mPath.lineTo(historicalX, historicalY);
+                    	adjustDirtyRegion(ihx, ihy);
+                    	redraw = true;
+                    	mLastX = ihx;
+                    	mLastY = ihy;
+                    }
             	}
-            	mPath.lineTo(x, y);
-            	adjustDirtyRegion(x, y);
-                invalidate(mDirtyRegion);
+                if (ix != mLastX || iy != mLastY) {
+                	mPath.lineTo(x, y);
+                	adjustDirtyRegion(ix, iy);
+                	redraw = true;
+                    mLastX = (int)x;
+                    mLastY = (int)y;
+                }
+                if (redraw) {
+                	invalidate(mDirtyRegion);
+                }
                 break;
             case MotionEvent.ACTION_UP:
             	remember();
             	mCanvas.drawPath(mPath, mPaint);
             	mPath.reset();
                 invalidate(mDirtyRegion);
+                mLastX = mLastY = -1;
                 break;
         }
         return true;
     }
     
     public void clear() {
+    	remember();
     	mBitmap.eraseColor(mPaperColor);
     	invalidate();
     }
@@ -252,9 +271,7 @@ public class CanvasView extends View {
     	}
     }
 
-    private void adjustDirtyRegion(float fx, float fy) {
-    	int x = (int)fx;
-    	int y = (int)fy;
+    private void adjustDirtyRegion(int x, int y) {
     	int strokeWidthHalf = (int)(mSize/2f)+2+(mSize/BLUR_FACTOR)/2+2;	// Hälfte der Strichbreite + 2 zur Sicherheit wg. Antialias ... bei Blur usw. entsprechend erweitern
     	mDirtyRegion.left = Math.min(mDirtyRegion.left, x-strokeWidthHalf);
     	mDirtyRegion.right = Math.max(mDirtyRegion.right, x+strokeWidthHalf);
@@ -267,10 +284,10 @@ public class CanvasView extends View {
      * remember for undo
      */
     private void remember() {
-    	mUndoBitmaps[mStep % UNDO_BUFFERS] = Bitmap.createBitmap(mBitmap);
-    	mStep++;
-    	if (mOldestUndo+UNDO_BUFFERS < mStep) {
-    		mOldestUndo++;
+    	mUndoBitmaps[mUndoNext % UNDO_BUFFERS] = Bitmap.createBitmap(mBitmap);
+    	mUndoNext++;
+    	if (mUndoOldest+UNDO_BUFFERS < mUndoNext) {
+    		mUndoOldest++;
     	}
     }
 }

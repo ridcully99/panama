@@ -1,17 +1,14 @@
 <?xml version="1.0" encoding="utf-8"?>
-<RelativeLayout android:layout_width="fill_parent"
-    android:layout_height="fill_parent" xmlns:android="http://schemas.android.com/apk/res/android">
+<RelativeLayout 
+	xmlns:android="http://schemas.android.com/apk/res/android"
+	android:layout_width="fill_parent"
+    android:layout_height="fill_parent"
+    android:layout_weight="1">
  	<panama.android.fingercolors.CanvasView 
  		android:id="@+id/canvas" 
  		android:layout_width="fill_parent" 
  		android:layout_height="fill_parent" 
  		android:focusableInTouchMode="true" />
-	<panama.android.fingercolors.ToolsView 
-		android:id="@+id/tools"
-		android:layout_width="fill_parent"
-		android:layout_alignTop="@id/canvas"
-		android:layout_height="wrap_content" 
-		android:visibility="invisible"/>
 	<panama.android.fingercolors.PaletteView 
 		android:id="@+id/palette"
 		android:layout_width="fill_parent"

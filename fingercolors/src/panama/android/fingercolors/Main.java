@@ -4,6 +4,9 @@ import android.app.Activity;
 import android.os.Bundle;
 import android.util.Log;
 import android.view.KeyEvent;
+import android.view.Menu;
+import android.view.MenuInflater;
+import android.view.MenuItem;
 import android.view.MotionEvent;
 import android.view.View;
 
@@ -36,6 +39,23 @@ public class Main extends Activity {
 	}
 	
 	@Override
+	public boolean onCreateOptionsMenu(Menu menu) {
+	    MenuInflater inflater = getMenuInflater();
+	    inflater.inflate(R.menu.main, menu);
+	    return true;
+	}
+	
+	@Override
+	public boolean onOptionsItemSelected(MenuItem item) {
+		switch(item.getItemId()) {
+			case R.id.miNew:
+				mCanvas.clear();
+				return true;
+		}
+		return false;
+	}
+	
+	@Override
 	public boolean onTrackballEvent(MotionEvent event) {
 		Log.i(LOG_TAG, "Main on Trackball Event: x="+event.getX()+", "+event.getY());
 		float x = event.getX();
@@ -65,7 +85,13 @@ public class Main extends Activity {
 				mCanvas.decreaseBrushSize();
 				return true;
 			case KeyEvent.KEYCODE_DPAD_CENTER:
-				mPalette.setVisibility(mPalette.getVisibility() == View.VISIBLE ? View.INVISIBLE : View.VISIBLE);
+				if (mPalette.getVisibility() == View.VISIBLE) {
+					mPalette.setVisibility(View.INVISIBLE);
+				}else {
+					mPalette.requestFocus();
+					mPalette.setVisibility(View.VISIBLE);
+					mPalette.bringToFront();
+				}
 				return true;
 			default:;
 		}
@@ -78,6 +104,11 @@ public class Main extends Activity {
 			case KeyEvent.KEYCODE_VOLUME_UP:
 			case KeyEvent.KEYCODE_VOLUME_DOWN:
 				return true;	// avoid changing any sound volumes
+			case KeyEvent.KEYCODE_DPAD_CENTER:
+				if (mPalette.getVisibility() == View.VISIBLE) {
+					mPalette.requestFocus();
+					mPalette.bringToFront();					
+				}
 		}
 		return false;
 	}
