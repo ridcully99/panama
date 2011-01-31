@@ -40,7 +40,7 @@ import android.widget.Toast;
  */
 public class CanvasView extends View {
 	
-	private final static int BLUR_FACTOR = 1000;	/* size/BLUR_FACTOR */
+	private final static int BLUR_FACTOR = 16;	/* size/BLUR_FACTOR */
 	private final static int UNDO_BUFFERS = 5;
 	
     private Bitmap  	mBitmap;
@@ -62,7 +62,8 @@ public class CanvasView extends View {
     private int			mLastY = -1;
     
     private Bitmap[]	mUndoBitmaps = new Bitmap[UNDO_BUFFERS];
-    private int			mUndoNext = 0; 
+    private int			mUndoNewest = 0;
+    private int			mUndoCurrent = 0; 
     private int			mUndoOldest = 0;
     
     public CanvasView(Context context, AttributeSet attrs) {
@@ -72,7 +73,7 @@ public class CanvasView extends View {
         mPath = new Path();
         mBitmapPaint = new Paint();
 
-        mPaint = new Paint(Paint.DITHER_FLAG);
+        mPaint = new Paint();
         mPaint.setAntiAlias(true);
         mPaint.setColor(mColor);
         mPaint.setStyle(Paint.Style.STROKE);
@@ -98,34 +99,33 @@ public class CanvasView extends View {
     @Override
     protected void onSizeChanged(int w, int h, int oldw, int oldh) {
         super.onSizeChanged(w, h, oldw, oldh);
+        recycleBitmap(mBitmap);
         mBitmap = Bitmap.createBitmap(w, h, Bitmap.Config.ARGB_8888);
         mBitmap.eraseColor(mPaperColor);
+        remember();
         mCanvas = new Canvas(mBitmap);
     }
     
     @Override
     protected void onDraw(Canvas canvas) {
+		mCanvas.drawBitmap(mUndoBitmaps[(mUndoCurrent-1)%UNDO_BUFFERS], 0, 0, mBitmapPaint);
+		mCanvas.drawPath(mPath, mPaint);
         canvas.drawBitmap(mBitmap, 0, 0, mBitmapPaint);
-        canvas.drawPath(mPath, mPaint);
+        //canvas.drawPath(mPath, mPaint);
     }
 
 	@Override
 	public boolean onKeyDown(int keyCode, KeyEvent event) {
 		switch (keyCode) {
 			case KeyEvent.KEYCODE_BACK:
-				if (mUndoNext > mUndoOldest) {
-					mUndoNext--;
-					mCanvas.drawColor(mPaperColor);
-					mCanvas.drawBitmap(mUndoBitmaps[mUndoNext%UNDO_BUFFERS], 0, 0, mBitmapPaint);
-					invalidate();
-				}
+				undo();
 				return true;
 		}
 		return false;
 	}
     
     
-    @Override
+	@Override
     public boolean onTouchEvent(MotionEvent event) {
         float x = event.getX();
         float y = event.getY();
@@ -186,6 +186,7 @@ public class CanvasView extends View {
     public void clear() {
     	remember();
     	mBitmap.eraseColor(mPaperColor);
+    	remember();
     	invalidate();
     }
     
@@ -282,10 +283,36 @@ public class CanvasView extends View {
      * remember for undo
      */
     private void remember() {
-    	mUndoBitmaps[mUndoNext % UNDO_BUFFERS] = Bitmap.createBitmap(mBitmap);
-    	mUndoNext++;
-    	if (mUndoOldest+UNDO_BUFFERS < mUndoNext) {
+    	recycleBitmap(mUndoBitmaps[mUndoCurrent % UNDO_BUFFERS]);
+    	mUndoBitmaps[mUndoCurrent % UNDO_BUFFERS] = Bitmap.createBitmap(mBitmap);
+    	mUndoCurrent++;
+    	if (mUndoOldest+UNDO_BUFFERS < mUndoCurrent) {
     		mUndoOldest++;
+    	}
+    	mUndoNewest = mUndoCurrent;
+    }
+    
+    public void undo() {
+		if (mUndoCurrent > mUndoOldest+1) {	// need one UNDO bitmap for proper painting
+			mUndoCurrent--;
+			//mCanvas.drawColor(mPaperColor);
+			mCanvas.drawBitmap(mUndoBitmaps[mUndoCurrent%UNDO_BUFFERS], 0, 0, mBitmapPaint);
+			invalidate();
+		}
+	}
+    
+    public void redo() {
+		if (mUndoCurrent < mUndoNewest) {
+			mUndoCurrent++;
+			mCanvas.drawBitmap(mUndoBitmaps[mUndoCurrent%UNDO_BUFFERS], 0, 0, mBitmapPaint);
+			invalidate();
+		}
+	}
+
+    
+    private void recycleBitmap(Bitmap bm) {
+    	if (bm != null) {
+    		bm.recycle();
     	}
     }
 }

@@ -28,6 +28,9 @@ Verlaufszeug verworfen, normales Linienzeichnen mit Path und invalidate nur der 
 
   Idee --> "Fat Touch Events, z.B. Daumen" erkennen und für Radierfunktion verwenden (i.e. temporär Papierfarbe und alpha=255)
   
+2011-01-31
+Undo usw fertig
+Farbproblem bei durchscheinend -- gelöst indem mit Hilfe von Undobuffer immer alles samt aktuellem Strich zuerst in mBitmap gezeichnet wird und dann erst in onDraw auf den gegebenen canvas.
 
 
 Ideen (gereiht nach Priorität):

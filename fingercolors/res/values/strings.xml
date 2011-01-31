@@ -2,7 +2,8 @@
 <resources>
     
     <string name="app_name">Finger Colors</string>
-<string name="mi_new">New</string>
-<string name="mi_clear">Clear</string>
-<string name="mi_save">Save</string>
+	<string name="mi_new">New</string>
+	<string name="mi_clear">Clear</string>
+	<string name="mi_save">Save</string>
+	<string name="mi_redo">Redo</string>
 </resources>

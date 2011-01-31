@@ -41,7 +41,7 @@ public class Main extends Activity {
 	@Override
 	public boolean onCreateOptionsMenu(Menu menu) {
 	    MenuInflater inflater = getMenuInflater();
-	    inflater.inflate(R.menu.main, menu);
+	    inflater.inflate(R.menu.main_menu, menu);
 	    return true;
 	}
 	
@@ -50,6 +50,9 @@ public class Main extends Activity {
 		switch(item.getItemId()) {
 			case R.id.miNew:
 				mCanvas.clear();
+				return true;
+			case R.id.miRedo:
+				mCanvas.redo();
 				return true;
 		}
 		return false;

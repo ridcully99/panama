@@ -18,9 +18,11 @@ package panama.android.fingercolors;
 import android.content.Context;
 import android.graphics.Canvas;
 import android.graphics.Color;
+import android.graphics.LinearGradient;
 import android.graphics.MaskFilter;
 import android.graphics.Paint;
 import android.graphics.Paint.Style;
+import android.graphics.Shader.TileMode;
 import android.graphics.RectF;
 import android.util.AttributeSet;
 import android.view.View;
@@ -59,9 +61,10 @@ public class BrushView extends View {
 		// draw background
 		int color = mBrushPaint.getColor();
 		float size = mBrushPaint.getStrokeWidth();
-		int luminance = (int)(0.3f*Color.red(color) + 0.59f*Color.green(color) + 0.11f*Color.blue(color));	// brightness
-		mBackgroundPaint.setColor(luminance < 128 ? 0xFFFFFFFF : 0xFF000000);
-		mBackgroundPaint.setAlpha(Color.alpha(color));
+		//int luminance = (int)(0.3f*Color.red(color) + 0.59f*Color.green(color) + 0.11f*Color.blue(color));	// brightness
+		//mBackgroundPaint.setColor(luminance < 128 ? 0xFFFFFFFF : 0xFF000000);
+		//mBackgroundPaint.setAlpha(Color.alpha(color));
+		mBackgroundPaint.setShader(new LinearGradient(0, 0, mBackgroundRect.right, 0, 0xFF333333, 0xFFCCCCCC, TileMode.CLAMP));
 		canvas.drawRoundRect(mBackgroundRect, PADDING, PADDING, mBackgroundPaint);
 		canvas.drawLine(PADDING+size/2, mBackgroundRect.centerY(), mBackgroundRect.right-size/2-PADDING, mBackgroundRect.centerY(), mBrushPaint);
 	}
