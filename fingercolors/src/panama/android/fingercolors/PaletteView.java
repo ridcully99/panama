@@ -36,8 +36,8 @@ import android.view.View;
  */
 public class PaletteView extends View {
 
-	private final static int GRAY_BAND_HEIGHT = 32;
-	private final static int COLOR_BAND_HEIGHT = 192;
+	private final static int GRAY_BAND_HEIGHT = 24;
+	private final static int COLOR_BAND_HEIGHT = 128;
 	private final static int[] COLORS = new int[] { 0xFF0000FF, 0xFF00FFFF, 0xFF00FF00, 0xFFFFFF00, 0xFFFF0000, 0xFFFF00FF, 0xFF0000FF};
 	
 	
@@ -59,7 +59,7 @@ public class PaletteView extends View {
         
         mPaint = new Paint();
         mPaint.setDither(true);
-        setFocusableInTouchMode(true);
+        //setFocusableInTouchMode(true);
 	}
 	
     @Override

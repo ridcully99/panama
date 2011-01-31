@@ -15,8 +15,6 @@
  */
 package panama.android.fingercolors;
 
-import java.util.Date;
-
 import android.content.Context;
 import android.graphics.Bitmap;
 import android.graphics.BlurMaskFilter;
@@ -42,8 +40,8 @@ import android.widget.Toast;
  */
 public class CanvasView extends View {
 	
-	private final static int BLUR_FACTOR = 16;	/* size/BLUR_FACTOR */
-	private final static int UNDO_BUFFERS = 10;
+	private final static int BLUR_FACTOR = 1000;	/* size/BLUR_FACTOR */
+	private final static int UNDO_BUFFERS = 5;
 	
     private Bitmap  	mBitmap;
     private Canvas  	mCanvas;
@@ -60,10 +58,12 @@ public class CanvasView extends View {
     private int			mAlpha = 255;
     private int 		mSize = 16;
     private Rect 		mDirtyRegion = new Rect(0,0,0,0);
-    private int			mLastX = -1, mLastY = -1;
+    private int			mLastX = -1;
+    private int			mLastY = -1;
     
     private Bitmap[]	mUndoBitmaps = new Bitmap[UNDO_BUFFERS];
-    private int			mUndoNext = 0, mUndoOldest = 0;
+    private int			mUndoNext = 0; 
+    private int			mUndoOldest = 0;
     
     public CanvasView(Context context, AttributeSet attrs) {
         super(context, attrs);
@@ -99,13 +99,12 @@ public class CanvasView extends View {
     protected void onSizeChanged(int w, int h, int oldw, int oldh) {
         super.onSizeChanged(w, h, oldw, oldh);
         mBitmap = Bitmap.createBitmap(w, h, Bitmap.Config.ARGB_8888);
+        mBitmap.eraseColor(mPaperColor);
         mCanvas = new Canvas(mBitmap);
     }
     
     @Override
     protected void onDraw(Canvas canvas) {
-    	Log.i(Main.LOG_TAG, "onDraw "+new Date().getTime());
-        canvas.drawColor(mPaperColor);
         canvas.drawBitmap(mBitmap, 0, 0, mBitmapPaint);
         canvas.drawPath(mPath, mPaint);
     }
@@ -277,7 +276,6 @@ public class CanvasView extends View {
     	mDirtyRegion.right = Math.max(mDirtyRegion.right, x+strokeWidthHalf);
     	mDirtyRegion.top = Math.min(mDirtyRegion.top, y-strokeWidthHalf);
     	mDirtyRegion.bottom = Math.max(mDirtyRegion.bottom, y+strokeWidthHalf);
-    	Log.i(Main.LOG_TAG, mDirtyRegion.toString());
     }
 
     /**
