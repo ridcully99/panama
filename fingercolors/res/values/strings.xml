@@ -6,4 +6,12 @@
 	<string name="mi_clear">Clear</string>
 	<string name="mi_save">Save</string>
 	<string name="mi_redo">Redo</string>
+	<string name="mi_open">Open...</string>
+
+	<string name="palette">Palette</string>
+	<string name="brush">Paint</string>
+	<string name="eraser">Erase</string>
+	<string name="pipette">Pick Color</string>
+	
+	<string name="new_dialog_title">Select Background</string>
 </resources>

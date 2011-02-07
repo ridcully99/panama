@@ -17,9 +17,7 @@ package panama.android.fingercolors;
 
 import android.content.Context;
 import android.graphics.Canvas;
-import android.graphics.Color;
 import android.graphics.LinearGradient;
-import android.graphics.MaskFilter;
 import android.graphics.Paint;
 import android.graphics.Paint.Style;
 import android.graphics.Shader.TileMode;
@@ -47,7 +45,6 @@ public class BrushView extends View {
 		
 	public BrushView(Context context, AttributeSet attrs) {
         super(context, attrs);
-		
 		mBackgroundPaint = new Paint();
 		mBackgroundPaint.setStrokeWidth(1);
 		mBackgroundPaint.setAntiAlias(true);

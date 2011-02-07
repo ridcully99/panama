@@ -21,6 +21,7 @@ import android.graphics.BlurMaskFilter;
 import android.graphics.Canvas;
 import android.graphics.Color;
 import android.graphics.MaskFilter;
+import android.graphics.Matrix;
 import android.graphics.Paint;
 import android.graphics.Path;
 import android.graphics.Rect;
@@ -52,8 +53,6 @@ public class CanvasView extends View {
     private BrushView 	mBrushView;
     private Toast		mBrushToast;
     
-    private int			mPaperColor = 0xFFAAAAAA;
-    
     private int 		mColor = 0xFF000000;
     private int			mAlpha = 255;
     private int 		mSize = 16;
@@ -68,7 +67,7 @@ public class CanvasView extends View {
     
     public CanvasView(Context context, AttributeSet attrs) {
         super(context, attrs);
-        mBitmap = Bitmap.createBitmap(320, 480, Bitmap.Config.ARGB_8888);
+        mBitmap = Bitmap.createBitmap(1, 1, Bitmap.Config.ARGB_8888);
         mCanvas = new Canvas(mBitmap);
         mPath = new Path();
         mBitmapPaint = new Paint();
@@ -101,9 +100,12 @@ public class CanvasView extends View {
         super.onSizeChanged(w, h, oldw, oldh);
         recycleBitmap(mBitmap);
         mBitmap = Bitmap.createBitmap(w, h, Bitmap.Config.ARGB_8888);
-        mBitmap.eraseColor(mPaperColor);
-        remember();
+        for (int i=0; i<mUndoBitmaps.length; i++) {
+        	mUndoBitmaps[i] = Bitmap.createBitmap(w, h, Bitmap.Config.ARGB_8888);
+        }
         mCanvas = new Canvas(mBitmap);
+        mBitmap.eraseColor(0xFFCCCCCC);
+        remember();
     }
     
     @Override
@@ -111,7 +113,6 @@ public class CanvasView extends View {
 		mCanvas.drawBitmap(mUndoBitmaps[(mUndoCurrent-1)%UNDO_BUFFERS], 0, 0, mBitmapPaint);
 		mCanvas.drawPath(mPath, mPaint);
         canvas.drawBitmap(mBitmap, 0, 0, mBitmapPaint);
-        //canvas.drawPath(mPath, mPaint);
     }
 
 	@Override
@@ -183,10 +184,26 @@ public class CanvasView extends View {
         return true;
     }
     
-    public void clear() {
+    public void reset(int color) {
     	remember();
-    	mBitmap.eraseColor(mPaperColor);
+    	mBitmap.eraseColor(color);
     	remember();
+    	invalidate();
+    }
+    
+    public void reset(Bitmap bm) {
+    	remember();
+    	if (false || bm.getWidth() > bm.getHeight()) {	// landscape? rotate 
+    		bm = Bitmap.createScaledBitmap(bm, mBitmap.getHeight(), mBitmap.getWidth(), true);
+        	Matrix matrix = new Matrix();
+        	matrix.postRotate(90f);
+        	bm = Bitmap.createBitmap(bm, 0, 0, bm.getWidth(), bm.getHeight(), matrix, true);
+    	} else {
+    		bm = Bitmap.createScaledBitmap(bm, mBitmap.getWidth(), mBitmap.getHeight(), true);
+    	}	
+    	mCanvas.drawBitmap(bm, 0, 0, mBitmapPaint);
+        bm.recycle();
+        remember();
     	invalidate();
     }
     
@@ -283,6 +300,7 @@ public class CanvasView extends View {
      * remember for undo
      */
     private void remember() {
+    	Log.i(Main.LOG_TAG, "remember");
     	recycleBitmap(mUndoBitmaps[mUndoCurrent % UNDO_BUFFERS]);
     	mUndoBitmaps[mUndoCurrent % UNDO_BUFFERS] = Bitmap.createBitmap(mBitmap);
     	mUndoCurrent++;
@@ -295,7 +313,7 @@ public class CanvasView extends View {
     public void undo() {
 		if (mUndoCurrent > mUndoOldest+1) {	// need one UNDO bitmap for proper painting
 			mUndoCurrent--;
-			//mCanvas.drawColor(mPaperColor);
+			//mCanvas.drawColor(mBackgroundColor);
 			mCanvas.drawBitmap(mUndoBitmaps[mUndoCurrent%UNDO_BUFFERS], 0, 0, mBitmapPaint);
 			invalidate();
 		}

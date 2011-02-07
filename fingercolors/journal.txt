@@ -32,9 +32,14 @@ Verlaufszeug verworfen, normales Linienzeichnen mit Path und invalidate nur der 
 Undo usw fertig
 Farbproblem bei durchscheinend -- gelöst indem mit Hilfe von Undobuffer immer alles samt aktuellem Strich zuerst in mBitmap gezeichnet wird und dann erst in onDraw auf den gegebenen canvas.
 
+2011-02-03
+manifest Eintrag gemacht der Installation auf sd-card erlaubt.
+Fürs Compilieren muss ich jetzt immer als Target Version 8 (Android 2.2) einstellen, während des Programmierens aber 
+auf Version 7 (2.1) oder niedriger damit ich damit kompatibel bleibe.
+
+-------------------------------------
 
 Ideen (gereiht nach Priorität):
--- Multitouch Unterstützung
 -- Menü --> Palette mit Farben, Pipette und verschiedenen Pinselgrößen;
 --          Profifunktion ... statt Farben was zum Aufhellen und Abdunkeln (i.e. weiss bzw. schwarz und mit alpha = 128 beginnen, oder Metapher mit Wasserbecher und so das Anfangs-Alpha verringern) 
 
@@ -56,5 +61,10 @@ Idee ... Radiergummi
 Idee ... Menü --> Palette mit Farb- und Pinselauswahl
 
 
+SPÄTER
 
-TODO: API-Level 9 (Android 2.3) ---> InputDevice#getMotionRange() abfragen der Bereiche für z.B. Pressure oder Size --> genaueres Mapping auf Alpha möglich
+  TODO: API-Level 9 (Android 2.3) ---> InputDevice#getMotionRange() abfragen der Bereiche für z.B. Pressure oder Size --> genaueres Mapping auf Alpha möglich
+
+VERWORFEN
+
+-- Multitouch Unterstützung <-- nicht sinnvoll da nur 2 Finger erkannt werden

@@ -2,7 +2,8 @@
 <manifest xmlns:android="http://schemas.android.com/apk/res/android"
       package="panama.android.fingercolors"
       android:versionCode="1"
-      android:versionName="1.0">
+      android:versionName="1.0"
+      android-installLocation="auto">	<!-- TODO change to android:installLocation and target to Level 8 before deployment! -->
     <application android:icon="@drawable/icon" android:label="@string/app_name" android:debuggable="true">
         <activity android:name=".Main"
                   android:label="@string/app_name" 
@@ -16,5 +17,4 @@
 
     </application>
     <uses-sdk android:minSdkVersion="7" />
-
 </manifest> 

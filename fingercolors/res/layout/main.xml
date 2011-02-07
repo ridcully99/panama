@@ -5,8 +5,9 @@
 	android:orientation="vertical">
 	<RelativeLayout 
 		android:layout_width="fill_parent"
-	    android:layout_height="fill_parent">
-	 	<panama.android.fingercolors.CanvasView 
+	    android:layout_height="wrap_content"
+	    android:layout_weight="1">
+		<panama.android.fingercolors.CanvasView 
 	 		android:id="@+id/canvas" 
 	 		android:layout_width="fill_parent" 
 	 		android:layout_height="fill_parent" 
@@ -18,4 +19,56 @@
 			android:layout_height="wrap_content" 
 			android:visibility="invisible"/>
 	</RelativeLayout>
+	<!-- 
+	<HorizontalScrollView
+		android:layout_width="fill_parent"
+		android:layout_height="wrap_content"
+		>
+		<LinearLayout
+		android:layout_width="fill_parent"
+		android:layout_height="wrap_content"
+		android:orientation="horizontal"
+		android:background="@android:color/white"
+		>
+		<Button android:id="@+id/paletteBtn" android:layout_width="wrap_content" android:layout_height="wrap_content" android:text="@string/palette"></Button>
+		<ImageButton
+			android:id="@+id/brushBtn" 
+			android:layout_width="48dp" 
+			android:layout_height="48dp"
+			android:src="@drawable/ic_menu_brush"
+			android:background="@drawable/image_button_background_states"
+			android:clickable="true"
+			>			
+		</ImageButton>
+		<ImageButton
+			android:id="@+id/eraserBtn" 
+			android:layout_width="48dp" 
+			android:layout_height="48dp"
+			android:src="@drawable/ic_menu_brush"
+			android:background="@drawable/image_button_background_states"
+			android:clickable="true"
+			>			
+		</ImageButton>
+		<ImageButton
+			android:id="@+id/colorPickerBtn" 
+			android:layout_width="48dp" 
+			android:layout_height="48dp"
+			android:src="@drawable/ic_menu_colorpicker"
+			android:background="@drawable/image_button_background_states"
+			android:clickable="true"
+			>			
+		</ImageButton>
+		<ImageButton android:id="@+id/saveBtn"
+			android:layout_width="48dp" 
+			android:layout_height="48dp"
+			android:src="@android:drawable/ic_menu_save"
+			android:background="@android:color/transparent"
+			>
+		</ImageButton>
+		<Button android:layout_width="wrap_content" android:layout_height="wrap_content" android:text="@string/mi_new"></Button>
+		<Button android:layout_width="wrap_content" android:layout_height="wrap_content" android:text="@string/mi_new"></Button>
+		<Button android:layout_width="wrap_content" android:layout_height="wrap_content" android:text="@string/mi_new"></Button>
+	</LinearLayout>
+	</HorizontalScrollView>
+	 -->
 </LinearLayout>
