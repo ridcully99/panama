@@ -29,7 +29,7 @@ import android.widget.GridView;
  */
 public class BackgroundsAdapter extends BaseAdapter {
 
-	public final static int[] BACKGROUND_COLORS = new int [] {
+	private final static int[] BACKGROUND_COLORS = new int [] {
 		Color.WHITE, 
 		Color.LTGRAY,
 		Color.DKGRAY,
@@ -86,6 +86,13 @@ public class BackgroundsAdapter extends BaseAdapter {
 		return 0;
 	}
 
+	public static int color(int position) {
+        float[] hsv = new float[3];
+    	Color.colorToHSV(BACKGROUND_COLORS[position], hsv);
+    	hsv[1] *= 0.5;	// decrease saturation
+    	return Color.HSVToColor(hsv);
+	}
+	
 	/* (non-Javadoc)
 	 * @see android.widget.Adapter#getView(int, android.view.View, android.view.ViewGroup)
 	 */
@@ -100,10 +107,10 @@ public class BackgroundsAdapter extends BaseAdapter {
             view = (View) convertView;
         }
         if (BACKGROUND_COLORS[position] == Color.TRANSPARENT) {
-        	Drawable galleryIcon = mContext.getResources().getDrawable(android.R.drawable.ic_menu_gallery);
+        	Drawable galleryIcon = mContext.getResources().getDrawable(R.drawable.ic_menu_slideshow);
         	view.setBackgroundDrawable(galleryIcon);
         } else {
-        	view.setBackgroundColor(BACKGROUND_COLORS[position]);
+        	view.setBackgroundColor(color(position));
         	//imageView.setColorFilter(color, mode);
         }
         return view;

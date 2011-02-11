@@ -36,7 +36,6 @@ import android.view.View;
  */
 public class PaletteView extends View {
 
-	private final static int GRAY_BAND_HEIGHT = 24;
 	private final static int COLOR_BAND_HEIGHT = 128;
 	private final static int[] COLORS = new int[] { 0xFF0000FF, 0xFF00FFFF, 0xFF00FF00, 0xFFFFFF00, 0xFFFF0000, 0xFFFF00FF, 0xFF0000FF};
 	
@@ -65,21 +64,23 @@ public class PaletteView extends View {
     @Override
     protected void onSizeChanged(int w, int h, int oldw, int oldh) {
         super.onSizeChanged(w, h, oldw, oldh);
+        int colorWidth = (w*7)/8;
         mBitmap = Bitmap.createBitmap(w, h, Bitmap.Config.ARGB_8888);
         mCanvas = new Canvas(mBitmap);
+        mCanvas.drawColor(Color.BLACK);
         mPaint.setStyle(Style.FILL);
-        // horizontal gray band
-        mPaint.setShader(new LinearGradient(0, 0, w-1, 0, 0xFFFFFFFF, 0xFF000000, TileMode.CLAMP));
-        mCanvas.drawRect(0, 0, w, GRAY_BAND_HEIGHT, mPaint);
+        // vertical gray band
+        mPaint.setShader(new LinearGradient(0, 0, 0, h, 0xFFFFFFFF, 0xFF000000, TileMode.CLAMP));
+        mCanvas.drawRect(colorWidth+2, 0, w, h, mPaint);
         // horizontal rainbow gradient
-        mPaint.setShader(new LinearGradient(0, 0, w-1, 0, COLORS, null, TileMode.CLAMP));
-        mCanvas.drawRect(0, GRAY_BAND_HEIGHT, w, h, mPaint);
+        mPaint.setShader(new LinearGradient(0, 0, colorWidth, 0, COLORS, null, TileMode.CLAMP));
+        mCanvas.drawRect(0, 0, colorWidth, h, mPaint);
         // vertical white to invisible gradient to half
-        mPaint.setShader(new LinearGradient(0, GRAY_BAND_HEIGHT, 0, GRAY_BAND_HEIGHT+COLOR_BAND_HEIGHT/2, 0xFFFFFFFF, 0x00FFFFFF, TileMode.CLAMP));
-        mCanvas.drawRect(0, GRAY_BAND_HEIGHT, w, GRAY_BAND_HEIGHT+COLOR_BAND_HEIGHT/2, mPaint);
+        mPaint.setShader(new LinearGradient(0, 0, 0, COLOR_BAND_HEIGHT/2, 0xFFFFFFFF, 0x00FFFFFF, TileMode.CLAMP));
+        mCanvas.drawRect(0, 0, colorWidth, COLOR_BAND_HEIGHT/2, mPaint);
         // vertical invisible to black gradient form half
-        mPaint.setShader(new LinearGradient(0, GRAY_BAND_HEIGHT+COLOR_BAND_HEIGHT/2, 0, h, 0x00000000, 0xFF000000, TileMode.CLAMP));
-        mCanvas.drawRect(0, GRAY_BAND_HEIGHT+COLOR_BAND_HEIGHT/2, w, h, mPaint);
+        mPaint.setShader(new LinearGradient(0, COLOR_BAND_HEIGHT/2, 0, h, 0x00000000, 0xFF000000, TileMode.CLAMP));
+        mCanvas.drawRect(0, COLOR_BAND_HEIGHT/2, colorWidth, h, mPaint);
     }
     
     @Override
@@ -92,7 +93,7 @@ public class PaletteView extends View {
     protected void onMeasure(int widthMeasureSpec, int heightMeasureSpec) {
         int parentWidth = MeasureSpec.getSize(widthMeasureSpec);
         int parentHeight = MeasureSpec.getSize(heightMeasureSpec);
-    	setMeasuredDimension(parentWidth, GRAY_BAND_HEIGHT+COLOR_BAND_HEIGHT);
+    	setMeasuredDimension(parentWidth, COLOR_BAND_HEIGHT);
     }
     
     @Override

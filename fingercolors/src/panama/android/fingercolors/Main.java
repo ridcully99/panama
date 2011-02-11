@@ -74,13 +74,13 @@ public class Main extends Activity implements OnClickListener {
 	    	gv.setOnItemClickListener(new AdapterView.OnItemClickListener() {
 				@Override
 				public void onItemClick(AdapterView<?> parent, View view, int position, long id) {
-					int color = BackgroundsAdapter.BACKGROUND_COLORS[position];
-					if (color == Color.TRANSPARENT) {
+					int color = BackgroundsAdapter.color(position);
+					if (color == Color.TRANSPARENT) {	// transparent --> select image as background
 						Intent intent = new Intent(Intent.ACTION_PICK, android.provider.MediaStore.Images.Media.INTERNAL_CONTENT_URI);
 						intent.setType("image/*");	// images only, no videos ...
 						startActivityForResult(intent, SELECT_IMAGE);
 					} else {
-						mCanvas.reset(color);	// TODO ... add selecting color or picture here.
+						mCanvas.reset(color);
 						mBackgroundDialog.dismiss();
 					}
 				}
