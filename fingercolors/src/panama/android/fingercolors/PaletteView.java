@@ -23,12 +23,11 @@ import android.graphics.LinearGradient;
 import android.graphics.Paint;
 import android.graphics.Paint.Style;
 import android.graphics.Path;
-import android.graphics.Shader;
 import android.graphics.Shader.TileMode;
 import android.util.AttributeSet;
-import android.util.Log;
 import android.view.MotionEvent;
 import android.view.View;
+import android.view.ViewGroup;
 
 /**
  * @author ridcully
@@ -36,7 +35,7 @@ import android.view.View;
  */
 public class PaletteView extends View {
 
-	private final static int COLOR_BAND_HEIGHT = 128;
+	private final static int COLOR_BAND_HEIGHT = 192;
 	private final static int[] COLORS = new int[] { 0xFF0000FF, 0xFF00FFFF, 0xFF00FF00, 0xFFFFFF00, 0xFFFF0000, 0xFFFF00FF, 0xFF0000FF};
 	
 	
@@ -113,7 +112,7 @@ public class PaletteView extends View {
                 break;
             case MotionEvent.ACTION_UP:
             	canvas.setColor(mSelectedColor);
-            	setVisibility(INVISIBLE);
+            	((ViewGroup)getParent()).setVisibility(INVISIBLE);	// hide LinearLayout containing this view (holds shadow and palette)
                 break;
         }
         return true;

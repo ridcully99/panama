@@ -3,10 +3,9 @@
     
     <string name="app_name">Finger Colors</string>
 	<string name="mi_new">New</string>
-	<string name="mi_clear">Clear</string>
 	<string name="mi_save">Save</string>
 	<string name="mi_redo">Redo</string>
-	<string name="mi_open">Open...</string>
+	<string name="mi_help">Help</string>
 
 	<string name="palette">Palette</string>
 	<string name="brush">Paint</string>
@@ -14,4 +13,7 @@
 	<string name="pipette">Pick Color</string>
 	
 	<string name="new_dialog_title">Select Background</string>
+	<string name="help_dialog_title">Help</string>
+	<string name="show_on_start_lbl">Show help at start-up.</string>
+	<string name="ok">OK</string>
 </resources>

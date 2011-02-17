@@ -37,6 +37,9 @@ manifest Eintrag gemacht der Installation auf sd-card erlaubt.
 Fürs Compilieren muss ich jetzt immer als Target Version 8 (Android 2.2) einstellen, während des Programmierens aber 
 auf Version 7 (2.1) oder niedriger damit ich damit kompatibel bleibe.
 
+2011-02-10
+Bild speichern gemacht -- ging nur mit SDK Level 8 --> auch in Manifest so eintragen.
+
 -------------------------------------
 
 Ideen (gereiht nach Priorität):

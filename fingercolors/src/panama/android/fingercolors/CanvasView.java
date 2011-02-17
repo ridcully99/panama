@@ -15,6 +15,8 @@
  */
 package panama.android.fingercolors;
 
+import java.io.BufferedOutputStream;
+
 import android.content.Context;
 import android.graphics.Bitmap;
 import android.graphics.BlurMaskFilter;
@@ -25,7 +27,9 @@ import android.graphics.Matrix;
 import android.graphics.Paint;
 import android.graphics.Path;
 import android.graphics.Rect;
+import android.graphics.Bitmap.CompressFormat;
 import android.util.AttributeSet;
+import android.util.FloatMath;
 import android.util.Log;
 import android.view.Gravity;
 import android.view.KeyEvent;
@@ -47,15 +51,18 @@ public class CanvasView extends View {
     private Bitmap  	mBitmap;
     private Canvas  	mCanvas;
     private Path    	mPath;
-    private MaskFilter	mBlur;
+    private MaskFilter	mBlurFilter;
     private Paint   	mBitmapPaint;
     private Paint		mPaint;
     private BrushView 	mBrushView;
     private Toast		mBrushToast;
     
     private int 		mColor = 0xFF000000;
+    private int[]		mColorRGB = new int[] {0, 0, 0};	// original RGB values of color, used to change brightness
     private int			mAlpha = 255;
     private int 		mSize = 16;
+    private float		mBlur = 0.2f;	// factor to multiply mSize with for blur-radius	
+    private int			mBrightness = 0;
     private Rect 		mDirtyRegion = new Rect(0,0,0,0);
     private int			mLastX = -1;
     private int			mLastY = -1;
@@ -212,6 +219,10 @@ public class CanvasView extends View {
     }
     
     public void setColor(int color) {
+    	mColorRGB[0] = Color.red(color);
+    	mColorRGB[1] = Color.green(color);
+    	mColorRGB[2] = Color.blue(color);
+    	mBrightness = brightness(mColorRGB);
     	mPaint.setColor(color);
     	mPaint.setAlpha(mAlpha);
     	mColor = mPaint.getColor();
@@ -243,7 +254,7 @@ public class CanvasView extends View {
     public void increaseAlpha(int delta) {
     	mAlpha = mPaint.getAlpha()+delta;
     	mAlpha = Math.min(255, mAlpha);
-    	mAlpha = Math.max(0, mAlpha);
+    	mAlpha = Math.max(5, mAlpha);
     	mPaint.setAlpha(mAlpha);
     	mColor = mPaint.getColor();
     	toastBrush();
@@ -254,14 +265,14 @@ public class CanvasView extends View {
     }
     
     public void increaseBrightness(int delta) {
+    	mBrightness += delta;
+    	mBrightness = Math.min(mBrightness, 255);
+    	mBrightness = Math.max(mBrightness, -255);
     	int[] rgb = new int[3];
-    	rgb[0] = Color.red(mColor);
-    	rgb[1] = Color.green(mColor);
-    	rgb[2] = Color.blue(mColor);
     	for (int i=0; i< 3; i++) {
-    		rgb[i] += delta;
-    		rgb[i] = Math.min(255, rgb[i]);
-    		rgb[i] = Math.max(0, rgb[i]);
+    		rgb[i] = mColorRGB[i] + mBrightness;
+        	rgb[i] = Math.min(rgb[i], 255);
+        	rgb[i] = Math.max(rgb[i], 0);
     	}
     	mPaint.setARGB(mAlpha, rgb[0], rgb[1], rgb[2]);
     	mColor = mPaint.getColor();
@@ -279,17 +290,17 @@ public class CanvasView extends View {
     }
     
     private void setBlur() {
-    	if (mSize < BLUR_FACTOR) {
-    		mBlur = null;
+    	if (mSize*mBlur < 1) {
+    		mBlurFilter = null;
     		mPaint.setMaskFilter(null);
     	} else {
-            mBlur = new BlurMaskFilter(mSize/BLUR_FACTOR, BlurMaskFilter.Blur.NORMAL);
-    		mPaint.setMaskFilter(mBlur);
+            mBlurFilter = new BlurMaskFilter(mSize*mBlur, BlurMaskFilter.Blur.NORMAL);
+    		mPaint.setMaskFilter(mBlurFilter);
     	}
     }
 
     private void adjustDirtyRegion(int x, int y) {
-    	int strokeWidthHalf = (int)(mSize/2f)+2+(mSize/BLUR_FACTOR)/2+2;	// Hälfte der Strichbreite + 2 zur Sicherheit wg. Antialias ... bei Blur usw. entsprechend erweitern
+    	int strokeWidthHalf = (int)(mSize/2f+mSize*mBlur)+4;	// Hälfte der Strichbreite + 2 zur Sicherheit wg. Antialias ... bei Blur usw. entsprechend erweitern
     	mDirtyRegion.left = Math.min(mDirtyRegion.left, x-strokeWidthHalf);
     	mDirtyRegion.right = Math.max(mDirtyRegion.right, x+strokeWidthHalf);
     	mDirtyRegion.top = Math.min(mDirtyRegion.top, y-strokeWidthHalf);
@@ -300,7 +311,6 @@ public class CanvasView extends View {
      * remember for undo
      */
     private void remember() {
-    	Log.i(Main.LOG_TAG, "remember");
     	recycleBitmap(mUndoBitmaps[mUndoCurrent % UNDO_BUFFERS]);
     	mUndoBitmaps[mUndoCurrent % UNDO_BUFFERS] = Bitmap.createBitmap(mBitmap);
     	mUndoCurrent++;
@@ -327,10 +337,22 @@ public class CanvasView extends View {
 		}
 	}
 
+	public boolean saveBitmap(BufferedOutputStream outStream) {
+		return mBitmap.compress(CompressFormat.PNG, 100, outStream);
+	}
     
     private void recycleBitmap(Bitmap bm) {
     	if (bm != null) {
     		bm.recycle();
     	}
     }
+    
+    // compute perceived brightness of a color in the range of 0 to 255
+    // from http://www.nbdtech.com/Blog/archive/2008/04/27/Calculating-the-Perceived-Brightness-of-a-Color.aspx
+    private int brightness(int[] rgb) {
+    	return (int)FloatMath.sqrt(rgb[0]*rgb[0]*0.241f+
+    						  rgb[1]*rgb[1]*0.691f+
+    						  rgb[2]*rgb[2]*0.068f);
+    }
+
 }

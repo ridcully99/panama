@@ -18,6 +18,7 @@ package panama.android.fingercolors;
 import android.content.Context;
 import android.graphics.Color;
 import android.graphics.drawable.Drawable;
+import android.util.Log;
 import android.view.View;
 import android.view.ViewGroup;
 import android.widget.BaseAdapter;
@@ -29,30 +30,54 @@ import android.widget.GridView;
  */
 public class BackgroundsAdapter extends BaseAdapter {
 
+//	private final static int[] BACKGROUND_COLORS = new int [] {
+//		Color.WHITE, 
+//		Color.LTGRAY,
+//		Color.DKGRAY,
+//		Color.BLACK,
+//		
+//		0xFF8080FF,
+//		0xFF80C0FF,
+//		0xFF80FFFF,
+//		0xFF80FFC0,
+//		
+//		0xFF80FF80,
+//		0xFFC0FF80,
+//		0xFFFFFF80,
+//		0xFFFFC080,
+//
+//		0xFFFF8080,
+//		0xFFFF80C0,
+//		0xFFFF80FF,
+//		0xFFC080FF,
+//
+//		Color.TRANSPARENT	// indicator for image selection
+//	};
+
 	private final static int[] BACKGROUND_COLORS = new int [] {
 		Color.WHITE, 
 		Color.LTGRAY,
 		Color.DKGRAY,
 		Color.BLACK,
 		
-		0xFF0000FF,
-		0xFF0080FF,
-		0xFF00FFFF,
-		0xFF00FF80,
+		0xFF6060C0,
+		0xFF6090C0,
+		0xFF60C0C0,
+		0xFF60C090,
 		
-		0xFF00FF00,
-		0xFF80FF00,
-		0xFFFFFF00,
-		0xFFFF8000,
+		0xFF60C060,
+		0xFF90C060,
+		0xFFC0C060,
+		0xFFC09060,
 
-		0xFFFF0000,
-		0xFFFF0080,
-		0xFFFF00FF,
-		0xFF8000FF,
+		0xFFC06060,
+		0xFFC06090,
+		0xFFC060C0,
+		0xFF9060C0,
 
 		Color.TRANSPARENT	// indicator for image selection
 	};
-
+	
 	private Context mContext;
 	private int mWidth;
 	private int mHeight;
@@ -90,7 +115,8 @@ public class BackgroundsAdapter extends BaseAdapter {
         float[] hsv = new float[3];
     	Color.colorToHSV(BACKGROUND_COLORS[position], hsv);
     	hsv[1] *= 0.5;	// decrease saturation
-    	return Color.HSVToColor(hsv);
+    	Log.i("fingercolors", position+"->"+Color.HSVToColor(hsv));
+		return BACKGROUND_COLORS[position];
 	}
 	
 	/* (non-Javadoc)
