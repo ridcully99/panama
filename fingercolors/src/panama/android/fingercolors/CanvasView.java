@@ -19,6 +19,7 @@ import java.io.BufferedOutputStream;
 
 import android.content.Context;
 import android.graphics.Bitmap;
+import android.graphics.Bitmap.CompressFormat;
 import android.graphics.BlurMaskFilter;
 import android.graphics.Canvas;
 import android.graphics.Color;
@@ -27,10 +28,8 @@ import android.graphics.Matrix;
 import android.graphics.Paint;
 import android.graphics.Path;
 import android.graphics.Rect;
-import android.graphics.Bitmap.CompressFormat;
 import android.util.AttributeSet;
 import android.util.FloatMath;
-import android.util.Log;
 import android.view.Gravity;
 import android.view.KeyEvent;
 import android.view.LayoutInflater;
@@ -45,7 +44,6 @@ import android.widget.Toast;
  */
 public class CanvasView extends View {
 	
-	private final static int BLUR_FACTOR = 16;	/* size/BLUR_FACTOR */
 	private final static int UNDO_BUFFERS = 5;
 	
     private Bitmap  	mBitmap;
@@ -61,7 +59,7 @@ public class CanvasView extends View {
     private int[]		mColorRGB = new int[] {0, 0, 0};	// original RGB values of color, used to change brightness
     private int			mAlpha = 255;
     private int 		mSize = 16;
-    private float		mBlur = 0.2f;	// factor to multiply mSize with for blur-radius	
+    private float		mBlur = 0.05f;	// factor to multiply (255-alpha) with for blur-radius	
     private int			mBrightness = 0;
     private Rect 		mDirtyRegion = new Rect(0,0,0,0);
     private int			mLastX = -1;
@@ -78,6 +76,7 @@ public class CanvasView extends View {
         mCanvas = new Canvas(mBitmap);
         mPath = new Path();
         mBitmapPaint = new Paint();
+        mBitmapPaint.setDither(true);
 
         mPaint = new Paint();
         mPaint.setAntiAlias(true);
@@ -111,7 +110,7 @@ public class CanvasView extends View {
         	mUndoBitmaps[i] = Bitmap.createBitmap(w, h, Bitmap.Config.ARGB_8888);
         }
         mCanvas = new Canvas(mBitmap);
-        mBitmap.eraseColor(0xFFCCCCCC);
+        mBitmap.eraseColor(Color.LTGRAY);
         remember();
     }
     
@@ -234,7 +233,7 @@ public class CanvasView extends View {
     	size = Math.min(mBitmap.getWidth()/4, size);
     	mSize = size;
     	mPaint.setStrokeWidth(size);
-    	setBlur();
+    	//setBlur();
     	toastBrush();
     }
     
@@ -257,6 +256,7 @@ public class CanvasView extends View {
     	mAlpha = Math.max(5, mAlpha);
     	mPaint.setAlpha(mAlpha);
     	mColor = mPaint.getColor();
+    	setBlur();
     	toastBrush();
     }
     
@@ -290,17 +290,19 @@ public class CanvasView extends View {
     }
     
     private void setBlur() {
-    	if (mSize*mBlur < 1) {
+		float blurRadius = (255-mAlpha)*mBlur;
+    	if (mAlpha == 255 || blurRadius < 1.0) {
     		mBlurFilter = null;
     		mPaint.setMaskFilter(null);
     	} else {
-            mBlurFilter = new BlurMaskFilter(mSize*mBlur, BlurMaskFilter.Blur.NORMAL);
+            mBlurFilter = new BlurMaskFilter(blurRadius, BlurMaskFilter.Blur.NORMAL);
     		mPaint.setMaskFilter(mBlurFilter);
     	}
     }
 
     private void adjustDirtyRegion(int x, int y) {
-    	int strokeWidthHalf = (int)(mSize/2f+mSize*mBlur)+4;	// Hälfte der Strichbreite + 2 zur Sicherheit wg. Antialias ... bei Blur usw. entsprechend erweitern
+		float blurRadius = (255-mAlpha)*mBlur;
+    	int strokeWidthHalf = (int)(mSize/2f+blurRadius)+4;	// Hälfte der Strichbreite + 2 zur Sicherheit wg. Antialias ... bei Blur usw. entsprechend erweitern
     	mDirtyRegion.left = Math.min(mDirtyRegion.left, x-strokeWidthHalf);
     	mDirtyRegion.right = Math.max(mDirtyRegion.right, x+strokeWidthHalf);
     	mDirtyRegion.top = Math.min(mDirtyRegion.top, y-strokeWidthHalf);

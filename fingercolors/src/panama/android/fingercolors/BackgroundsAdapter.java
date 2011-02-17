@@ -30,30 +30,6 @@ import android.widget.GridView;
  */
 public class BackgroundsAdapter extends BaseAdapter {
 
-//	private final static int[] BACKGROUND_COLORS = new int [] {
-//		Color.WHITE, 
-//		Color.LTGRAY,
-//		Color.DKGRAY,
-//		Color.BLACK,
-//		
-//		0xFF8080FF,
-//		0xFF80C0FF,
-//		0xFF80FFFF,
-//		0xFF80FFC0,
-//		
-//		0xFF80FF80,
-//		0xFFC0FF80,
-//		0xFFFFFF80,
-//		0xFFFFC080,
-//
-//		0xFFFF8080,
-//		0xFFFF80C0,
-//		0xFFFF80FF,
-//		0xFFC080FF,
-//
-//		Color.TRANSPARENT	// indicator for image selection
-//	};
-
 	private final static int[] BACKGROUND_COLORS = new int [] {
 		Color.WHITE, 
 		Color.LTGRAY,
