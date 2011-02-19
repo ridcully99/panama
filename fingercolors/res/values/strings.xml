@@ -7,13 +7,9 @@
 	<string name="mi_redo">Redo</string>
 	<string name="mi_help">Help</string>
 
-	<string name="palette">Palette</string>
-	<string name="brush">Paint</string>
-	<string name="eraser">Erase</string>
-	<string name="pipette">Pick Color</string>
-	
 	<string name="new_dialog_title">Select Background</string>
-	<string name="help_dialog_title">Help</string>
+	<string name="help_dialog_title">Finger Colors</string>
 	<string name="show_on_start_lbl">Show help at start-up.</string>
 	<string name="ok">OK</string>
+	<string name="image_saved_as">Image saved as %s</string>
 </resources>

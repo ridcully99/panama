@@ -1,0 +1,16 @@
+<?xml version="1.0" encoding="utf-8"?>
+<resources>
+    
+    <string name="app_name">Finger Colors</string>
+	<string name="mi_new">Neu</string>
+	<string name="mi_save">Speichern</string>
+	<string name="mi_redo">Wiederherstellen</string>
+	<string name="mi_help">Hilfe</string>
+
+	<string name="new_dialog_title">Hintergrund wählen</string>
+	<string name="help_dialog_title">Finger Colors</string>
+	<string name="show_on_start_lbl">Hilfe zeigen beim Start.</string>
+	<string name="ok">OK</string>
+	<string name="image_saved_as">Bild gespeichert als %s</string>
+	
+</resources>

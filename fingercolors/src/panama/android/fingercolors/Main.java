@@ -119,8 +119,7 @@ public class Main extends Activity {
 	    	AlertDialog helpDialog;
 	    	
 	    	LayoutInflater inflater = (LayoutInflater) this.getSystemService(LAYOUT_INFLATER_SERVICE);
-	    	View layout = inflater.inflate(R.layout.help_dialog,
-	    	                               (ViewGroup) findViewById(R.id.helpDialog));
+	    	View layout = inflater.inflate(R.layout.help_dialog, (ViewGroup) findViewById(R.id.helpDialog));
 
 	    	WebView wv = (WebView)layout.findViewById(R.id.helpWebView);
 	    	final CheckBox cb = (CheckBox)layout.findViewById(R.id.showHelpOnStart);
@@ -142,7 +141,7 @@ public class Main extends Activity {
 	    	builder.setInverseBackgroundForced(true);
 	    	builder.setView(layout);
 	    	builder.setTitle(R.string.help_dialog_title);
-	    	builder.setIcon(R.drawable.icon);
+	    	builder.setIcon(R.drawable.ic_launcher);
 	    	builder.setNeutralButton(R.string.ok, new OnClickListener() {
 				@Override
 				public void onClick(DialogInterface dialog, int which) {
@@ -280,7 +279,8 @@ public class Main extends Activity {
 			outStream.flush();
 			outStream.close();
 			if (success) {
-				Toast.makeText(this, "Image saved as "+file.getAbsolutePath(), Toast.LENGTH_LONG).show();
+				String msg = getResources().getString(R.string.image_saved_as, file.getAbsolutePath());
+				Toast.makeText(this, msg, Toast.LENGTH_LONG).show();
 				// Tell the media scanner about the new file so that it is
 		       // immediately available to the user.
 		       MediaScannerConnection.scanFile(this,

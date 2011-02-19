@@ -16,6 +16,8 @@
 package panama.android.fingercolors;
 
 import java.io.BufferedOutputStream;
+import java.util.Iterator;
+import java.util.Stack;
 
 import android.content.Context;
 import android.graphics.Bitmap;
@@ -28,8 +30,10 @@ import android.graphics.Matrix;
 import android.graphics.Paint;
 import android.graphics.Path;
 import android.graphics.Rect;
+import android.os.SystemClock;
 import android.util.AttributeSet;
 import android.util.FloatMath;
+import android.util.Log;
 import android.view.Gravity;
 import android.view.KeyEvent;
 import android.view.LayoutInflater;
@@ -44,10 +48,12 @@ import android.widget.Toast;
  */
 public class CanvasView extends View {
 	
-	private final static int UNDO_BUFFERS = 5;
-	
     private Bitmap  	mBitmap;
+    private Bitmap		mPrevBitmap;
+    private Bitmap		mUndoBackgroundBitmap;
     private Canvas  	mCanvas;
+    private Canvas		mPrevCanvas;
+    private Canvas		mUndoBackgroundCanvas;
     private Path    	mPath;
     private MaskFilter	mBlurFilter;
     private Paint   	mBitmapPaint;
@@ -64,11 +70,9 @@ public class CanvasView extends View {
     private Rect 		mDirtyRegion = new Rect(0,0,0,0);
     private int			mLastX = -1;
     private int			mLastY = -1;
-    
-    private Bitmap[]	mUndoBitmaps = new Bitmap[UNDO_BUFFERS];
-    private int			mUndoNewest = 0;
-    private int			mUndoCurrent = 0; 
-    private int			mUndoOldest = 0;
+
+    private Stack<UndoRedoStep>	mUndoStack = new Stack<UndoRedoStep>();
+    private Stack<UndoRedoStep>	mRedoStack = new Stack<UndoRedoStep>();
     
     public CanvasView(Context context, AttributeSet attrs) {
         super(context, attrs);
@@ -104,19 +108,20 @@ public class CanvasView extends View {
     @Override
     protected void onSizeChanged(int w, int h, int oldw, int oldh) {
         super.onSizeChanged(w, h, oldw, oldh);
-        recycleBitmap(mBitmap);
         mBitmap = Bitmap.createBitmap(w, h, Bitmap.Config.ARGB_8888);
-        for (int i=0; i<mUndoBitmaps.length; i++) {
-        	mUndoBitmaps[i] = Bitmap.createBitmap(w, h, Bitmap.Config.ARGB_8888);
-        }
+        mPrevBitmap = Bitmap.createBitmap(w, h, Bitmap.Config.ARGB_8888);
+        mUndoBackgroundBitmap = Bitmap.createBitmap(w, h, Bitmap.Config.ARGB_8888);
         mCanvas = new Canvas(mBitmap);
+        mPrevCanvas = new Canvas(mPrevBitmap);
+        mUndoBackgroundCanvas = new Canvas(mUndoBackgroundBitmap);
         mBitmap.eraseColor(Color.LTGRAY);
-        remember();
+        mPrevBitmap.eraseColor(Color.LTGRAY);
+        mUndoBackgroundBitmap.eraseColor(Color.LTGRAY);
     }
     
     @Override
     protected void onDraw(Canvas canvas) {
-		mCanvas.drawBitmap(mUndoBitmaps[(mUndoCurrent-1)%UNDO_BUFFERS], 0, 0, mBitmapPaint);
+		mCanvas.drawBitmap(mPrevBitmap, 0, 0, mBitmapPaint);
 		mCanvas.drawPath(mPath, mPaint);
         canvas.drawBitmap(mBitmap, 0, 0, mBitmapPaint);
     }
@@ -172,16 +177,17 @@ public class CanvasView extends View {
                 	mPath.lineTo(x, y);
                 	adjustDirtyRegion(ix, iy);
                 	redraw = true;
-                    mLastX = (int)x;
-                    mLastY = (int)y;
+                    mLastX = ix;
+                    mLastY = iy;
                 }
                 if (redraw) {
                 	invalidate(mDirtyRegion);
                 }
                 break;
             case MotionEvent.ACTION_UP:
-            	remember();
-            	mCanvas.drawPath(mPath, mPaint);
+            	mPrevCanvas.drawPath(mPath, mPaint);
+            	mUndoStack.push(new UndoRedoStep(mPath, mPaint));
+            	mRedoStack.clear();
             	mPath.reset();
                 invalidate(mDirtyRegion);
                 mLastX = mLastY = -1;
@@ -191,14 +197,16 @@ public class CanvasView extends View {
     }
     
     public void reset(int color) {
-    	remember();
     	mBitmap.eraseColor(color);
-    	remember();
+    	mPrevBitmap.eraseColor(color);
+    	mUndoBackgroundBitmap.eraseColor(color);
+    	mUndoStack.clear();
+    	mRedoStack.clear();
     	invalidate();
     }
     
+    // TODO better handling for images with other size as the display needed
     public void reset(Bitmap bm) {
-    	remember();
     	if (false || bm.getWidth() > bm.getHeight()) {	// landscape? rotate 
     		bm = Bitmap.createScaledBitmap(bm, mBitmap.getHeight(), mBitmap.getWidth(), true);
         	Matrix matrix = new Matrix();
@@ -208,8 +216,11 @@ public class CanvasView extends View {
     		bm = Bitmap.createScaledBitmap(bm, mBitmap.getWidth(), mBitmap.getHeight(), true);
     	}	
     	mCanvas.drawBitmap(bm, 0, 0, mBitmapPaint);
-        bm.recycle();
-        remember();
+    	mPrevCanvas.drawBitmap(bm, 0, 0, mBitmapPaint);
+    	mUndoBackgroundCanvas.drawBitmap(bm, 0, 0, mBitmapPaint);
+    	mUndoStack.clear();
+    	mRedoStack.clear();
+    	bm.recycle();
     	invalidate();
     }
     
@@ -233,7 +244,6 @@ public class CanvasView extends View {
     	size = Math.min(mBitmap.getWidth()/4, size);
     	mSize = size;
     	mPaint.setStrokeWidth(size);
-    	//setBlur();
     	toastBrush();
     }
     
@@ -243,11 +253,6 @@ public class CanvasView extends View {
 
     public void decreaseBrushSize() {
     	setBrushSize(mSize/2);
-//    	if (mSize > SIZE_STEP) {
-//    		setBrushSize(mSize-SIZE_STEP);
-//    	} else {
-//    		setBrushSize(0);
-//    	}
     }
     
     public void increaseAlpha(int delta) {
@@ -302,52 +307,44 @@ public class CanvasView extends View {
 
     private void adjustDirtyRegion(int x, int y) {
 		float blurRadius = (255-mAlpha)*mBlur;
-    	int strokeWidthHalf = (int)(mSize/2f+blurRadius)+4;	// Hälfte der Strichbreite + 2 zur Sicherheit wg. Antialias ... bei Blur usw. entsprechend erweitern
+    	int strokeWidthHalf = (int)(mSize/2f+blurRadius)+4;	// Hälfte der Strichbreite + blurRadius +4 zur Sicherheit wg. Blur und Antialias
     	mDirtyRegion.left = Math.min(mDirtyRegion.left, x-strokeWidthHalf);
     	mDirtyRegion.right = Math.max(mDirtyRegion.right, x+strokeWidthHalf);
     	mDirtyRegion.top = Math.min(mDirtyRegion.top, y-strokeWidthHalf);
     	mDirtyRegion.bottom = Math.max(mDirtyRegion.bottom, y+strokeWidthHalf);
     }
 
-    /**
-     * remember for undo
-     */
-    private void remember() {
-    	recycleBitmap(mUndoBitmaps[mUndoCurrent % UNDO_BUFFERS]);
-    	mUndoBitmaps[mUndoCurrent % UNDO_BUFFERS] = Bitmap.createBitmap(mBitmap);
-    	mUndoCurrent++;
-    	if (mUndoOldest+UNDO_BUFFERS < mUndoCurrent) {
-    		mUndoOldest++;
+    private void redrawUndoStack() {
+    	mPrevCanvas.drawBitmap(mUndoBackgroundBitmap, 0, 0, mBitmapPaint);
+    	//long start = SystemClock.uptimeMillis();
+    	for (Iterator<UndoRedoStep> it = mUndoStack.iterator(); it.hasNext(); ) {
+    		UndoRedoStep step = it.next();
+    		mPrevCanvas.drawPath(step.path, step.paint);
     	}
-    	mUndoNewest = mUndoCurrent;
+    	//long stop = SystemClock.uptimeMillis();
+    	//Log.d(Main.LOG_TAG, "redraw undo stack in "+(stop-start)+" ms");
+    	invalidate();
     }
     
     public void undo() {
-		if (mUndoCurrent > mUndoOldest+1) {	// need one UNDO bitmap for proper painting
-			mUndoCurrent--;
-			//mCanvas.drawColor(mBackgroundColor);
-			mCanvas.drawBitmap(mUndoBitmaps[mUndoCurrent%UNDO_BUFFERS], 0, 0, mBitmapPaint);
-			invalidate();
-		}
+    	if (mUndoStack.isEmpty()) {
+    		return;
+    	}
+    	mRedoStack.push(mUndoStack.pop());
+    	redrawUndoStack();
 	}
     
     public void redo() {
-		if (mUndoCurrent < mUndoNewest) {
-			mUndoCurrent++;
-			mCanvas.drawBitmap(mUndoBitmaps[mUndoCurrent%UNDO_BUFFERS], 0, 0, mBitmapPaint);
-			invalidate();
-		}
+    	if (mRedoStack.isEmpty()) {
+    		return;
+    	}
+    	mUndoStack.push(mRedoStack.pop());
+    	redrawUndoStack();
 	}
 
 	public boolean saveBitmap(BufferedOutputStream outStream) {
 		return mBitmap.compress(CompressFormat.PNG, 100, outStream);
 	}
-    
-    private void recycleBitmap(Bitmap bm) {
-    	if (bm != null) {
-    		bm.recycle();
-    	}
-    }
     
     // compute perceived brightness of a color in the range of 0 to 255
     // from http://www.nbdtech.com/Blog/archive/2008/04/27/Calculating-the-Perceived-Brightness-of-a-Color.aspx
@@ -356,5 +353,15 @@ public class CanvasView extends View {
     						  rgb[1]*rgb[1]*0.691f+
     						  rgb[2]*rgb[2]*0.068f);
     }
-
+    
+    
+    private class UndoRedoStep {
+    	public Path path;
+    	public Paint paint;
+    	
+    	public UndoRedoStep(Path originalPath, Paint originalPaint) {
+    		path = new Path(originalPath);
+    		paint = new Paint(originalPaint);
+    	}
+    }
 }
