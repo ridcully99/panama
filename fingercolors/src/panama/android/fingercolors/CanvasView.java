@@ -1,17 +1,5 @@
 /*
- *  Copyright 2004-2010 Robert Brandner (robert.brandner@gmail.com) 
- *  
- *  Licensed under the Apache License, Version 2.0 (the "License"); 
- *  you may not use this file except in compliance with the License. 
- *  You may obtain a copy of the License at 
- *  
- *  http://www.apache.org/licenses/LICENSE-2.0 
- *  
- *  Unless required by applicable law or agreed to in writing, software 
- *  distributed under the License is distributed on an "AS IS" BASIS, 
- *  WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied. 
- *  See the License for the specific language governing permissions and 
- *  limitations under the License. 
+ *  Copyright 2011 Robert Brandner (robert.brandner@gmail.com) 
  */
 package panama.android.fingercolors;
 
@@ -30,10 +18,8 @@ import android.graphics.Matrix;
 import android.graphics.Paint;
 import android.graphics.Path;
 import android.graphics.Rect;
-import android.os.SystemClock;
 import android.util.AttributeSet;
 import android.util.FloatMath;
-import android.util.Log;
 import android.view.Gravity;
 import android.view.KeyEvent;
 import android.view.LayoutInflater;
@@ -205,19 +191,26 @@ public class CanvasView extends View {
     	invalidate();
     }
     
-    // TODO better handling for images with other size as the display needed
     public void reset(Bitmap bm) {
-    	if (false || bm.getWidth() > bm.getHeight()) {	// landscape? rotate 
-    		bm = Bitmap.createScaledBitmap(bm, mBitmap.getHeight(), mBitmap.getWidth(), true);
+    	if ((bm.getWidth() > bm.getHeight())) {	// landscape? rotate 
+    		float scaleX = ((float)mBitmap.getWidth())/bm.getHeight();
+    		float scaleY = ((float)mBitmap.getHeight())/bm.getWidth();
+    		float scale = Math.max(scaleX, scaleY);
+    		bm = Bitmap.createScaledBitmap(bm, (int)(bm.getWidth()*scale + 0.5), (int)(bm.getHeight()*scale + 0.5), true);
         	Matrix matrix = new Matrix();
         	matrix.postRotate(90f);
         	bm = Bitmap.createBitmap(bm, 0, 0, bm.getWidth(), bm.getHeight(), matrix, true);
     	} else {
-    		bm = Bitmap.createScaledBitmap(bm, mBitmap.getWidth(), mBitmap.getHeight(), true);
-    	}	
-    	mCanvas.drawBitmap(bm, 0, 0, mBitmapPaint);
-    	mPrevCanvas.drawBitmap(bm, 0, 0, mBitmapPaint);
-    	mUndoBackgroundCanvas.drawBitmap(bm, 0, 0, mBitmapPaint);
+    		float scaleX = ((float)mBitmap.getWidth())/bm.getWidth();
+    		float scaleY = ((float)mBitmap.getHeight())/bm.getHeight();
+    		float scale = Math.max(scaleX, scaleY);
+    		bm = Bitmap.createScaledBitmap(bm, (int)(bm.getWidth()*scale + 0.5), (int)(bm.getHeight()*scale + 0.5), true);
+    	}
+    	int left = -(bm.getWidth()-mBitmap.getWidth())/2;
+    	int top = -(bm.getHeight()-mBitmap.getHeight())/2;
+    	mCanvas.drawBitmap(bm, left, top, mBitmapPaint);
+    	mPrevCanvas.drawBitmap(bm, left, top, mBitmapPaint);
+    	mUndoBackgroundCanvas.drawBitmap(bm, left, top, mBitmapPaint);
     	mUndoStack.clear();
     	mRedoStack.clear();
     	bm.recycle();
@@ -353,7 +346,6 @@ public class CanvasView extends View {
     						  rgb[1]*rgb[1]*0.691f+
     						  rgb[2]*rgb[2]*0.068f);
     }
-    
     
     private class UndoRedoStep {
     	public Path path;

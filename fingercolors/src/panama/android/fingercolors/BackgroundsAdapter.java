@@ -1,24 +1,11 @@
 /*
- *  Copyright 2004-2010 Robert Brandner (robert.brandner@gmail.com) 
- *  
- *  Licensed under the Apache License, Version 2.0 (the "License"); 
- *  you may not use this file except in compliance with the License. 
- *  You may obtain a copy of the License at 
- *  
- *  http://www.apache.org/licenses/LICENSE-2.0 
- *  
- *  Unless required by applicable law or agreed to in writing, software 
- *  distributed under the License is distributed on an "AS IS" BASIS, 
- *  WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied. 
- *  See the License for the specific language governing permissions and 
- *  limitations under the License. 
+ * Copyright 2011 Robert Brandner (robert.brandner@gmail.com)
  */
 package panama.android.fingercolors;
 
 import android.content.Context;
 import android.graphics.Color;
 import android.graphics.drawable.Drawable;
-import android.util.Log;
 import android.view.View;
 import android.view.ViewGroup;
 import android.widget.BaseAdapter;
@@ -55,8 +42,7 @@ public class BackgroundsAdapter extends BaseAdapter {
 	};
 	
 	private Context mContext;
-	private int mWidth;
-	private int mHeight;
+	private int 	mHeight;
 	
 	public BackgroundsAdapter(Context context, int w, int h) {
 		mContext = context;
@@ -88,10 +74,6 @@ public class BackgroundsAdapter extends BaseAdapter {
 	}
 
 	public static int color(int position) {
-        float[] hsv = new float[3];
-    	Color.colorToHSV(BACKGROUND_COLORS[position], hsv);
-    	hsv[1] *= 0.5;	// decrease saturation
-    	Log.i("fingercolors", position+"->"+Color.HSVToColor(hsv));
 		return BACKGROUND_COLORS[position];
 	}
 	
@@ -113,7 +95,6 @@ public class BackgroundsAdapter extends BaseAdapter {
         	view.setBackgroundDrawable(galleryIcon);
         } else {
         	view.setBackgroundColor(color(position));
-        	//imageView.setColorFilter(color, mode);
         }
         return view;
 	}

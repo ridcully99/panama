@@ -1,3 +1,6 @@
+/*
+ * Copyright 2011 Robert Brandner (robert.brandner@gmail.com)
+ */
 package panama.android.fingercolors;
 
 import java.io.BufferedOutputStream;
@@ -24,6 +27,7 @@ import android.media.MediaScannerConnection;
 import android.net.Uri;
 import android.os.Bundle;
 import android.os.Environment;
+import android.util.FloatMath;
 import android.util.Log;
 import android.view.KeyEvent;
 import android.view.LayoutInflater;
@@ -103,9 +107,9 @@ public class Main extends Activity {
 				public void onItemClick(AdapterView<?> parent, View view, int position, long id) {
 					int color = BackgroundsAdapter.color(position);
 					if (color == Color.TRANSPARENT) {	// transparent --> select image as background
-						mIsProgramStartUp = false;	// don't show when coming back from Intent
+						mIsProgramStartUp = false;		// don't show help when coming back from Intent
 						Intent intent = new Intent(Intent.ACTION_PICK, android.provider.MediaStore.Images.Media.EXTERNAL_CONTENT_URI);
-						intent.setType("image/*");	// images only, no videos ...
+						intent.setType("image/*");		// images only, no videos ...
 						startActivityForResult(intent, SELECT_IMAGE);
 					} else {
 						mCanvas.reset(color);
@@ -134,7 +138,7 @@ public class Main extends Activity {
 		    	// base-url needed to be able to reference to assets-images in the html
 		    	wv.loadDataWithBaseURL("fake://not/needed", txt.toString(), "text/html", "utf-8", "");
 	    	} catch (IOException e) {
-	    		wv.loadData("error reading help text", "text/plain", "utf-8");
+	    		wv.loadData(getResources().getString(R.string.error_reading_help), "text/plain", "utf-8");
 	    	}
 	    	
 	    	builder = new AlertDialog.Builder(this);
@@ -178,7 +182,7 @@ public class Main extends Activity {
 				mCanvas.redo();
 				return true;
 			case R.id.miSave:
-				save();
+				saveImage();
 				return true;
 			case R.id.miHelp:
 				showDialog(DIALOG_HELP_ID);
@@ -249,26 +253,54 @@ public class Main extends Activity {
 		super.onActivityResult(requestCode, resultCode, data);
 		if (requestCode == SELECT_IMAGE) {
 		    if (resultCode == Activity.RESULT_OK) {
-		    	Uri imageUri = data.getData();
-		    	InputStream imageStream = null;
 		    	try {
-		    		imageStream = getContentResolver().openInputStream(imageUri);
-			    	BitmapFactory.Options options = new BitmapFactory.Options();
-			    	options.inSampleSize = 2;	// MUST down-size as photos are so large we get an OutOfMemory Error otherwise
-			    	Bitmap bm = BitmapFactory.decodeStream(imageStream, null, options);
-			    	imageStream.close();
-		    		mCanvas.reset(bm);
-		    		mBackgroundDialog.dismiss();
+			    	loadImage(data);
 		    	} catch(Exception e) {
-		    		Toast.makeText(this, "failed to open image", Toast.LENGTH_SHORT).show();
-		    		return;
+		    		Toast.makeText(this, getResources().getString(R.string.error_reading_image), Toast.LENGTH_SHORT).show();
+		    	} finally {
+		    		mBackgroundDialog.dismiss();
 		    	}
 		    } 
 		}
 	}
 
+	private void loadImage(Intent data) throws Exception {
+    	Uri imageUri = data.getData();
+    	InputStream imageStream = null;
+		imageStream = getContentResolver().openInputStream(imageUri);
+    	BitmapFactory.Options options = new BitmapFactory.Options();
+    	options.inJustDecodeBounds = true;
+    	BitmapFactory.decodeStream(imageStream, null, options);
+    	if (options.outWidth == -1) {
+    		throw new Exception();
+    	}
+    	options.inJustDecodeBounds = false;
+    	int width = options.outWidth;
+    	int height = options.outHeight;
+    	if (width > height) {	// landscape? swap width & height for sampleSize calculation
+    		int tmp = width;
+    		width = height;
+    		height = tmp;
+    	}
+    	int displayWidth = mCanvas.getWidth();
+    	int displayHeight = mCanvas.getHeight();
+    	int sampleX = width/displayWidth;
+    	int sampleY = height/displayHeight;
+    	int sampleSize = Math.min(sampleX, sampleY);
+    	// find largest power of 2, smaller than sampleSize
+    	options.inSampleSize = 1;
+    	while (options.inSampleSize*2 < sampleSize) {
+    		options.inSampleSize *= 2;
+    	}
+    	imageStream.close();
+    	imageStream = getContentResolver().openInputStream(imageUri);
+    	Bitmap bm = BitmapFactory.decodeStream(imageStream, null, options);
+    	imageStream.close();
+		mCanvas.reset(bm);
+	}
+	
 	// based on http://developer.android.com/reference/android/os/Environment.html
-	private void save() {
+	private void saveImage() {
 		String fileName = "fingercolors-"+mDateFormat.format(new Date())+".png";
 		File path = Environment.getExternalStoragePublicDirectory(Environment.DIRECTORY_PICTURES);
 	    File file = new File(path, fileName);
@@ -296,7 +328,7 @@ public class Main extends Activity {
 			}
 		} catch (Exception e) {
 			Log.w(LOG_TAG, "Saving image failed: "+e.getMessage(), e);
-			Toast.makeText(this, "Saving image failed, likely because external storage (sd-card) is not mounted.", Toast.LENGTH_LONG).show();
+			Toast.makeText(this, getResources().getString(R.string.error_saving_image), Toast.LENGTH_LONG).show();
 		}
 	}
 }
