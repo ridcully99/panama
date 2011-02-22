@@ -12,4 +12,8 @@
 	<string name="show_on_start_lbl">Show help at start-up.</string>
 	<string name="ok">OK</string>
 	<string name="image_saved_as">Image saved as %s</string>
+	
+	<string name="error_reading_image">Sorry, could not load the image.</string>
+	<string name="error_reading_help">Sorry, could not load help text.</string>
+	<string name="error_saving_image">Sorry, could not save the image, likely because external storage (SD card) is not mounted.</string>	
 </resources>

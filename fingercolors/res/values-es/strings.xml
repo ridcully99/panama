@@ -1,0 +1,17 @@
+<?xml version="1.0" encoding="utf-8"?>
+<resources>
+    
+	<string name="mi_new">Nuevo</string>
+	<string name="mi_save">Guardar</string>
+	<string name="mi_redo">Restaurar</string>
+	<string name="mi_help">Ayuda</string>
+
+	<string name="new_dialog_title">Elegir fondo</string>
+	<string name="show_on_start_lbl">Mostrar ayuda en el inicio.</string>
+	<string name="ok">OK</string>
+	<string name="image_saved_as">La imagen se guarda como %s</string>    
+
+	<string name="error_reading_image">Perdón, no se pudo cargar la imagen.</string>
+	<string name="error_reading_help">Perdón, no se pudo cargar el texto de ayuda.</string>
+	<string name="error_saving_image">Perdón, no se pudo guardar la imagen, probablemente porque el almacenamiento externo (tarjeta SD) no está montado.</string>
+</resources>

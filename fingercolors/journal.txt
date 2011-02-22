@@ -40,6 +40,9 @@ auf Version 7 (2.1) oder niedriger damit ich damit kompatibel bleibe.
 2011-02-10
 Bild speichern gemacht -- ging nur mit SDK Level 8 --> auch in Manifest so eintragen.
 
+2011-02-22
+Release-Candidate 1 -- alles fertig, nur ein paar Übersetzungen fehlen noch
+
 -------------------------------------
 
 Ideen (gereiht nach Priorität):

@@ -91,7 +91,7 @@ public class BackgroundsAdapter extends BaseAdapter {
             view = (View) convertView;
         }
         if (BACKGROUND_COLORS[position] == Color.TRANSPARENT) {
-        	Drawable galleryIcon = mContext.getResources().getDrawable(R.drawable.ic_menu_slideshow);
+        	Drawable galleryIcon = mContext.getResources().getDrawable(R.drawable.ic_gallery);
         	view.setBackgroundDrawable(galleryIcon);
         } else {
         	view.setBackgroundColor(color(position));

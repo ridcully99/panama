@@ -27,7 +27,7 @@ import android.media.MediaScannerConnection;
 import android.net.Uri;
 import android.os.Bundle;
 import android.os.Environment;
-import android.util.FloatMath;
+import android.util.DisplayMetrics;
 import android.util.Log;
 import android.view.KeyEvent;
 import android.view.LayoutInflater;
@@ -37,6 +37,7 @@ import android.view.MenuItem;
 import android.view.MotionEvent;
 import android.view.View;
 import android.view.ViewGroup;
+import android.view.Window;
 import android.webkit.WebView;
 import android.widget.AdapterView;
 import android.widget.CheckBox;
@@ -98,10 +99,13 @@ public class Main extends Activity {
 	    case DIALOG_BACKGROUND_ID:
 		    Dialog dialog = new Dialog(this);
 	    	mBackgroundDialog = dialog;
+	    	dialog.requestWindowFeature(Window.FEATURE_NO_TITLE);
 	    	dialog.setContentView(R.layout.new_dialog);
-	    	dialog.setTitle(R.string.new_dialog_title);
+	    	//dialog.setTitle(R.string.new_dialog_title);
 	    	GridView gv = (GridView)dialog.findViewById(R.id.backgroundsGrid);
-	    	gv.setAdapter(new BackgroundsAdapter(this, mCanvas.getWidth(), mCanvas.getHeight()));
+			DisplayMetrics metrics = new DisplayMetrics();
+			getWindowManager().getDefaultDisplay().getMetrics(metrics);
+	    	gv.setAdapter(new BackgroundsAdapter(this, metrics.widthPixels, metrics.heightPixels));
 	    	gv.setOnItemClickListener(new AdapterView.OnItemClickListener() {
 				@Override
 				public void onItemClick(AdapterView<?> parent, View view, int position, long id) {
@@ -319,15 +323,15 @@ public class Main extends Activity {
 		                new String[] { file.toString() }, null,
 		                new MediaScannerConnection.OnScanCompletedListener() {
 		            public void onScanCompleted(String path, Uri uri) {
-		                Log.i("ExternalStorage", "Scanned " + path + ":");
-		                Log.i("ExternalStorage", "-> uri=" + uri);
+		                //Log.i("ExternalStorage", "Scanned " + path + ":");
+		                //Log.i("ExternalStorage", "-> uri=" + uri);
 		            }
 		        });					
 			} else {
 				throw new Exception("canvas.saveBitmap did not succeed.");
 			}
 		} catch (Exception e) {
-			Log.w(LOG_TAG, "Saving image failed: "+e.getMessage(), e);
+			//Log.w(LOG_TAG, "Saving image failed: "+e.getMessage(), e);
 			Toast.makeText(this, getResources().getString(R.string.error_saving_image), Toast.LENGTH_LONG).show();
 		}
 	}
