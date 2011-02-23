@@ -11,4 +11,8 @@
 	<string name="ok">OK</string>
 	<string name="image_saved_as">Immagine salvata come %s</string>
 
+	<string name="error_reading_image">Spiacente, non è possibile caricare l\'immagine.</string>
+	<string name="error_reading_help">Spiacente, non è possibile caricare il testo di aiuto.</string>
+	<string name="error_saving_image">Spiacente, non è stato possibile salvare l\'immagine. Prova collegare disco esterno (carta SD).</string>
+
 </resources>

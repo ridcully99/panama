@@ -1,0 +1,18 @@
+<?xml version="1.0" encoding="utf-8"?>
+<resources>
+    
+	<string name="mi_new">Создать</string>
+	<string name="mi_save">Сохранить</string>
+	<string name="mi_redo">Восстановить</string>
+	<string name="mi_help">Справка</string>
+	
+	<string name="new_dialog_title">Выбрать фон</string>
+	<string name="show_on_start_lbl">Выводите справку при запуске.</string>
+	<string name="ok">ОК</string>
+	<string name="image_saved_as">Рисунок сохранен как %s</string>
+
+	<string name="error_reading_image">Извините, рисунок не мог быть загружен.</string>
+	<string name="error_reading_help">Извините, справка не могла быть загружена.</string>
+	<string name="error_saving_image">Извините, рисунок не мог быть сохранен, может быть потому, что внешняя память (SD-карта) не присоединена.</string> 
+
+</resources>
