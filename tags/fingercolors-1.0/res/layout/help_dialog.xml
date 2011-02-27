@@ -1,0 +1,28 @@
+<?xml version="1.0" encoding="utf-8"?>
+<LinearLayout
+	xmlns:android="http://schemas.android.com/apk/res/android"
+	android:id="@+id/helpDialog"
+	android:layout_width="fill_parent"
+	android:layout_height="fill_parent"
+	android:orientation="vertical">
+	<WebView 
+		android:layout_width="match_parent"
+		android:id="@+id/helpWebView" 
+		android:layout_height="250dp"
+		android:scrollbarAlwaysDrawVerticalTrack="true" 
+		android:fadeScrollbars="false">
+	</WebView>
+	<View 
+		android:background="@drawable/palette_shadow"
+		android:layout_width="match_parent" android:layout_height="2sp"
+		/>
+	<CheckBox 
+		android:layout_width="match_parent"
+		android:layout_height="wrap_content" 
+		android:id="@+id/showHelpOnStart"
+		android:text="@string/show_on_start_lbl" 
+		android:checked="true"
+		android:textColor="#000000"
+		android:textStyle="bold">
+	</CheckBox>
+</LinearLayout>

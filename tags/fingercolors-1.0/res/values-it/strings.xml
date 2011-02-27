@@ -1,0 +1,18 @@
+<?xml version="1.0" encoding="utf-8"?>
+<resources>
+    
+	<string name="mi_new">Nuovo</string>
+	<string name="mi_save">Salva</string>
+	<string name="mi_redo">Ripristina</string>
+	<string name="mi_help">Aiuto</string>
+	
+	<string name="new_dialog_title">Scegli sfondo</string>
+	<string name="show_on_start_lbl">Mostra Aiuto all\'avvio.</string>
+	<string name="ok">OK</string>
+	<string name="image_saved_as">Immagine salvata come %s</string>
+
+	<string name="error_reading_image">Spiacente, non è possibile caricare l\'immagine.</string>
+	<string name="error_reading_help">Spiacente, non è possibile caricare il testo di aiuto.</string>
+	<string name="error_saving_image">Spiacente, non è stato possibile salvare l\'immagine. Prova collegare disco esterno (carta SD).</string>
+
+</resources>
