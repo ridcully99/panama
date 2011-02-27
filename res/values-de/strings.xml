@@ -1,0 +1,18 @@
+<?xml version="1.0" encoding="utf-8"?>
+<resources>
+    
+	<string name="mi_new">Neu</string>
+	<string name="mi_save">Speichern</string>
+	<string name="mi_redo">Wiederherstellen</string>
+	<string name="mi_help">Hilfe</string>
+
+	<string name="new_dialog_title">Hintergrund wählen</string>
+	<string name="show_on_start_lbl">Hilfe zeigen beim Start.</string>
+	<string name="ok">OK</string>
+	<string name="image_saved_as">Bild gespeichert als %s</string>
+	
+	<string name="error_reading_image">Bild konnte nicht geladen werden.</string>
+	<string name="error_reading_help">Hilfetext konnte nicht geladen werden.</string>
+	<string name="error_saving_image">Bild konnte nicht gespeichert werden, vermutlich ist die SD card nicht gemountet.</string>		
+	
+</resources>

@@ -1,0 +1,33 @@
+<?xml version="1.0" encoding="utf-8"?>
+<LinearLayout xmlns:android="http://schemas.android.com/apk/res/android"
+	android:layout_width="fill_parent"
+	android:layout_height="fill_parent" 
+	android:orientation="vertical">
+	<RelativeLayout 
+		android:layout_width="fill_parent"
+	    android:layout_height="wrap_content"
+	    android:layout_weight="1">
+		<panama.android.fingercolors.CanvasView 
+	 		android:id="@+id/canvas" 
+	 		android:layout_width="fill_parent" 
+	 		android:layout_height="fill_parent" 
+	 		android:focusableInTouchMode="true" />
+		<LinearLayout
+			android:id="@+id/palette"
+			android:layout_width="fill_parent"
+		    android:layout_height="wrap_content"
+		    android:orientation="vertical"
+			android:layout_alignBottom="@id/canvas"
+			android:visibility="invisible">	
+			<View 
+				android:id="@+id/palette_shadow" 
+				android:background="@drawable/palette_shadow"
+				android:layout_width="match_parent" android:layout_height="8sp"
+				/>
+			<panama.android.fingercolors.PaletteView 
+				android:layout_width="fill_parent"
+				android:layout_height="wrap_content" 
+				/>
+		</LinearLayout>
+	</RelativeLayout>
+</LinearLayout>

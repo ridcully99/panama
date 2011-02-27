@@ -1,0 +1,84 @@
+2011-01-07
+Begonnen mit Smudge -- Als Basis diente das LunarLander Beispiel
+Probleme mit Flackern
+
+2011-01-08
+Eintrag im Internet gefunden der das Flackern erklärt (Double Buffering) und beschreibt wie man es los wird (in Bitmap rendern und das in den SurfaceView kopieren)
+http://groups.google.com/group/android-developers/msg/8d1243c33f9b7b6e
+
+2011-01-09
+Zeichnen geht jetzt richtig. Mit Linien, solange bis abgesetzt wird. Und rund statt eckig.
+TODO: Immer im Portraitmodus bleiben (Titel ausblenden) damit beim Drehen nicht die Bitmap gelöscht wird?
+
+2011-01-10
+Linie wird jetzt immer schwächer solange nicht abgesetzt wird.
+
+2011-01-16
+Inzwischen auf Basis von TouchPaint ... Alpha abhängig von Pressure und Linienstärke abhängig von Size.
+Überlappungen mittels Clipping verringert
+Fullscreen-App damit beim Malen nicht versehentlich der Infobereich runtergezogen wird.
+
+
+2011-01-16
+Versuch: Alpha aus Druck bei Touchdown nehmen und dann für den Rest der Linie beibehalten; die Linie als Path zeichnen.
+
+
+2011-01-20
+Verlaufszeug verworfen, normales Linienzeichnen mit Path und invalidate nur der dirty regions ... recht schnell
+
+  Idee --> "Fat Touch Events, z.B. Daumen" erkennen und für Radierfunktion verwenden (i.e. temporär Papierfarbe und alpha=255)
+  
+2011-01-31
+Undo usw fertig
+Farbproblem bei durchscheinend -- gelöst indem mit Hilfe von Undobuffer immer alles samt aktuellem Strich zuerst in mBitmap gezeichnet wird und dann erst in onDraw auf den gegebenen canvas.
+
+2011-02-03
+manifest Eintrag gemacht der Installation auf sd-card erlaubt.
+Fürs Compilieren muss ich jetzt immer als Target Version 8 (Android 2.2) einstellen, während des Programmierens aber 
+auf Version 7 (2.1) oder niedriger damit ich damit kompatibel bleibe.
+
+2011-02-10
+Bild speichern gemacht -- ging nur mit SDK Level 8 --> auch in Manifest so eintragen.
+
+2011-02-22
+Release-Candidate 1 -- alles fertig, nur ein paar Übersetzungen fehlen noch.
+Keystore gemacht mit Production-Key:
+
+Keystore: /home/ridcully/ridcully.keystore
+Key: android-production-key
+Pwd: beide Male L3...
+
+2011-02-23
+Version 1.0 -- russisch ohne Nadjas Feedback
+
+-------------------------------------
+
+Ideen (gereiht nach Priorität):
+-- Menü --> Palette mit Farben, Pipette und verschiedenen Pinselgrößen;
+--          Profifunktion ... statt Farben was zum Aufhellen und Abdunkeln (i.e. weiss bzw. schwarz und mit alpha = 128 beginnen, oder Metapher mit Wasserbecher und so das Anfangs-Alpha verringern) 
+
+-- "Papier" ... leicht gemusterte Bitmap als Hintergrund ... Farbe mit Alpha-Anteil --> Papierstruktur auch im Bild leicht sichtbar
+-- Menüfunktionen: 
+   -- neues Bild -> Papier wählen (verschiedene Farben, jeweils mit Papierstruktur)
+   -- Farbe wählen ... aus anderem Screen mit einer Reihe von Farbtöpfen (keine RGB Regler o.ä.)
+   --              ... aus aktuellem Bild
+   -- Speichern, Laden von  Bildern
+-- Zeichnen ... je schneller die Bewegung desto heller (mehr Transparenz) und eventuell auch dünner der Strich.
+-- Zeichnen ... Multitouch (ev. im Menü aktivierbar)
+-- Schmieren ... 
+
+Idee ... Effekt verwenden um Ecken zu vermeiden http://developer.android.com/reference/android/graphics/CornerPathEffect.html
+         unnötig.
+         
+Idee ... Wenn neues Bild begonnen wird, altes automatisch speichern (in App's Filesystem).
+Idee ... Radiergummi
+Idee ... Menü --> Palette mit Farb- und Pinselauswahl
+
+
+SPÄTER
+
+  TODO: API-Level 9 (Android 2.3) ---> InputDevice#getMotionRange() abfragen der Bereiche für z.B. Pressure oder Size --> genaueres Mapping auf Alpha möglich
+
+VERWORFEN
+
+-- Multitouch Unterstützung <-- nicht sinnvoll da nur 2 Finger erkannt werden
