@@ -15,9 +15,6 @@
  */
 package panama.core;
 
-import java.io.OutputStreamWriter;
-import java.io.PrintWriter;
-
 import org.json.simple.JSONArray;
 import org.json.simple.JSONObject;
 
