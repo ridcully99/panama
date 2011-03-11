@@ -31,7 +31,7 @@ import panama.form.Form;
 import panama.form.FormData;
 import panama.form.StringField;
 
-@Controller(alias="guestbook", defaultAction="list")
+@Controller(alias="guestbook", defaultAction="list") 
 public class GuestbookController extends BaseController {
 
 	/* create ListModel backed by a simple list. As this should be shared by all users, we make it static */
