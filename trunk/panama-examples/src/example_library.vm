@@ -1,0 +1,8 @@
+##
+## example for a velocity library
+## this library is included by velocity.properties and thus the macros are automatically available in all templates.
+##
+
+#macro(bold $text)
+<strong>$text</strong>
+#end
