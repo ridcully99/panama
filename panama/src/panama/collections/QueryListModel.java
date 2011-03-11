@@ -21,9 +21,7 @@ import java.util.Map;
 import panama.filter.Filter;
 import panama.filter.FilterExtension;
 
-
 import com.avaje.ebean.Query;
-import com.avaje.ebeaninternal.server.querydefn.DefaultOrmQuery;
 
 
 /**
@@ -65,7 +63,6 @@ public class QueryListModel implements ListModel {
 	}
 
 	/**
-	 * TODO this uses a cast to use the non-public copy() method!
 	 * @param q
 	 */
 	protected Query applyFilters(Query query) {
