@@ -100,7 +100,7 @@ public class Dispatcher implements Filter {
 	private ServletContext applicationContext = null;
 	
 	/** Multilanguage support */
-	private List<String> supportedLanguages = null;
+	protected List<String> supportedLanguages = null;
 	
 	/** Velocity */
 	private VelocityEngine velocityEngine;
@@ -248,7 +248,6 @@ public class Dispatcher implements Filter {
 				ctx = Context.createInstance(this, session, req, res, defaultLocale); 					// create context instance
 			}
 			ctx.put(CONTEXT_KEY, ctx);																	// put context into itself - some tools may need a context passed to them
-			
 			Target target = handleAction(ctx, req.getServletPath(), ACTION_INVOCATION_BY_URL);
 			if (target != null) {
 				log.debug("about to go to target "+target);
@@ -257,7 +256,7 @@ public class Dispatcher implements Filter {
 				targetTimer.done();
 				log.debug("returned from target");
 			}
-		} catch (Throwable e) {	// catch all sorts of exceptions -- we MUST close the hibernate session.
+		} catch (Throwable e) {	// catch all sorts of exceptions
 			log.fatalException(e);
 			try {
 				res.sendError(HttpServletResponse.SC_INTERNAL_SERVER_ERROR);
@@ -268,6 +267,17 @@ public class Dispatcher implements Filter {
 		}
 	}
 	
+	/**
+	 * Callback allowing additional stuff (e.g. rolblack database session)
+	 * This is called if during handling the action and target an exception is thrown that is not catched anywhere else.
+	 * The default implementation does nothing.
+	 * 
+	 * @param ctx
+	 * @param throwable 
+	 */
+	public void onExceptionWhileHandlingAction(Context ctx, Throwable throwable) {
+	}
+
 	/**
 	 * Scan WEB-INF/lib and WEB-INF/classes for Controller classes and puts all in controllerClasses map.
 	 * @throws IOException
@@ -389,7 +399,7 @@ public class Dispatcher implements Filter {
 	 * @return The target returned by the action or some error target in case of an error.
 	 * @throws IOException 
 	 */
-	private Target handleAction(Context ctx, String path, String invocationMode) throws IOException {
+	protected Target handleAction(Context ctx, String path, String invocationMode) throws IOException {
 	
 		/* put invokation mode in request context */
 		ctx.put(ACTION_INVOCATION_MODE_KEY, invocationMode);
@@ -582,7 +592,7 @@ public class Dispatcher implements Filter {
 	 * @return the best fitting locale
 	 */
 	@SuppressWarnings("rawtypes")
-	private Locale computeDefaultLocale(List<String> supported, Enumeration accepted) {
+	protected Locale computeDefaultLocale(List<String> supported, Enumeration accepted) {
 		if (supported == null) {
 			return null;
 		}

@@ -27,7 +27,7 @@ public class Version {
 	// b: Revision (increases when cool new features are added)
 	// c: Minor	(increases when updates or fixes are made - even numbers mark stable releases)
 	
-	public final static String VERSION = "3.2.2";
+	public final static String VERSION = "3.2.3";
 	
 	public final static String LOGO_ASCIIART = 
 	" ______ _______ _______ _______ _______ _______ \n"+
@@ -40,16 +40,17 @@ public class Version {
 
 	/* 	History
 	 * ---------------------------------------------------------------------------------
+	 * 3.2.3	2010-03-10 little fixes to allow derived versions of dispatcher.
 	 *          2010-12-31 switched to other name
 	 * 3.2.2  - 2010-12-06 Fix for JsonTarget - send correct content type (application/json) and do utf-8 encoding
 	 * 3.2.1  - 2010-11-15 Allow dots in action names
 	 * 3.2.0  - 2010-11-14 Ebean update to 2.7.1 and added json-simple.jar and a JsonTarget for easier use with JSON/AJAX
 	 * 3.1.0  - 2010-11-02 Ebean ORM, Removed authorization as well, config via Filter Init-Parameters, no more pandora.xml
 	 * 3.1.0 alpha - 2010-10-24   Removed quartz and hibernate -> switch to Ebean (and perhaps a flexible plugin System)
-     * 3.0.0  - 2010-10-22 Finally!
-     * -""-   - 2010-10-07 Filter statt Servlet --> auch pretty urls möglich
-     *                     RequestEncodeFilter in Dispatcher integriert
-     * 3.0.0.alpha - 2010-09-.. XSS entfernt, Controller/Action Konzept vereinfacht mithilfe von Annotations
+	 * 3.0.0  - 2010-10-22 Finally!
+	 * -""-   - 2010-10-07 Filter statt Servlet --> auch pretty urls möglich
+	 *                     RequestEncodeFilter in Dispatcher integriert
+	 * 3.0.0.alpha - 2010-09-.. XSS entfernt, Controller/Action Konzept vereinfacht mithilfe von Annotations
 	 * 2.3.0  - 2010-08-03 Included optional XSS (cross side scripting) protection for all FormFields (stripping all html from the input). Uses jericho htmlparser (http://jericho.htmlparser.net) introducing a new dependency (jericho-html-3.1.jar)
 	 * 2.2.0  - 2010-04-27 Included misc. updates, applied Apache License and published on code.google.com/p/pandora-web-framework!
 	 * 2.0.4  - 2010-03-23 Added FileItem Field with necessary updates to FormData and Context -- see Mediathek#save() for usage.
