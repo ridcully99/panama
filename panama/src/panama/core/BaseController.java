@@ -106,8 +106,8 @@ public class BaseController {
 	 * Note: Use redirect only if you need the client browser's URL to have a new URL.
 	 *       Its <strong>much faster</strong> to use doAction().
 	 * 
- 	 * @param url
- 	 * @return A Target object
+	 * @param url
+	 * @return A Target object
 	 */	
 	public Target redirect(String url) {
 		Target t = new RedirectTarget(url);
@@ -124,8 +124,8 @@ public class BaseController {
 	 * Note: Use redirect only if you need the client browser's URL to have a new URL.
 	 *       Its <strong>much faster</strong> to use doAction().
 	 * 
- 	 * @param action
- 	 * @return A Target object
+	 * @param action
+	 * @return A Target object
 	 */		
 	public Target redirectToAction(String action) {
 		return redirectToAction(this.getClass(), action, null);
@@ -143,9 +143,9 @@ public class BaseController {
 	 * Note: Use redirect only if you need the client browser's URL to have a new URL.
 	 *       Its <strong>much faster</strong> to use doAction().
 	 * 
- 	 * @param action
- 	 * @param parameterMap
- 	 * @return A Target object
+	 * @param action
+	 * @param parameterMap
+	 * @return A Target object
 	 */		
 	public Target redirectToAction(String action, Map parameterMap) {
 		return redirectToAction(this.getClass(), action, parameterMap);
@@ -161,9 +161,9 @@ public class BaseController {
 	 * Note: Use redirect only if you need the client browser's URL to have a new URL.
 	 *       Its <strong>much faster</strong> to use doAction().
 	 * 
- 	 * @param controllerClass
- 	 * @param action
- 	 * @return A Target object
+	 * @param controllerClass
+	 * @param action
+	 * @return A Target object
 	 */	
 	public Target redirectToAction(Class<? extends BaseController> controllerClass, String action) {
 		return redirectToAction(controllerClass, action, null);
@@ -181,10 +181,10 @@ public class BaseController {
 	 * Note: Use redirect only if you need the client browser's URL to have a new URL.
 	 *       Its <strong>much faster</strong> to use doAction().
 	 * 
- 	 * @param controllerClass
- 	 * @param action
- 	 * @param parameterMap A map of parameter/value pairs.
- 	 * @return A Target object
+	 * @param controllerClass
+	 * @param action
+	 * @param parameterMap A map of parameter/value pairs.
+	 * @return A Target object
 	 */	
 	public Target redirectToAction(Class<? extends BaseController> controllerClass, String action, Map parameterMap) {
 		Controller annotation = controllerClass.getAnnotation(Controller.class);
@@ -210,9 +210,9 @@ public class BaseController {
 	}
 	
 	/**
-	 * Hands control over to other servlet (e.g. Velocity to render the template).
+	 * Creates a TemplateTarget for the specified templateName (building absolute path is a relativ path was provided)
 	 * 
-	 * @param templateName The name of the template to render
+	 * @param templateName The name (with relative or absolute path) of the template to render
 	 * @return a Target object
 	 */
 	public Target render(String templateName) {
@@ -329,11 +329,11 @@ public class BaseController {
 	 * @return the formatted string
 	 */
 	public String getLocalizedString(String bundleName, String key, Object... args) {
-        ResourceBundle bundle = ResourceBundle.getBundle(bundleName, context.getLocale());
-        if (bundle.containsKey(key)) {
-        	return MessageFormat.format(bundle.getString(key), args);
-        } else {
-        	return "???"+key+"???";
-        }
+		ResourceBundle bundle = ResourceBundle.getBundle(bundleName, context.getLocale());
+		if (bundle.containsKey(key)) {
+			return MessageFormat.format(bundle.getString(key), args);
+		} else {
+			return "???"+key+"???";
+		}
 	}
 }
