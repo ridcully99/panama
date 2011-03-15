@@ -165,7 +165,7 @@ public class FormData {
 	 * @param bean The bean, the current input-data will be applied to.
 	 */
 	public void applyTo(Object bean) {
-		applyTo(bean, null, Form.EXCLUDE_PROPERTIES);
+		applyTo(bean, Form.EXCLUDE_PROPERTIES);
 	}
 	
 	/**
@@ -176,8 +176,8 @@ public class FormData {
 	 * @param bean The bean, the input should be applied to.
 	 * @param properties the properties to be set
 	 */
-	public void applyTo(Object bean, String[] properties) {
-		applyTo(bean, properties, Form.INCLUDE_PROPERTIES);
+	public void applyTo(Object bean, String... properties) {
+		applyTo(bean, Form.INCLUDE_PROPERTIES, properties);
 	}	
 
 	/**
@@ -191,7 +191,7 @@ public class FormData {
 	 * @param properties the properties to be set or to be skipped, depending on method
 	 * @param method wether to set the specified or all _but_ the specified properties. Value should be one of Form.INCLUDE_PROPERTIES or Form.EXCLUDE_PROPERTIES 
 	 */
-	public void applyTo(Object bean, String[] properties, int method) {
+	public void applyTo(Object bean, int method, String... properties) {
 		List<String> allProperties = Arrays.asList(DynaBeanUtils.getPropertyNames(bean));
 		List<String> props = Arrays.asList(properties == null ? new String[0] : properties);
 		if (!allProperties.containsAll(props)) {
