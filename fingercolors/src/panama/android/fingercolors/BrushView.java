@@ -44,11 +44,7 @@ public class BrushView extends View {
 		canvas.drawColor(0x00FFFFFF);
 
 		// draw background
-		int color = mBrushPaint.getColor();
 		float size = mBrushPaint.getStrokeWidth();
-		//int luminance = (int)(0.3f*Color.red(color) + 0.59f*Color.green(color) + 0.11f*Color.blue(color));	// brightness
-		//mBackgroundPaint.setColor(luminance < 128 ? 0xFFFFFFFF : 0xFF000000);
-		//mBackgroundPaint.setAlpha(Color.alpha(color));
 		mBackgroundPaint.setShader(new LinearGradient(0, 0, mBackgroundRect.right, 0, 0xFF666666, 0xFFFFFFFF, TileMode.CLAMP));
 		canvas.drawRoundRect(mBackgroundRect, PADDING, PADDING, mBackgroundPaint);
 		canvas.drawLine(PADDING+size/2, mBackgroundRect.centerY(), mBackgroundRect.right-size/2-PADDING, mBackgroundRect.centerY(), mBrushPaint);
@@ -57,7 +53,6 @@ public class BrushView extends View {
 	@Override
 	protected void onMeasure(int widthMeasureSpec, int heightMeasureSpec) {
         int parentWidth = MeasureSpec.getSize(widthMeasureSpec);
-        int parentHeight = MeasureSpec.getSize(heightMeasureSpec);
 		int size = (int)mBrushPaint.getStrokeWidth();
         int width = parentWidth/2 + 2*PADDING;
 		int height = Math.max(size, 4*PADDING) + 2*PADDING;

@@ -10,7 +10,6 @@ import android.graphics.Color;
 import android.graphics.LinearGradient;
 import android.graphics.Paint;
 import android.graphics.Paint.Style;
-import android.graphics.Path;
 import android.graphics.Shader.TileMode;
 import android.util.AttributeSet;
 import android.view.MotionEvent;
@@ -29,23 +28,26 @@ public class PaletteView extends View {
 	
     private Bitmap  mBitmap;
     private Canvas  mCanvas;
-    private Path    mPath;
     private Paint   mBitmapPaint;
     private Paint	mPaint;
-    
+    private Paint	mMarkerPaint;
     private int		mSelectedColor = Color.BLACK;
+    private int		mSelectionX = 0;
+    private int		mSelectionY = 0;
     
 	public PaletteView(Context context, AttributeSet attrs) {
 		super(context, attrs);
 		
         mBitmap = Bitmap.createBitmap(32, 32, Bitmap.Config.ARGB_8888);
         mCanvas = new Canvas(mBitmap);
-        mPath = new Path();
         mBitmapPaint = new Paint(Paint.DITHER_FLAG);
+        mMarkerPaint = new Paint();
+        mMarkerPaint.setAntiAlias(true);
+        mMarkerPaint.setStyle(Paint.Style.STROKE);
+        mMarkerPaint.setStrokeWidth(2);
         
         mPaint = new Paint();
         mPaint.setDither(true);
-        //setFocusableInTouchMode(true);
 	}
 	
     @Override
@@ -68,18 +70,25 @@ public class PaletteView extends View {
         // vertical invisible to black gradient form half
         mPaint.setShader(new LinearGradient(0, COLOR_BAND_HEIGHT/2, 0, h, 0x00000000, 0xFF000000, TileMode.CLAMP));
         mCanvas.drawRect(0, COLOR_BAND_HEIGHT/2, colorWidth, h, mPaint);
+        
+        mSelectionX = 0;
+        mSelectionY = h;
     }
     
     @Override
     protected void onDraw(Canvas canvas) {
-        canvas.drawColor(mSelectedColor);
         canvas.drawBitmap(mBitmap, 0, 0, mBitmapPaint);
+        mMarkerPaint.setColor(0x80000000);	// transparent black
+        mMarkerPaint.setStrokeWidth(5);
+        canvas.drawCircle(mSelectionX, mSelectionY, 8, mMarkerPaint);
+        mMarkerPaint.setColor(0xFFEEEEEE);
+        mMarkerPaint.setStrokeWidth(3);
+        canvas.drawCircle(mSelectionX, mSelectionY, 8, mMarkerPaint);
     }
     
     @Override
     protected void onMeasure(int widthMeasureSpec, int heightMeasureSpec) {
         int parentWidth = MeasureSpec.getSize(widthMeasureSpec);
-        int parentHeight = MeasureSpec.getSize(heightMeasureSpec);
     	setMeasuredDimension(parentWidth, COLOR_BAND_HEIGHT);
     }
     
@@ -91,16 +100,20 @@ public class PaletteView extends View {
         x = Math.min(x, mBitmap.getWidth()-1);
         y = Math.max(0, y);
         y = Math.min(y, mBitmap.getHeight()-1);
-    	CanvasView canvas = (CanvasView)((Main)this.getContext()).findViewById(R.id.canvas);
+    	CanvasView canvas = (CanvasView)((Main)this.getContext()).findViewById(R.id.canvas);	// TODO slow?
         switch (event.getAction()) {
         	case MotionEvent.ACTION_DOWN:
             case MotionEvent.ACTION_MOVE:
             	mSelectedColor = mBitmap.getPixel(x, y);
+            	mSelectionX = x;
+            	mSelectionY = y;
             	canvas.setColor(mSelectedColor);
+            	invalidate();
                 break;
             case MotionEvent.ACTION_UP:
             	canvas.setColor(mSelectedColor);
-            	((ViewGroup)getParent()).setVisibility(INVISIBLE);	// hide LinearLayout containing this view (holds shadow and palette)
+            	canvas.enableColorPickMode(false);
+            	((Main)this.getContext()).hidePalettes();
                 break;
         }
         return true;

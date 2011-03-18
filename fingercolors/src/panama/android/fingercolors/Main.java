@@ -28,7 +28,6 @@ import android.net.Uri;
 import android.os.Bundle;
 import android.os.Environment;
 import android.util.DisplayMetrics;
-import android.util.Log;
 import android.view.KeyEvent;
 import android.view.LayoutInflater;
 import android.view.Menu;
@@ -36,36 +35,99 @@ import android.view.MenuInflater;
 import android.view.MenuItem;
 import android.view.MotionEvent;
 import android.view.View;
+import android.view.View.OnTouchListener;
 import android.view.ViewGroup;
 import android.view.Window;
+import android.view.WindowManager;
 import android.webkit.WebView;
 import android.widget.AdapterView;
 import android.widget.CheckBox;
 import android.widget.GridView;
+import android.widget.ImageButton;
+import android.widget.SeekBar;
+import android.widget.SeekBar.OnSeekBarChangeListener;
 import android.widget.Toast;
 
-public class Main extends Activity {
+public class Main extends Activity implements OnSeekBarChangeListener {
 
 	public final static String LOG_TAG = "fingercolors";
 	public final static int DIALOG_BACKGROUND_ID = 1;
-	public final static int DIALOG_HELP_ID = 2;
-	public final static int SELECT_IMAGE = 1;
+	public final static int DIALOG_HELP_ID       = 2;
+	public final static int SELECT_IMAGE         = 1;
 	public final static String PREFS_SHOW_HELP_AT_STARTUP = "showHelpAtStartup";
-	
+	public final static int INITIAL_BRUSH_SIZE = 16;
+
 	private final static SimpleDateFormat mDateFormat = new SimpleDateFormat("yyMMdd-HHmmss");
 	
 	private CanvasView mCanvas;
-	private ViewGroup mPalette;
+	private ViewGroup mColorPalette;
+	private ViewGroup mBrushPalette;
+	private ViewGroup mTransparencyPalette;
+	private SeekBar mBrushSizeSlider;
 	private Dialog mBackgroundDialog;
 	private boolean mIsProgramStartUp;	// flag so we can differ between real startup and a comeback from the 'select image' Intent
+	
+	private OnTouchListener mMyBtnListener = new OnTouchListener() {
+        @Override
+        public boolean onTouch(View v, MotionEvent event) {
+        	if (event.getAction() == MotionEvent.ACTION_DOWN) {
+        		boolean wasPressed = v.isPressed();
+        		hidePalettes(); 	// also unpresses all buttons
+        		if (wasPressed) {
+        			return true;	// if buttons was pressed, the user pressed it again to hide the palette, which is done now.
+        		}
+        		// a previously not pressed button was touched.
+        		// mark it pressed and show it's palette (or enable color pick mode)
+        		v.setPressed(true);
+        		int id = v.getId();
+        		switch(id) {
+        			case R.id.paletteBtn:
+    					mCanvas.enableColorPickMode(true);
+    					mColorPalette.setVisibility(View.VISIBLE);
+    					mColorPalette.bringToFront();
+    					mColorPalette.requestFocus();
+        				break;
+        			case R.id.colorPickBtn:
+        				mCanvas.enableColorPickMode(true);
+        				break;
+        			case R.id.brushBtn:
+    					mBrushPalette.setVisibility(View.VISIBLE);
+    					mBrushPalette.bringToFront();
+    					mBrushPalette.requestFocus();
+        				break;
+        			case R.id.transparencyBtn:
+    					mTransparencyPalette.setVisibility(View.VISIBLE);
+    					mTransparencyPalette.bringToFront();
+    					mTransparencyPalette.requestFocus();
+        				break;
+        		}
+        	}
+            return true;
+        }
+    }; 
+	
 	
 	/** Called when the activity is first created. */
 	@Override
 	public void onCreate(Bundle savedInstanceState) {
 		super.onCreate(savedInstanceState);
+        requestWindowFeature(Window.FEATURE_NO_TITLE);
+        getWindow().setFlags(WindowManager.LayoutParams.FLAG_FULLSCREEN,  WindowManager.LayoutParams.FLAG_FULLSCREEN);
 		setContentView(R.layout.main);
 		mCanvas = (CanvasView)findViewById(R.id.canvas);
-		mPalette = (ViewGroup)findViewById(R.id.palette);
+		mColorPalette = (ViewGroup)findViewById(R.id.colorPalette);
+		mBrushPalette = (ViewGroup)findViewById(R.id.brushPalette);
+		mTransparencyPalette = (ViewGroup)findViewById(R.id.transparencyPalette);
+		mBrushSizeSlider = (SeekBar)findViewById(R.id.brushSizeSlider);
+		mBrushSizeSlider.setOnSeekBarChangeListener(this);
+		((SeekBar)findViewById(R.id.transparencySlider)).setOnSeekBarChangeListener(this);
+		mBrushSizeSlider.setProgress(INITIAL_BRUSH_SIZE);	// also sets brushSize in CanvasView
+		
+		((ImageButton)findViewById(R.id.brushBtn)).setOnTouchListener(mMyBtnListener);
+		((ImageButton)findViewById(R.id.transparencyBtn)).setOnTouchListener(mMyBtnListener);
+		((ImageButton)findViewById(R.id.colorPickBtn)).setOnTouchListener(mMyBtnListener);
+		((ImageButton)findViewById(R.id.paletteBtn)).setOnTouchListener(mMyBtnListener);
+		
 		mIsProgramStartUp = true;
 	}
 	
@@ -196,41 +258,22 @@ public class Main extends Activity {
 	}
 	
 	@Override
-	public boolean onTrackballEvent(MotionEvent event) {
-		float x = event.getX();
-		float y = event.getY();
-		if (x > 0) {
-			mCanvas.increaseAlpha((int)(255*x)/10);
-		}
-		if (x < 0) {
-			mCanvas.decreaseAlpha((int)(-255*x)/10);
-		}
-		if (y > 0) {
-			mCanvas.decreaseBrightness((int)(255*y)/5);
-		}
-		if (y < 0) {
-			mCanvas.increaseBrightness((int)(-255*y)/5);
-		}
-		return false;
-	}
-	
-	@Override
 	public boolean onKeyDown(int keyCode, KeyEvent event) {
+		int size;
 		switch (keyCode) {
 			case KeyEvent.KEYCODE_VOLUME_UP:
-				mCanvas.increaseBrushSize();
+				size = mBrushSizeSlider.getProgress();
+				size *= 2;
+				if (size == 0) {
+					size = 1;
+				}
+				mBrushSizeSlider.setProgress(size);
+				mCanvas.setBrushSize(mBrushSizeSlider.getProgress());	// necessary to do this too, to show the BrushToast
 				return true;
 			case KeyEvent.KEYCODE_VOLUME_DOWN:
-				mCanvas.decreaseBrushSize();
-				return true;
-			case KeyEvent.KEYCODE_DPAD_CENTER:
-				if (mPalette.getVisibility() == View.VISIBLE) {
-					mPalette.setVisibility(View.INVISIBLE);
-				} else {
-					mPalette.requestFocus();
-					mPalette.setVisibility(View.VISIBLE);
-					mPalette.bringToFront();
-				}
+				size = mBrushSizeSlider.getProgress();
+				mBrushSizeSlider.setProgress(size/2);
+				mCanvas.setBrushSize(mBrushSizeSlider.getProgress());	// necessary to do this too, to show the BrushToast
 				return true;
 			default:;
 		}
@@ -243,13 +286,20 @@ public class Main extends Activity {
 			case KeyEvent.KEYCODE_VOLUME_UP:
 			case KeyEvent.KEYCODE_VOLUME_DOWN:
 				return true;	// avoid changing any sound volumes
-			case KeyEvent.KEYCODE_DPAD_CENTER:
-				if (mPalette.getVisibility() == View.VISIBLE) {
-					mPalette.requestFocus();
-					mPalette.bringToFront();					
-				}
 		}
 		return false;
+	}
+	
+	public void hidePalettes() {
+		mColorPalette.setVisibility(View.GONE);
+		mBrushPalette.setVisibility(View.GONE);
+		mTransparencyPalette.setVisibility(View.GONE);
+    	mCanvas.enableColorPickMode(false);
+    	// TODO in variablen speichern, statt jedesmal zu suchen.
+		findViewById(R.id.brushBtn).setPressed(false);
+		findViewById(R.id.transparencyBtn).setPressed(false);
+		findViewById(R.id.colorPickBtn).setPressed(false);
+		findViewById(R.id.paletteBtn).setPressed(false);
 	}
 	
 	@Override
@@ -318,21 +368,41 @@ public class Main extends Activity {
 				String msg = getResources().getString(R.string.image_saved_as, file.getAbsolutePath());
 				Toast.makeText(this, msg, Toast.LENGTH_LONG).show();
 				// Tell the media scanner about the new file so that it is
-		       // immediately available to the user.
-		       MediaScannerConnection.scanFile(this,
-		                new String[] { file.toString() }, null,
-		                new MediaScannerConnection.OnScanCompletedListener() {
-		            public void onScanCompleted(String path, Uri uri) {
-		                //Log.i("ExternalStorage", "Scanned " + path + ":");
-		                //Log.i("ExternalStorage", "-> uri=" + uri);
-		            }
-		        });					
+				// immediately available to the user.
+				MediaScannerConnection.scanFile(this,
+						new String[] { file.toString() }, null,
+						new MediaScannerConnection.OnScanCompletedListener() {
+							public void onScanCompleted(String path, Uri uri) {
+							}
+						});
 			} else {
 				throw new Exception("canvas.saveBitmap did not succeed.");
 			}
 		} catch (Exception e) {
-			//Log.w(LOG_TAG, "Saving image failed: "+e.getMessage(), e);
 			Toast.makeText(this, getResources().getString(R.string.error_saving_image), Toast.LENGTH_LONG).show();
 		}
+	}
+
+	/* -- OnSeekBarListener methods ------------------------------------------------------------------------------ */
+	
+	@Override
+	public void onProgressChanged(SeekBar seekBar, int progress, boolean fromUser) {
+		switch (seekBar.getId()) {
+		case R.id.brushSizeSlider:
+			mCanvas.setBrushSize(progress, fromUser);
+			break;
+		case R.id.transparencySlider:
+			mCanvas.setAlpha(progress);
+			break;
+		}
+	}
+
+	@Override
+	public void onStartTrackingTouch(SeekBar seekBar) {
+	}
+
+	@Override
+	public void onStopTrackingTouch(SeekBar seekBar) {
+		hidePalettes();
 	}
 }

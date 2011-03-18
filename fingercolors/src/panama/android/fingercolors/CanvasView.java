@@ -34,6 +34,7 @@ import android.widget.Toast;
  */
 public class CanvasView extends View {
 	
+	private Context		mContext;
     private Bitmap  	mBitmap;
     private Bitmap		mPrevBitmap;
     private Bitmap		mUndoBackgroundBitmap;
@@ -53,15 +54,18 @@ public class CanvasView extends View {
     private int 		mSize = 16;
     private float		mBlur = 0.05f;	// factor to multiply (255-alpha) with for blur-radius	
     private int			mBrightness = 0;
-    private Rect 		mDirtyRegion = new Rect(0,0,0,0);
-    private int			mLastX = -1;
-    private int			mLastY = -1;
+    private Rect 		mDirtyRegion = new Rect(0, 0, 0, 0);
+    private float		mLastX = -1;
+    private float		mLastY = -1;
 
     private Stack<UndoRedoStep>	mUndoStack = new Stack<UndoRedoStep>();
     private Stack<UndoRedoStep>	mRedoStack = new Stack<UndoRedoStep>();
+
+    private boolean		mColorPickMode = false;
     
     public CanvasView(Context context, AttributeSet attrs) {
         super(context, attrs);
+        mContext = context;
         mBitmap = Bitmap.createBitmap(1, 1, Bitmap.Config.ARGB_8888);
         mCanvas = new Canvas(mBitmap);
         mPath = new Path();
@@ -77,7 +81,7 @@ public class CanvasView extends View {
         mPaint.setStrokeWidth(mSize);
         setBlur();
 
-        LayoutInflater inflater = ((Main)context).getLayoutInflater();
+        LayoutInflater inflater = ((Main)mContext).getLayoutInflater();
         View layout = inflater.inflate(R.layout.brushtoast, (ViewGroup) findViewById(R.id.brushtoast_layout_root));        
         
     	mBrushToast = new Toast(this.getContext());
@@ -91,7 +95,14 @@ public class CanvasView extends View {
         setFocusableInTouchMode(true);	
     }
     
-    @Override
+	@Override
+	protected void onMeasure(int widthMeasureSpec, int heightMeasureSpec) {
+		int width = MeasureSpec.getSize(widthMeasureSpec);
+		int height = MeasureSpec.getSize(heightMeasureSpec);
+		setMeasuredDimension(width, height);
+	}    
+
+	@Override
     protected void onSizeChanged(int w, int h, int oldw, int oldh) {
         super.onSizeChanged(w, h, oldw, oldh);
         mBitmap = Bitmap.createBitmap(w, h, Bitmap.Config.ARGB_8888);
@@ -125,23 +136,30 @@ public class CanvasView extends View {
     
 	@Override
     public boolean onTouchEvent(MotionEvent event) {
+		
+		if (mColorPickMode) {
+			// hide palette (but button stays pressed)
+			View v = ((Main)mContext).findViewById(R.id.colorPalette);
+			v.setVisibility(View.GONE);
+			return handleColorPickTouchEvent(event);
+		}
+
         float x = event.getX();
         float y = event.getY();
-        int ix = (int)x;
-        int iy = (int)y;
         
         mBrushToast.cancel();
 
         switch (event.getAction()) {
         	case MotionEvent.ACTION_DOWN:
+        		((Main)mContext).hidePalettes();
         		mPath.reset();
         		mPath.moveTo(x, y);
         		mPath.lineTo(x+0.5f, y+0.5f);
-        		mDirtyRegion.set(ix, iy, ix, iy);
-            	adjustDirtyRegion(ix, iy);
+        		mDirtyRegion.set((int)x, (int)y, (int)x, (int)y);
+            	adjustDirtyRegion(x, y);
                 invalidate(mDirtyRegion);
-                mLastX = (int)x;
-                mLastY = (int)y;
+                mLastX = x;
+                mLastY = y;
                 break;
             case MotionEvent.ACTION_MOVE:
             	boolean redraw = false;	// only invalidate if actually something gets drawn
@@ -149,22 +167,21 @@ public class CanvasView extends View {
             	for (int i = 0; i < historySize; i++) {
             		float historicalX = event.getHistoricalX(i);
             		float historicalY = event.getHistoricalY(i);
-            		int ihx = (int)historicalX;
-            		int ihy = (int)historicalY;
-                    if (ihx != mLastX || ihy != mLastY) {
+            		
+                    if (enoughDistance(historicalX, historicalY, mLastX, mLastY)) {
                     	mPath.lineTo(historicalX, historicalY);
-                    	adjustDirtyRegion(ihx, ihy);
+                    	adjustDirtyRegion(historicalX, historicalY);	// TODO hier wäre eine einfachere Methode ausreichend (ohne Blur-Ränder usw.) -- vielleicht ein adjustDirtyRegion mit einem Rect als Parameter machen
                     	redraw = true;
-                    	mLastX = ihx;
-                    	mLastY = ihy;
+                    	mLastX = historicalY;
+                    	mLastY = historicalY;
                     }
             	}
-                if (ix != mLastX || iy != mLastY) {
+                if (enoughDistance(x, y, mLastX, mLastY)) {
                 	mPath.lineTo(x, y);
-                	adjustDirtyRegion(ix, iy);
+                	adjustDirtyRegion(x, y);
                 	redraw = true;
-                    mLastX = ix;
-                    mLastY = iy;
+                    mLastX = x;
+                    mLastY = y;
                 }
                 if (redraw) {
                 	invalidate(mDirtyRegion);
@@ -181,8 +198,8 @@ public class CanvasView extends View {
         }
         return true;
     }
-    
-    public void reset(int color) {
+
+	public void reset(int color) {
     	mBitmap.eraseColor(color);
     	mPrevBitmap.eraseColor(color);
     	mUndoBackgroundBitmap.eraseColor(color);
@@ -232,12 +249,18 @@ public class CanvasView extends View {
     	toastBrush();
     }
     
-    public void setBrushSize(int size) {
+    public void setBrushSize(int size, boolean show) {
     	size = Math.max(2, size);
-    	size = Math.min(mBitmap.getWidth()/4, size);
+    	size = Math.min(128, size);
     	mSize = size;
     	mPaint.setStrokeWidth(size);
-    	toastBrush();
+    	if (show) {
+    		toastBrush();
+    	}
+    }
+    
+    public void setBrushSize(int size) {
+    	setBrushSize(size, true);
     }
     
     public void increaseBrushSize() {
@@ -248,8 +271,8 @@ public class CanvasView extends View {
     	setBrushSize(mSize/2);
     }
     
-    public void increaseAlpha(int delta) {
-    	mAlpha = mPaint.getAlpha()+delta;
+    public void setAlpha(int alpha) {
+    	mAlpha = alpha;
     	mAlpha = Math.min(255, mAlpha);
     	mAlpha = Math.max(5, mAlpha);
     	mPaint.setAlpha(mAlpha);
@@ -258,12 +281,16 @@ public class CanvasView extends View {
     	toastBrush();
     }
     
-    public void decreaseAlpha(int delta) {
-    	increaseAlpha(-delta);
+    public void increaseAlpha(int delta) {
+    	setAlpha(mPaint.getAlpha()+delta);
     }
     
-    public void increaseBrightness(int delta) {
-    	mBrightness += delta;
+    public void decreaseAlpha(int delta) {
+    	setAlpha(mPaint.getAlpha()-delta);
+    }
+
+    public void setBrightness(int brightness) {
+    	mBrightness = brightness;
     	mBrightness = Math.min(mBrightness, 255);
     	mBrightness = Math.max(mBrightness, -255);
     	int[] rgb = new int[3];
@@ -275,10 +302,15 @@ public class CanvasView extends View {
     	mPaint.setARGB(mAlpha, rgb[0], rgb[1], rgb[2]);
     	mColor = mPaint.getColor();
     	toastBrush();
+    	
+    }
+    
+    public void increaseBrightness(int delta) {
+    	setBrightness(mBrightness+delta);
     }
     
     public void decreaseBrightness(int delta) {
-    	increaseBrightness(-delta);
+    	setBrightness(mBrightness-delta);
     }
     
     private void toastBrush() {
@@ -298,13 +330,13 @@ public class CanvasView extends View {
     	}
     }
 
-    private void adjustDirtyRegion(int x, int y) {
+    private void adjustDirtyRegion(float x, float y) {
 		float blurRadius = (255-mAlpha)*mBlur;
-    	int strokeWidthHalf = (int)(mSize/2f+blurRadius)+4;	// Hälfte der Strichbreite + blurRadius +4 zur Sicherheit wg. Blur und Antialias
-    	mDirtyRegion.left = Math.min(mDirtyRegion.left, x-strokeWidthHalf);
-    	mDirtyRegion.right = Math.max(mDirtyRegion.right, x+strokeWidthHalf);
-    	mDirtyRegion.top = Math.min(mDirtyRegion.top, y-strokeWidthHalf);
-    	mDirtyRegion.bottom = Math.max(mDirtyRegion.bottom, y+strokeWidthHalf);
+    	float strokeWidthHalf = (mSize/2f+blurRadius)+4;	// Hälfte der Strichbreite + blurRadius +4 zur Sicherheit wg. Blur und Antialias
+    	mDirtyRegion.left   = (int)FloatMath.floor(Math.min(mDirtyRegion.left, x-strokeWidthHalf));
+    	mDirtyRegion.right  = (int)FloatMath.ceil(Math.max(mDirtyRegion.right, x+strokeWidthHalf));
+    	mDirtyRegion.top    = (int)FloatMath.floor(Math.min(mDirtyRegion.top, y-strokeWidthHalf));
+    	mDirtyRegion.bottom = (int)FloatMath.ceil(Math.max(mDirtyRegion.bottom, y+strokeWidthHalf));
     }
 
     private void redrawUndoStack() {
@@ -339,6 +371,10 @@ public class CanvasView extends View {
 		return mBitmap.compress(CompressFormat.PNG, 100, outStream);
 	}
     
+	public void enableColorPickMode(boolean enabled) {
+		mColorPickMode = enabled;
+	}
+	
     // compute perceived brightness of a color in the range of 0 to 255
     // from http://www.nbdtech.com/Blog/archive/2008/04/27/Calculating-the-Perceived-Brightness-of-a-Color.aspx
     private int brightness(int[] rgb) {
@@ -346,6 +382,35 @@ public class CanvasView extends View {
     						  rgb[1]*rgb[1]*0.691f+
     						  rgb[2]*rgb[2]*0.068f);
     }
+    
+	/** 
+	 * check if distance between points (x1,y1) and (x2, y2) is big enough to draw a line in between. 
+	 * tests if quadratic distance is > 2
+	 */
+    private boolean enoughDistance(float x1, float y1, float x2, float y2) {
+		return (x1-x2)*(x1-x2)+(y1-y2)*(y1-y2) > 2;
+	}    
+    
+	private boolean handleColorPickTouchEvent(MotionEvent event) {
+        int x = (int)event.getX();
+        int y = (int)event.getY();
+        x = Math.max(0, x);
+        x = Math.min(x, mBitmap.getWidth()-1);
+        y = Math.max(0, y);
+        y = Math.min(y, mBitmap.getHeight()-1);
+        switch (event.getAction()) {
+        	case MotionEvent.ACTION_DOWN:
+            case MotionEvent.ACTION_MOVE:
+            	int selectedColor = mBitmap.getPixel(x, y);
+            	setColor(selectedColor);
+                break;
+            case MotionEvent.ACTION_UP:
+            	mBrushToast.cancel();
+            	((Main)mContext).hidePalettes();
+            	break;
+        }
+        return true;
+	}    
     
     private class UndoRedoStep {
     	public Path path;

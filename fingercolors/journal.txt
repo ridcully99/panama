@@ -51,6 +51,37 @@ Pwd: beide Male L3...
 2011-02-23
 Version 1.0 -- russisch ohne Nadjas Feedback
 
+2011-02-24
+Version 1.0 Published!!!
+
+2011-02-25
+Aufruf an Evolaris Mitarbeiter
+Submitted to http://www.androidtapp.com/get-reviewed/
+
+2011-03-02
+Bei androidpit.com upgeloadet (alternativer App-Store für Android)
+
+2011-03-03
+Nächste Version begonnen:
+- muss auch ohne Trackball/Volume Controls ... gehen
+- Toolbar am unteren Rand
+- Popupviews (wie bisher schon Palette) darüber (i.e. am unteren Rand des CanvasView)
+- Für Strichstärke und Transparenz -- horizontale Regler
+- Keinen Regler für Helligkeit?
+- Palette: Ringerl zeigt die Position der ausgewählten Farbe
+- Colorpicker
+
+2011-03-08
+- Für Brushsize + Transparency Multistate-Buttons --> TODO Grafiken fehlen noch
+- Linienberechnung mit Floats gemacht, da durch Runden auf ints komische Ecken entstehen.
+- Colorpicker eingebaut.
+- Idee: Bei Background die Möglichkeit einbauen direkt ein Foto zu machen.
+
+
+2011-03-15
+- SeekBar heisst der Slider-View.
+- Idee: Bild "sharen" via Intent: siehe hier (2. Beispiel): http://androidforums.com/application-development/98031-share-intent.html
+
 -------------------------------------
 
 Ideen (gereiht nach Priorität):

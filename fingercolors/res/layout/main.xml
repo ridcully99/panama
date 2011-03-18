@@ -110,6 +110,7 @@
 			android:layout_height="wrap_content"
 			android:layout_weight="0"
 			android:src="@drawable/ic_btn_pipette"
+			android:visibility="gone"
 			/>		
 		<ImageButton
 			android:id="@+id/paletteBtn"
