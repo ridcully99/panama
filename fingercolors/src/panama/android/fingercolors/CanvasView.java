@@ -21,7 +21,6 @@ import android.graphics.Rect;
 import android.util.AttributeSet;
 import android.util.FloatMath;
 import android.view.Gravity;
-import android.view.KeyEvent;
 import android.view.LayoutInflater;
 import android.view.MotionEvent;
 import android.view.View;
@@ -52,7 +51,7 @@ public class CanvasView extends View {
     private int[]		mColorRGB = new int[] {0, 0, 0};	// original RGB values of color, used to change brightness
     private int			mAlpha = 255;
     private int 		mSize = 16;
-    private float		mBlur = 0.05f;	// factor to multiply (255-alpha) with for blur-radius	
+    private float		mBlur = 0.05f;						// factor to multiply (255-alpha) with for blur-radius	
     private int			mBrightness = 0;
     private Rect 		mDirtyRegion = new Rect(0, 0, 0, 0);
     private float		mLastX = -1;
@@ -91,17 +90,8 @@ public class CanvasView extends View {
         
         mBrushView = (BrushView)layout.findViewById(R.id.brushview);
         mBrushView.setPaint(mPaint);
-        
-        setFocusableInTouchMode(true);	
     }
     
-	@Override
-	protected void onMeasure(int widthMeasureSpec, int heightMeasureSpec) {
-		int width = MeasureSpec.getSize(widthMeasureSpec);
-		int height = MeasureSpec.getSize(heightMeasureSpec);
-		setMeasuredDimension(width, height);
-	}    
-
 	@Override
     protected void onSizeChanged(int w, int h, int oldw, int oldh) {
         super.onSizeChanged(w, h, oldw, oldh);
@@ -123,17 +113,6 @@ public class CanvasView extends View {
         canvas.drawBitmap(mBitmap, 0, 0, mBitmapPaint);
     }
 
-	@Override
-	public boolean onKeyDown(int keyCode, KeyEvent event) {
-		switch (keyCode) {
-			case KeyEvent.KEYCODE_BACK:
-				undo();
-				return true;
-		}
-		return false;
-	}
-    
-    
 	@Override
     public boolean onTouchEvent(MotionEvent event) {
 		

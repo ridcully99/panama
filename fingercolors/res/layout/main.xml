@@ -5,14 +5,13 @@
 	android:orientation="vertical">
 	<RelativeLayout 
 		android:layout_width="fill_parent"
-	    android:layout_height="wrap_content"
+	    android:layout_height="0dip"
 	    android:layout_weight="1">
 		<panama.android.fingercolors.CanvasView 
 	 		android:id="@+id/canvas" 
 	 		android:layout_width="fill_parent" 
 	 		android:layout_height="fill_parent" 
-	 		android:focusableInTouchMode="true" />
-		
+	 		/>
 		<LinearLayout
 			android:id="@+id/colorPalette"
 			android:layout_width="fill_parent"
@@ -104,14 +103,15 @@
 			android:layout_weight="0"
 			android:src="@drawable/ic_btn_transparency"
 		/>
+		<!-- 
 		<ImageButton
 			android:id="@+id/colorPickBtn"
 			android:layout_width="wrap_content"
 			android:layout_height="wrap_content"
 			android:layout_weight="0"
 			android:src="@drawable/ic_btn_pipette"
-			android:visibility="gone"
-			/>		
+			/>	
+		 -->	
 		<ImageButton
 			android:id="@+id/paletteBtn"
 			android:layout_width="wrap_content"

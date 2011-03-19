@@ -43,7 +43,6 @@ import android.webkit.WebView;
 import android.widget.AdapterView;
 import android.widget.CheckBox;
 import android.widget.GridView;
-import android.widget.ImageButton;
 import android.widget.SeekBar;
 import android.widget.SeekBar.OnSeekBarChangeListener;
 import android.widget.Toast;
@@ -63,9 +62,12 @@ public class Main extends Activity implements OnSeekBarChangeListener {
 	private ViewGroup mColorPalette;
 	private ViewGroup mBrushPalette;
 	private ViewGroup mTransparencyPalette;
+	private View mBrushBtn;
+	private View mTransparencyBtn;
+	private View mPaletteBtn;
 	private SeekBar mBrushSizeSlider;
+	private SeekBar mTransparencySlider;
 	private Dialog mBackgroundDialog;
-	private boolean mIsProgramStartUp;	// flag so we can differ between real startup and a comeback from the 'select image' Intent
 	
 	private OnTouchListener mMyBtnListener = new OnTouchListener() {
         @Override
@@ -81,25 +83,22 @@ public class Main extends Activity implements OnSeekBarChangeListener {
         		v.setPressed(true);
         		int id = v.getId();
         		switch(id) {
-        			case R.id.paletteBtn:
-    					mCanvas.enableColorPickMode(true);
-    					mColorPalette.setVisibility(View.VISIBLE);
-    					mColorPalette.bringToFront();
-    					mColorPalette.requestFocus();
-        				break;
-        			case R.id.colorPickBtn:
-        				mCanvas.enableColorPickMode(true);
-        				break;
-        			case R.id.brushBtn:
-    					mBrushPalette.setVisibility(View.VISIBLE);
-    					mBrushPalette.bringToFront();
-    					mBrushPalette.requestFocus();
-        				break;
-        			case R.id.transparencyBtn:
-    					mTransparencyPalette.setVisibility(View.VISIBLE);
-    					mTransparencyPalette.bringToFront();
-    					mTransparencyPalette.requestFocus();
-        				break;
+    			case R.id.paletteBtn:
+					mCanvas.enableColorPickMode(true);
+					mColorPalette.setVisibility(View.VISIBLE);
+					mColorPalette.bringToFront();
+					mColorPalette.requestFocus();
+    				break;
+    			case R.id.brushBtn:
+					mBrushPalette.setVisibility(View.VISIBLE);
+					mBrushPalette.bringToFront();
+					mBrushPalette.requestFocus();
+    				break;
+    			case R.id.transparencyBtn:
+					mTransparencyPalette.setVisibility(View.VISIBLE);
+					mTransparencyPalette.bringToFront();
+					mTransparencyPalette.requestFocus();
+    				break;
         		}
         	}
             return true;
@@ -114,33 +113,21 @@ public class Main extends Activity implements OnSeekBarChangeListener {
         requestWindowFeature(Window.FEATURE_NO_TITLE);
         getWindow().setFlags(WindowManager.LayoutParams.FLAG_FULLSCREEN,  WindowManager.LayoutParams.FLAG_FULLSCREEN);
 		setContentView(R.layout.main);
-		mCanvas = (CanvasView)findViewById(R.id.canvas);
-		mColorPalette = (ViewGroup)findViewById(R.id.colorPalette);
-		mBrushPalette = (ViewGroup)findViewById(R.id.brushPalette);
+		mCanvas              = (CanvasView)findViewById(R.id.canvas);
+		mColorPalette        = (ViewGroup)findViewById(R.id.colorPalette);
+		mBrushPalette        = (ViewGroup)findViewById(R.id.brushPalette);
 		mTransparencyPalette = (ViewGroup)findViewById(R.id.transparencyPalette);
-		mBrushSizeSlider = (SeekBar)findViewById(R.id.brushSizeSlider);
+		mBrushBtn            = findViewById(R.id.brushBtn);
+		mTransparencyBtn     = findViewById(R.id.transparencyBtn);
+		mPaletteBtn          = findViewById(R.id.paletteBtn);
+		mBrushSizeSlider     = (SeekBar)findViewById(R.id.brushSizeSlider);
+		mTransparencySlider  = (SeekBar)findViewById(R.id.transparencySlider); 
 		mBrushSizeSlider.setOnSeekBarChangeListener(this);
-		((SeekBar)findViewById(R.id.transparencySlider)).setOnSeekBarChangeListener(this);
+		mTransparencySlider.setOnSeekBarChangeListener(this);
 		mBrushSizeSlider.setProgress(INITIAL_BRUSH_SIZE);	// also sets brushSize in CanvasView
-		
-		((ImageButton)findViewById(R.id.brushBtn)).setOnTouchListener(mMyBtnListener);
-		((ImageButton)findViewById(R.id.transparencyBtn)).setOnTouchListener(mMyBtnListener);
-		((ImageButton)findViewById(R.id.colorPickBtn)).setOnTouchListener(mMyBtnListener);
-		((ImageButton)findViewById(R.id.paletteBtn)).setOnTouchListener(mMyBtnListener);
-		
-		mIsProgramStartUp = true;
-	}
-	
-	@Override
-	protected void onResume() {
-		super.onResume();
-		if (mIsProgramStartUp) {
-			SharedPreferences settings = getSharedPreferences(Main.class.getName(), MODE_PRIVATE);
-			if (settings.getBoolean(PREFS_SHOW_HELP_AT_STARTUP, true)) {
-				showDialog(DIALOG_HELP_ID);
-			}
-		}
-		mIsProgramStartUp = true;	// in case it was false due to invoking Intent
+		mBrushBtn.setOnTouchListener(mMyBtnListener);
+		mTransparencyBtn.setOnTouchListener(mMyBtnListener);
+		mPaletteBtn.setOnTouchListener(mMyBtnListener);
 	}
 	
 	@Override
@@ -163,7 +150,6 @@ public class Main extends Activity implements OnSeekBarChangeListener {
 	    	mBackgroundDialog = dialog;
 	    	dialog.requestWindowFeature(Window.FEATURE_NO_TITLE);
 	    	dialog.setContentView(R.layout.new_dialog);
-	    	//dialog.setTitle(R.string.new_dialog_title);
 	    	GridView gv = (GridView)dialog.findViewById(R.id.backgroundsGrid);
 			DisplayMetrics metrics = new DisplayMetrics();
 			getWindowManager().getDefaultDisplay().getMetrics(metrics);
@@ -172,8 +158,7 @@ public class Main extends Activity implements OnSeekBarChangeListener {
 				@Override
 				public void onItemClick(AdapterView<?> parent, View view, int position, long id) {
 					int color = BackgroundsAdapter.color(position);
-					if (color == Color.TRANSPARENT) {	// transparent --> select image as background
-						mIsProgramStartUp = false;		// don't show help when coming back from Intent
+					if (color == BackgroundsAdapter.PICK_IMAGE) {
 						Intent intent = new Intent(Intent.ACTION_PICK, android.provider.MediaStore.Images.Media.EXTERNAL_CONTENT_URI);
 						intent.setType("image/*");		// images only, no videos ...
 						startActivityForResult(intent, SELECT_IMAGE);
@@ -261,21 +246,23 @@ public class Main extends Activity implements OnSeekBarChangeListener {
 	public boolean onKeyDown(int keyCode, KeyEvent event) {
 		int size;
 		switch (keyCode) {
-			case KeyEvent.KEYCODE_VOLUME_UP:
-				size = mBrushSizeSlider.getProgress();
-				size *= 2;
-				if (size == 0) {
-					size = 1;
-				}
-				mBrushSizeSlider.setProgress(size);
-				mCanvas.setBrushSize(mBrushSizeSlider.getProgress());	// necessary to do this too, to show the BrushToast
-				return true;
-			case KeyEvent.KEYCODE_VOLUME_DOWN:
-				size = mBrushSizeSlider.getProgress();
-				mBrushSizeSlider.setProgress(size/2);
-				mCanvas.setBrushSize(mBrushSizeSlider.getProgress());	// necessary to do this too, to show the BrushToast
-				return true;
-			default:;
+		case KeyEvent.KEYCODE_VOLUME_UP:
+			size = mBrushSizeSlider.getProgress();
+			size *= 2;
+			if (size == 0) {
+				size = 1;
+			}
+			mBrushSizeSlider.setProgress(size);
+			mCanvas.setBrushSize(mBrushSizeSlider.getProgress());	// necessary to do this too, to show the BrushToast
+			return true;
+		case KeyEvent.KEYCODE_VOLUME_DOWN:
+			size = mBrushSizeSlider.getProgress();
+			mBrushSizeSlider.setProgress(size/2);
+			mCanvas.setBrushSize(mBrushSizeSlider.getProgress());	// necessary to do this too, to show the BrushToast
+			return true;
+		case KeyEvent.KEYCODE_BACK:
+			mCanvas.undo();
+			return true;
 		}
 		return false;
 	}
@@ -283,9 +270,9 @@ public class Main extends Activity implements OnSeekBarChangeListener {
 	@Override
 	public boolean onKeyUp(int keyCode, KeyEvent event) {
 		switch (keyCode) {
-			case KeyEvent.KEYCODE_VOLUME_UP:
-			case KeyEvent.KEYCODE_VOLUME_DOWN:
-				return true;	// avoid changing any sound volumes
+		case KeyEvent.KEYCODE_VOLUME_UP:
+		case KeyEvent.KEYCODE_VOLUME_DOWN:
+			return true;	// avoid changing any sound volumes
 		}
 		return false;
 	}
@@ -294,12 +281,10 @@ public class Main extends Activity implements OnSeekBarChangeListener {
 		mColorPalette.setVisibility(View.GONE);
 		mBrushPalette.setVisibility(View.GONE);
 		mTransparencyPalette.setVisibility(View.GONE);
+		mBrushBtn.setPressed(false);
+		mTransparencyBtn.setPressed(false);
+		mPaletteBtn.setPressed(false);
     	mCanvas.enableColorPickMode(false);
-    	// TODO in variablen speichern, statt jedesmal zu suchen.
-		findViewById(R.id.brushBtn).setPressed(false);
-		findViewById(R.id.transparencyBtn).setPressed(false);
-		findViewById(R.id.colorPickBtn).setPressed(false);
-		findViewById(R.id.paletteBtn).setPressed(false);
 	}
 	
 	@Override

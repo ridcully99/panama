@@ -17,6 +17,9 @@ import android.widget.GridView;
  */
 public class BackgroundsAdapter extends BaseAdapter {
 
+	public final static int PICK_IMAGE = 1;
+	public final static int CAMERA = 2;
+	
 	private final static int[] BACKGROUND_COLORS = new int [] {
 		Color.WHITE, 
 		Color.LTGRAY,
@@ -38,7 +41,8 @@ public class BackgroundsAdapter extends BaseAdapter {
 		0xFFC060C0,
 		0xFF9060C0,
 
-		Color.TRANSPARENT	// indicator for image selection
+		PICK_IMAGE,	// indicator for image selection
+		CAMERA
 	};
 	
 	private Context mContext;
@@ -90,9 +94,12 @@ public class BackgroundsAdapter extends BaseAdapter {
         } else {
             view = (View) convertView;
         }
-        if (BACKGROUND_COLORS[position] == Color.TRANSPARENT) {
-        	Drawable galleryIcon = mContext.getResources().getDrawable(R.drawable.ic_gallery);
+        if (BACKGROUND_COLORS[position] == PICK_IMAGE) {
+        	Drawable galleryIcon = mContext.getResources().getDrawable(R.drawable.ic_btn_image);
         	view.setBackgroundDrawable(galleryIcon);
+        } else if (BACKGROUND_COLORS[position] == CAMERA) {
+        	Drawable cameraIcon = mContext.getResources().getDrawable(R.drawable.ic_btn_camera);
+        	view.setBackgroundDrawable(cameraIcon);
         } else {
         	view.setBackgroundColor(color(position));
         }

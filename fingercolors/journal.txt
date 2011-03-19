@@ -82,7 +82,34 @@ Nächste Version begonnen:
 - SeekBar heisst der Slider-View.
 - Idee: Bild "sharen" via Intent: siehe hier (2. Beispiel): http://androidforums.com/application-development/98031-share-intent.html
 
+2011-03-19
+- Brushsize + Transparency via Sliders.
+- Palette hat auch Colorpickerfunktion. Wenn im Bild eingesetzt, verschwindet Palette.
+- Pressed State bei Buttons bleibt, bis Palette weg.
+- Trackballsachen entfernt (VOlumne Control bleibt)
+- Fullscreen-Tilted down-Problem gelöst
+- Show at Startup entfernt für Hilfe
+- Neues Gallery-Icon für Background
+- Kamera-Icon für Background eingeführt (TODO ausblenden für übernächste Version)
+
 -------------------------------------
+
+TODOs für Version 2:
+- Hilfetext als eigene Activity, statt Dialog (und Checkbox entfernen)
+
+TODOs für Version 3:
+- Background von Kamera
+- Share-Intent
+- Undo beschleunigen
+- Animationen für Palette
+
+
+
+
+
+
+
+
 
 Ideen (gereiht nach Priorität):
 -- Menü --> Palette mit Farben, Pipette und verschiedenen Pinselgrößen;
