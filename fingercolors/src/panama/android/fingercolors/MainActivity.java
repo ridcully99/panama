@@ -171,11 +171,31 @@ public class MainActivity extends Activity implements OnSeekBarChangeListener {
 			case R.id.miNew:
 				showDialog(DIALOG_BACKGROUND_ID);
 				return true;
+			case R.id.miUndo:
+				mCanvas.undo();
+				return true;
 			case R.id.miRedo:
 				mCanvas.redo();
 				return true;
 			case R.id.miSave:
-				saveImage();
+				try {
+					String path = saveImage();
+					String msg = getResources().getString(R.string.image_saved_as, path);
+					Toast.makeText(this, msg, Toast.LENGTH_LONG).show();
+				} catch (Exception e) {
+					Toast.makeText(this, getResources().getString(R.string.error_saving_image), Toast.LENGTH_LONG).show();
+				}
+				return true;
+			case R.id.miShare:
+				try {
+					String path = saveImage();
+					Intent share = new Intent(Intent.ACTION_SEND);
+					share.setType("image/png");
+					share.putExtra(Intent.EXTRA_STREAM, Uri.parse("file://"+path));
+					startActivity(Intent.createChooser(share, getResources().getString(R.string.share_image)));
+				} catch (Exception e) {
+					Toast.makeText(this, getResources().getString(R.string.error_saving_image), Toast.LENGTH_LONG).show();
+				}
 				return true;
 			case R.id.miHelp:
 				Intent intent = new Intent(this, HelpActivity.class);
@@ -288,33 +308,32 @@ public class MainActivity extends Activity implements OnSeekBarChangeListener {
 		mCanvas.reset(bm);
 	}
 	
-	// based on http://developer.android.com/reference/android/os/Environment.html
-	private void saveImage() {
+	/**
+	 * Saves image
+	 * based on http://developer.android.com/reference/android/os/Environment.html
+	 * @return absolute path of file (used for Info-Toast and Sharing)
+	 */
+	private String saveImage() throws Exception {
 		String fileName = "fingercolors-"+mDateFormat.format(new Date())+".png";
 		File path = Environment.getExternalStoragePublicDirectory(Environment.DIRECTORY_PICTURES);
 	    File file = new File(path, fileName);
-		try {
-			path.mkdirs();	// make sure the Pictures folder exists.
-			BufferedOutputStream outStream = new BufferedOutputStream(new FileOutputStream(file));
-			boolean success = mCanvas.saveBitmap(outStream);
-			outStream.flush();
-			outStream.close();
-			if (success) {
-				String msg = getResources().getString(R.string.image_saved_as, file.getAbsolutePath());
-				Toast.makeText(this, msg, Toast.LENGTH_LONG).show();
-				// Tell the media scanner about the new file so that it is
-				// immediately available to the user.
-				MediaScannerConnection.scanFile(this,
-						new String[] { file.toString() }, null,
-						new MediaScannerConnection.OnScanCompletedListener() {
-							public void onScanCompleted(String path, Uri uri) {
-							}
-						});
-			} else {
-				throw new Exception("canvas.saveBitmap did not succeed.");
-			}
-		} catch (Exception e) {
-			Toast.makeText(this, getResources().getString(R.string.error_saving_image), Toast.LENGTH_LONG).show();
+	    path.mkdirs();	// make sure the Pictures folder exists.
+		BufferedOutputStream outStream = new BufferedOutputStream(new FileOutputStream(file));
+		boolean success = mCanvas.saveBitmap(outStream);
+		outStream.flush();
+		outStream.close();
+		if (success) {
+			// Tell the media scanner about the new file so that it is
+			// immediately available to the user.
+			MediaScannerConnection.scanFile(this,
+					new String[] { file.toString() }, null,
+					new MediaScannerConnection.OnScanCompletedListener() {
+						public void onScanCompleted(String path, Uri uri) {
+						}
+					});
+			return file.getAbsolutePath();
+		} else {
+			throw new Exception("canvas.saveBitmap did not succeed.");
 		}
 	}
 

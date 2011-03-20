@@ -92,15 +92,17 @@ Nächste Version begonnen:
 - Neues Gallery-Icon für Background
 - Kamera-Icon für Background eingeführt
 - Hilfetext als eigene Activity, statt Dialog (und Checkbox entfernt)
+- Background von Kamera
+- Share Funktion
 
 -------------------------------------
 
 TODOs für Version 2:
-- Background von Kamera
+- Hilfetext überarbeiten/kürzen/mit Bildern versehen
+- Übersetzungen (Strings, Hilfetext)
 
 TODOs für Version 3:
 - Kompatibel machen mit Version 2.1
-- Share-Intent
 - Undo beschleunigen
 - Animationen für Palette
 
