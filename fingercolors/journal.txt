@@ -90,15 +90,16 @@ Nächste Version begonnen:
 - Fullscreen-Tilted down-Problem gelöst
 - Show at Startup entfernt für Hilfe
 - Neues Gallery-Icon für Background
-- Kamera-Icon für Background eingeführt (TODO ausblenden für übernächste Version)
+- Kamera-Icon für Background eingeführt
+- Hilfetext als eigene Activity, statt Dialog (und Checkbox entfernt)
 
 -------------------------------------
 
 TODOs für Version 2:
-- Hilfetext als eigene Activity, statt Dialog (und Checkbox entfernen)
+- Background von Kamera
 
 TODOs für Version 3:
-- Background von Kamera
+- Kompatibel machen mit Version 2.1
 - Share-Intent
 - Undo beschleunigen
 - Animationen für Palette

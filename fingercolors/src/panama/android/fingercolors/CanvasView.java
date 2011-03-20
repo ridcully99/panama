@@ -80,7 +80,7 @@ public class CanvasView extends View {
         mPaint.setStrokeWidth(mSize);
         setBlur();
 
-        LayoutInflater inflater = ((Main)mContext).getLayoutInflater();
+        LayoutInflater inflater = ((MainActivity)mContext).getLayoutInflater();
         View layout = inflater.inflate(R.layout.brushtoast, (ViewGroup) findViewById(R.id.brushtoast_layout_root));        
         
     	mBrushToast = new Toast(this.getContext());
@@ -118,7 +118,7 @@ public class CanvasView extends View {
 		
 		if (mColorPickMode) {
 			// hide palette (but button stays pressed)
-			View v = ((Main)mContext).findViewById(R.id.colorPalette);
+			View v = ((MainActivity)mContext).findViewById(R.id.colorPalette);
 			v.setVisibility(View.GONE);
 			return handleColorPickTouchEvent(event);
 		}
@@ -130,7 +130,7 @@ public class CanvasView extends View {
 
         switch (event.getAction()) {
         	case MotionEvent.ACTION_DOWN:
-        		((Main)mContext).hidePalettes();
+        		((MainActivity)mContext).hidePalettes();
         		mPath.reset();
         		mPath.moveTo(x, y);
         		mPath.lineTo(x+0.5f, y+0.5f);
@@ -326,7 +326,7 @@ public class CanvasView extends View {
     		mPrevCanvas.drawPath(step.path, step.paint);
     	}
     	//long stop = SystemClock.uptimeMillis();
-    	//Log.d(Main.LOG_TAG, "redraw undo stack in "+(stop-start)+" ms");
+    	//Log.d(MainActivity.LOG_TAG, "redraw undo stack in "+(stop-start)+" ms");
     	invalidate();
     }
     
@@ -385,7 +385,7 @@ public class CanvasView extends View {
                 break;
             case MotionEvent.ACTION_UP:
             	mBrushToast.cancel();
-            	((Main)mContext).hidePalettes();
+            	((MainActivity)mContext).hidePalettes();
             	break;
         }
         return true;

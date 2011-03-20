@@ -100,7 +100,7 @@ public class PaletteView extends View {
         x = Math.min(x, mBitmap.getWidth()-1);
         y = Math.max(0, y);
         y = Math.min(y, mBitmap.getHeight()-1);
-    	CanvasView canvas = (CanvasView)((Main)this.getContext()).findViewById(R.id.canvas);	// TODO slow?
+    	CanvasView canvas = (CanvasView)((MainActivity)this.getContext()).findViewById(R.id.canvas);	// TODO slow?
         switch (event.getAction()) {
         	case MotionEvent.ACTION_DOWN:
             case MotionEvent.ACTION_MOVE:
@@ -113,7 +113,7 @@ public class PaletteView extends View {
             case MotionEvent.ACTION_UP:
             	canvas.setColor(mSelectedColor);
             	canvas.enableColorPickMode(false);
-            	((Main)this.getContext()).hidePalettes();
+            	((MainActivity)this.getContext()).hidePalettes();
                 break;
         }
         return true;
