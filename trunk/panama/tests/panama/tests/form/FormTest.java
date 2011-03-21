@@ -4,9 +4,10 @@
  */
 package panama.tests.form;
 
-import panama.form.Form;
-import panama.util.DynaBeanUtils;
 import junit.framework.TestCase;
+import panama.form.Form;
+import panama.form.FormData;
+import panama.util.DynaBeanUtils;
 
 public class FormTest extends TestCase {
 
@@ -38,4 +39,19 @@ public class FormTest extends TestCase {
 		f4.addFields(TestBean.class, "unknown");	// should log an error msg at debug level.
 		assertEquals(0, f4.getFields().size());		
 	}
+	
+	public void testPrimitives() {
+		Form f = new Form();
+		f.addFields(PrimitiveTestBean.class);
+		FormData fd = new FormData(f);
+		fd.setInput("lng", "42");
+		assertTrue(42L == fd.getLong("lng"));
+		PrimitiveTestBean dest = new PrimitiveTestBean();
+		fd.applyTo(dest);
+		assertTrue(42L == dest.getLng());
+		fd.clearInput();
+		fd.applyTo(dest);
+		assertTrue(0 == dest.getLng());
+	}
+
 }

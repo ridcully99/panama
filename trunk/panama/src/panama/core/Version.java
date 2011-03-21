@@ -27,7 +27,7 @@ public class Version {
 	// b: Revision (increases when cool new features are added)
 	// c: Minor	(increases when updates or fixes are made - even numbers mark stable releases)
 	
-	public final static String VERSION = "3.2.3";
+	public final static String VERSION = "3.2.4";
 	
 	public final static String LOGO_ASCIIART = 
 	" ______ _______ _______ _______ _______ _______ \n"+
@@ -40,7 +40,8 @@ public class Version {
 
 	/* 	History
 	 * ---------------------------------------------------------------------------------
-	 * 3.2.3	2010-03-10 little fixes to allow derived versions of dispatcher.
+	 * 3.2.4    2011-03-21 support for primitives in Form system
+	 * 3.2.3	2011-03-10 little fixes to allow derived versions of dispatcher.
 	 *          2010-12-31 switched to other name
 	 * 3.2.2  - 2010-12-06 Fix for JsonTarget - send correct content type (application/json) and do utf-8 encoding
 	 * 3.2.1  - 2010-11-15 Allow dots in action names

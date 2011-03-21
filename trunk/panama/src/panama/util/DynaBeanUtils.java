@@ -41,7 +41,7 @@ public class DynaBeanUtils {
 	 * @return the value of the named property
 	 * @throws PropertyNotFoundException If no getter for propertyName is found
 	 */
-    public static Object getProperty(Object bean, String propertyName) throws PropertyNotFoundException {
+	public static Object getProperty(Object bean, String propertyName) throws PropertyNotFoundException {
 
 		Class<?> c = bean.getClass();
 		Object value = null;
@@ -52,18 +52,18 @@ public class DynaBeanUtils {
 			subProperty = propertyName.substring(propertyName.indexOf(".")+1);
 			propertyName = propertyName.substring(0, propertyName.indexOf("."));
 		}
-        String getterName = getterName(propertyName);
-        try {
-            Method getterMethod = c.getMethod(getterName);
-            value = getterMethod.invoke(bean);
-            if (subProperty != null && value != null && value instanceof DynaBeanUtils) {
-            	value = getProperty(value, subProperty); 
-            }
-        }
-        catch (Exception e) {
-        	throw new PropertyNotFoundException(bean.getClass(), propertyName);
-        }
-        return value;
+		String getterName = getterName(propertyName);
+		try {
+			Method getterMethod = c.getMethod(getterName);
+			value = getterMethod.invoke(bean);
+			if (subProperty != null && value != null && value instanceof DynaBeanUtils) {
+				value = getProperty(value, subProperty); 
+			}
+		}
+		catch (Exception e) {
+			throw new PropertyNotFoundException(bean.getClass(), propertyName);
+		}
+		return value;
 	}		
 	
 	/**
@@ -98,27 +98,31 @@ public class DynaBeanUtils {
 			}
 			Class<?> valueClass = getPropertyClass(bean.getClass(), propertyName);
 
-	        String setterName = setterName(propertyName);
-	        String getterName = getterName(propertyName);
-	        try {
-	        	Method setterMethod = c.getMethod(setterName, new Class[]{valueClass});
-	        	Method getterMethod = null;
-	        	try {
-	        		getterMethod = c.getMethod(getterName);
-	        	} catch (Exception e) {
-	        		// if not there, it cannot be annotated, that's okay.
-	        	}
-	        	if (isVersionMethod(setterMethod) || isVersionMethod(getterMethod)) {
-	        		return;
-	        	}
-		        try {
-		        	setterMethod.invoke(bean, value);
-		        } catch (Exception e) {
-		        	throw new WrongValueTypeException(bean.getClass(), propertyName, valueClass);
-		        }
-	        } catch (Exception e) {
-	    		throw new PropertyNotFoundException(bean.getClass(), propertyName);
-	        }
+			if (valueClass.isPrimitive() && value == null) {
+				value = getNullValueForPrimitive(valueClass);
+			}
+
+			String setterName = setterName(propertyName);
+			String getterName = getterName(propertyName);
+			try {
+				Method setterMethod = c.getMethod(setterName, new Class[]{valueClass});
+				Method getterMethod = null;
+				try {
+					getterMethod = c.getMethod(getterName);
+				} catch (Exception e) {
+					// if not there, it cannot be annotated, that's okay.
+				}
+				if (isVersionMethod(setterMethod) || isVersionMethod(getterMethod)) {
+					return;
+				}
+				try {
+					setterMethod.invoke(bean, value);
+				} catch (Exception e) {
+					throw new WrongValueTypeException(bean.getClass(), propertyName, valueClass);
+				}
+			} catch (Exception e) {
+				throw new PropertyNotFoundException(bean.getClass(), propertyName);
+			}
 		}
 	}
 
@@ -135,22 +139,22 @@ public class DynaBeanUtils {
 			subProperty = propertyName.substring(propertyName.indexOf(".")+1);
 			propertyName = propertyName.substring(0, propertyName.indexOf("."));
 		}
-        String getterName = getterName(propertyName);
-        try {
-	    	Method getterMethod = clazz.getMethod(getterName);
-	    	if (getterMethod != null) {
-	    		Class<?> type = getterMethod.getReturnType();
-	    		if (subProperty != null) {
-	    			type = getPropertyClass(type, subProperty);
-	    		}
-	    		return type;
-	    	} else {
-	    		throw new PropertyNotFoundException(clazz.getClass(), originalPropertyName);
-	    	}
-        }
-        catch (Exception e) {
-        	throw new PropertyNotFoundException(clazz.getClass(), propertyName);
-        }
+		String getterName = getterName(propertyName);
+		try {
+			Method getterMethod = clazz.getMethod(getterName);
+			if (getterMethod != null) {
+				Class<?> type = getterMethod.getReturnType();
+				if (subProperty != null) {
+					type = getPropertyClass(type, subProperty);
+				}
+				return type;
+			} else {
+				throw new PropertyNotFoundException(clazz.getClass(), originalPropertyName);
+			}
+		}
+		catch (Exception e) {
+			throw new PropertyNotFoundException(clazz.getClass(), propertyName);
+		}
 	} 	
 
 	/**
@@ -207,8 +211,8 @@ public class DynaBeanUtils {
 	 * @return name of getter method.
 	 */
 	private static String getterName(String propertyName) {
-        String firstLetter = propertyName.substring(0, 1);
-        return "get" + firstLetter.toUpperCase() + propertyName.substring(1);
+		String firstLetter = propertyName.substring(0, 1);
+		return "get" + firstLetter.toUpperCase() + propertyName.substring(1);
 	}
 
 	/**
@@ -217,8 +221,8 @@ public class DynaBeanUtils {
 	 * @return name of setter method.
 	 */
 	private static String setterName(String propertyName) {
-        String firstLetter = propertyName.substring(0, 1);
-        return "set" + firstLetter.toUpperCase() + propertyName.substring(1);
+		String firstLetter = propertyName.substring(0, 1);
+		return "set" + firstLetter.toUpperCase() + propertyName.substring(1);
 	} 
 	
 	/**
@@ -261,5 +265,33 @@ public class DynaBeanUtils {
 	 */
 	private static boolean isVersionMethod(Method method) {
 		return method != null && method.getAnnotation(javax.persistence.Version.class) != null;
-	}	
+	}
+
+	/**
+	 * Gets a non null default value for primitives.
+	 * @param valueClass
+	 * @return a non-null object
+	 */
+	private static Object getNullValueForPrimitive(Class<?> valueClass) {
+		if (valueClass == Long.TYPE) {
+			return new Long(0);
+		} else if (valueClass == Integer.TYPE) {
+			return new Integer(0);
+		} else if (valueClass == Float.TYPE) {
+			return new Float(0);
+		} else if (valueClass == Double.TYPE) {
+			return new Double(0);
+		} else if (valueClass == Boolean.TYPE) {
+			return new Boolean(false);
+		} else if (valueClass == Byte.TYPE) {
+			return new Byte((byte)0);
+		} else if (valueClass == Character.TYPE) {
+			return new Character('\0');
+		} else if (valueClass == Short.TYPE) {
+			return new Short((short)0);
+		} else {
+			return null;	// not a primitive class
+		}
+	}
+	
 }

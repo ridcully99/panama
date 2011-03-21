@@ -37,43 +37,27 @@ public class PersistentBean implements Serializable {
 	/**
 	 * We use an assigned ID to avoid having to build equals/hashCode methods for each entity class
 	 * VMID() contains an ID unique accross all Java Virtual Machines
-	 * Note, that your mapping has to look like that:
-	 * 
-	 * <code>
-	 * <id name="id" type="string" column="id">
-     *     <generator class="assigned"/>
-     * </id>
-     * </code>
 	 */
 	@Id
-    protected String id = new VMID().toString().replace(':', 'x');	// replacing colons as they are not allowed for id attributes in HTML tags.
-    
-    /**
-     * As - due to the assigned id - hibernate does not know if an object is persisted or new and would always
-     * check with the database we provide an optional timestamp that hibernate will use instead, if you
-     * add the following lines to your mapping:
-     * 
-     * <code>
-     * <timestamp
-     *     column="tstamp"
-     *     name="timeStamp" />
-     * </code>
-     * 
-     * Using the timestamp you can easily check if an object is new or persistent by checking if timestamp is null
-     */
+	protected String id = new VMID().toString().replace(':', 'x');	// replacing colons as they are not allowed for id attributes in HTML tags.
+	
+	/**
+	 * A version field
+	 * Using the timestamp you can easily check if an object is new or persistent by checking if timestamp is null
+	 */
 	@Version
 	protected Date timeStamp;
 
-    public PersistentBean() {
-    }
-    
-    public void setId(String id) {
-        this.id = id;
-    }
+	public PersistentBean() {
+	}
+	
+	public void setId(String id) {
+		this.id = id;
+	}
 
-    public String getId() {
-        return id;
-    }
+	public String getId() {
+		return id;
+	}
 
 	public Date getTimeStamp() {
 		return timeStamp;
