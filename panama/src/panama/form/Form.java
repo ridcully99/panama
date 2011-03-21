@@ -114,6 +114,25 @@ public class Form {
 				if (valueClass.isArray()) {									// for arrays we create a Field for it's component type (formdata allows multiple inputs for it then)
 					valueClass = valueClass.getComponentType();
 				}
+				if (valueClass.isPrimitive()) {
+					if (valueClass == Long.TYPE) {
+						valueClass = Long.class;
+					} else if (valueClass == Integer.TYPE) {
+						valueClass = Integer.class;
+					} else if (valueClass == Float.TYPE) {
+						valueClass = Float.class;
+					} else if (valueClass == Double.TYPE) {
+						valueClass = Double.class;
+					} else if (valueClass == Boolean.TYPE) {
+						valueClass = Boolean.class;
+					} else if (valueClass == Byte.TYPE) {
+						valueClass = Byte.class;
+					} else if (valueClass == Character.TYPE) {
+						valueClass = Character.class;
+					} else if (valueClass == Short.TYPE) {
+						valueClass = Short.class;
+					}
+				}
 				Object valueInstance;
 				try {
 					valueInstance = valueClass.newInstance();

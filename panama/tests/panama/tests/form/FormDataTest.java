@@ -7,12 +7,11 @@ package panama.tests.form;
 import java.util.Date;
 import java.util.List;
 
+import junit.framework.TestCase;
 import panama.form.Form;
 import panama.form.FormData;
 import panama.form.LongField;
 import panama.persistence.PersistentBean;
-
-import junit.framework.TestCase;
 
 public class FormDataTest extends TestCase {
 
@@ -27,7 +26,7 @@ public class FormDataTest extends TestCase {
 		TestBean src = makeTestBean();
 		fd.setInput(src);
 		TestBean target = new TestBean();
-		fd.applyTo(target, new String[] {"prst"}, Form.EXCLUDE_PROPERTIES);
+		fd.applyTo(target, Form.EXCLUDE_PROPERTIES, "prst");
 		assertEquals(src.getBln(), target.getBln());
 	}
 	
@@ -40,7 +39,7 @@ public class FormDataTest extends TestCase {
 		src.setLngs(new Long[] {42L, 4711L});
 		fd.setInput(src);
 		TestBean target = new TestBean();
-		fd.applyTo(target, new String[] {"prst"}, Form.EXCLUDE_PROPERTIES);
+		fd.applyTo(target, Form.EXCLUDE_PROPERTIES, "prst");
 		assertEquals(2, target.getStrngs().length);
 		assertEquals(2, target.getLngs().length);
 	}	
@@ -52,7 +51,7 @@ public class FormDataTest extends TestCase {
 		TestBean src = new TestBean();
 		fd.setInput(src);
 		TestBean target = new TestBean();
-		fd.applyTo(target, new String[] {"prst"}, Form.EXCLUDE_PROPERTIES);
+		fd.applyTo(target, Form.EXCLUDE_PROPERTIES, "prst");
 		assertEquals(src.getBln(), target.getBln());
 	}
 	
