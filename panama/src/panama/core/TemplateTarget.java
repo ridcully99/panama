@@ -49,6 +49,7 @@ public class TemplateTarget extends Target {
 		Context ctx = Context.getInstance();
 		VelocityEngine engine = ctx.getCore().getVelocityEngine();
 		ViewToolContext velocityContext = ctx.getCore().getVelocityToolManager().createContext(ctx.getRequest(), ctx.getResponse());
+		ctx.getResponse().setContentType("text/html;charset=UTF-8");
 		
 		// put all from request scope into context (this also contains the reference to the context itself by Dispatcher.CONTEXT_KEY)
 		String key = null;
@@ -59,6 +60,6 @@ public class TemplateTarget extends Target {
 		// TODO ? put all from application- and session- scope into context too. Rather not.
 		Template template = null;
 		template = engine.getTemplate(this.template, "UTF-8");
-		template.merge(velocityContext, ctx.getResponse().getWriter());		
+		template.merge(velocityContext, ctx.getResponse().getWriter());
 	}
 }
