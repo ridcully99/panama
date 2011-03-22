@@ -23,8 +23,8 @@ import javax.swing.text.DefaultFormatter;
 
 import org.grlea.log.SimpleLogger;
 
-import panama.core.Dispatcher;
 import panama.exceptions.ValidatorException;
+import panama.util.DynaBeanUtils;
 
 
 
@@ -107,7 +107,7 @@ public class Field {
 	 * @throws ParseException
 	 */
 	public synchronized Object[] stringsToValues(String[] texts) throws ParseException {
-		Object[] result = new Object[texts.length];		
+		Object[] result = new Object[texts.length];	
 		for (int i=0; i<result.length; i++) {
 			if (texts[i].trim().length()==0) {
 				result[i] = getNullValue();
@@ -130,8 +130,16 @@ public class Field {
 	 * @return The value as an object
 	 */
 	protected synchronized Object stringToValue(String valueString) throws ParseException {
-		fmttr.setValueClass(getValueClass());
-		return fmttr.stringToValue(valueString);		
+		if (getValueClass().isPrimitive()) {
+			try {
+				return DynaBeanUtils.parsePrimitive(getValueClass(), valueString);
+			} catch (Exception nfe) {
+				throw new ParseException(nfe.getMessage(), 0);
+			}
+		} else {
+			fmttr.setValueClass(getValueClass());
+			return fmttr.stringToValue(valueString);		
+		}
 	}
 
 	/**
@@ -189,6 +197,10 @@ public class Field {
 	 * @return null
 	 */
 	protected Object getNullValue() {
-		return null;
+		if (getValueClass().isPrimitive()) {
+			return DynaBeanUtils.getNullValueForPrimitive(getValueClass());
+		} else {
+			return null;
+		}
 	}
 }

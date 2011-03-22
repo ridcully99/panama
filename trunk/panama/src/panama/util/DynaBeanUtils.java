@@ -269,29 +269,57 @@ public class DynaBeanUtils {
 
 	/**
 	 * Gets a non null default value for primitives.
-	 * @param valueClass
+	 * @param primitiveClass
 	 * @return a non-null object
 	 */
-	private static Object getNullValueForPrimitive(Class<?> valueClass) {
-		if (valueClass == Long.TYPE) {
+	public static Object getNullValueForPrimitive(Class<?> primitiveClass) {
+		if (primitiveClass == Long.TYPE) {
 			return new Long(0);
-		} else if (valueClass == Integer.TYPE) {
+		} else if (primitiveClass == Integer.TYPE) {
 			return new Integer(0);
-		} else if (valueClass == Float.TYPE) {
+		} else if (primitiveClass == Float.TYPE) {
 			return new Float(0);
-		} else if (valueClass == Double.TYPE) {
+		} else if (primitiveClass == Double.TYPE) {
 			return new Double(0);
-		} else if (valueClass == Boolean.TYPE) {
+		} else if (primitiveClass == Boolean.TYPE) {
 			return new Boolean(false);
-		} else if (valueClass == Byte.TYPE) {
+		} else if (primitiveClass == Byte.TYPE) {
 			return new Byte((byte)0);
-		} else if (valueClass == Character.TYPE) {
+		} else if (primitiveClass == Character.TYPE) {
 			return new Character('\0');
-		} else if (valueClass == Short.TYPE) {
+		} else if (primitiveClass == Short.TYPE) {
 			return new Short((short)0);
 		} else {
 			return null;	// not a primitive class
 		}
 	}
-	
+
+	/**
+	 * Tries to convert string to specified primitiveCass.
+	 * @param primitiveClass
+	 * @param valueString
+	 * @return native representation of valueString in the specified primitiveClaass. If the class ist not primitive, null is returned!
+	 * @throws NumberFormatException
+	 */
+	public static Object parsePrimitive(Class<?> primitiveClass, String valueString) throws NumberFormatException {
+		if (primitiveClass == Long.TYPE) {
+			return Long.parseLong(valueString);
+		} else if (primitiveClass == Integer.TYPE) {
+			return Integer.parseInt(valueString);
+		} else if (primitiveClass == Float.TYPE) {
+			return Float.parseFloat(valueString);
+		} else if (primitiveClass == Double.TYPE) {
+			return Double.parseDouble(valueString);
+		} else if (primitiveClass == Boolean.TYPE) {
+			return Boolean.parseBoolean(valueString);
+		} else if (primitiveClass == Byte.TYPE) {
+			return Byte.parseByte(valueString);
+		} else if (primitiveClass == Character.TYPE) {
+			return valueString.charAt(0);
+		} else if (primitiveClass == Short.TYPE) {
+			return Short.parseShort(valueString);
+		} else {
+			return null;	// not a primitive class
+		}
+	}
 }
