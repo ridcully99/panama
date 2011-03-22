@@ -373,12 +373,17 @@ public class FormData {
 	 * @throws NoSuchFieldException
 	 */
 	public Object getValue(String fieldName) throws NoSuchFieldException {		
-		Field field = (Field)form.getFields().get(fieldName);
-		if (field == null) {
-			throw new NoSuchFieldException("No field named '"+fieldName+"'");
+		Object[] values = getValues(fieldName);
+		if (values != null && values.length > 0) {
+			return values[0];
+		} else {
+			Field field = (Field)form.getFields().get(fieldName);
+			if (field.getValueClass().isPrimitive()) { // if primitive, replace null value	
+				return DynaBeanUtils.getNullValueForPrimitive(field.getValueClass());
+			} else {
+				return null;
+			}
 		}
-		Object[] values = validateAndParse(field, input.get(fieldName));
-		return (values != null && values.length > 0) ? values[0] : null;
 	}
 
 	/**
@@ -392,7 +397,16 @@ public class FormData {
 		if (field == null) {
 			throw new NoSuchFieldException("No field named '"+fieldName+"'");
 		}
-		Object[] values = validateAndParse(field, input.get(fieldName));	
+		Object[] values = parseAndValidate(field, input.get(fieldName));
+		if (field.getValueClass().isPrimitive()) { // if primitive, replace null values (values that failed parsing for the primitive type, are already replaced by null) so we do not get exceptions in autoboxing later.
+			if (values != null) {
+				for (int i=0; i<values.length; i++) {
+					if (values[i] == null) {
+						values[i] = DynaBeanUtils.getNullValueForPrimitive(field.getValueClass());
+					}
+				}
+			}
+		}
 		return values;
 	}
 
@@ -443,16 +457,21 @@ public class FormData {
 	 * @param f
 	 * @param values An array of strings, array of objects or null
 	 */
-	private Object[] validateAndParse(Field f, Object values) {
+	private Object[] parseAndValidate(Field f, Object values) {
 		//Object value = input.get(f.getName()); // array of Strings or objects or null
 		try {
 			if (values == null) {
-				return validateAndParseValues(f, new Object[] {});	// 2009-11-05: was {null}
+				return validateValues(f, new Object[] {});	// 2009-11-05: was {null}
 			}
 			else if (values instanceof String[]) {
-				return validateAndParseTexts(f, (String[])values);
+				try {
+					Object[] actualValues = f.stringsToValues((String[])values);
+					return validateValues(f, actualValues);
+				} catch (ParseException pe) {
+					throw new ValidatorException(Validator.PARSING_FAILED, pe);
+				}				
 			} else {
-				return validateAndParseValues(f, (Object[])values);					
+				return validateValues(f, (Object[])values);					
 			}
 		} catch (ValidatorException ve) {
 			errors.put(f.getName(), ve);
@@ -461,23 +480,10 @@ public class FormData {
 	}	
 	
 	/**
-	 * Sets values of this field after parsing and validating the values
-	 * @param texts An array of Strings (most of the time just one element)
-	 */
-	private Object[] validateAndParseTexts(Field f, String[] texts) throws ValidatorException {
-		try {
-			Object[] values = f.stringsToValues(texts);
-			return validateAndParseValues(f, values);
-		} catch (ParseException pe) {
-			throw new ValidatorException(Validator.PARSING_FAILED, pe);
-		}
-	}
-
-	/**
 	 * Sets values of this field after validating
 	 * @param values An array of Objects (most of the time just one element)
 	 */
-	private Object[] validateAndParseValues(Field f, Object[] values) throws ValidatorException {
+	private Object[] validateValues(Field f, Object[] values) throws ValidatorException {
 		f.validate(values);	// throws ValidatorException on error
 		return values;
 	}	
