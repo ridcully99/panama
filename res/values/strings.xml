@@ -1,0 +1,20 @@
+<?xml version="1.0" encoding="utf-8"?>
+<resources>
+    
+    <string name="app_name">Finger Colors</string>
+	<string name="mi_new">New</string>
+	<string name="mi_save">Save</string>
+	<string name="mi_share">Share</string>
+	<string name="mi_undo">Undo</string>
+	<string name="mi_redo">Redo</string>
+	<string name="mi_help">Help</string>
+
+	<string name="new_dialog_title">Select Background</string>
+	<string name="help_dialog_title">Finger Colors</string>
+	<string name="image_saved_as">Image saved as %s</string>
+	<string name="share_image">Share Image</string>
+	
+	<string name="error_reading_image">Sorry, could not load the image.</string>
+	<string name="error_reading_help">Sorry, could not load help text.</string>
+	<string name="error_saving_image">Sorry, could not save the image, likely because external storage (SD card) is not mounted.</string>	
+</resources>

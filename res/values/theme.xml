@@ -1,0 +1,6 @@
+<!-- tip from http://developer.android.com/resources/articles/window-bg-speed.html -->
+<resources>
+    <style name="Theme.NoBackground" parent="android:Theme">
+        <item name="android:windowBackground">@null</item>
+    </style>
+</resources>
