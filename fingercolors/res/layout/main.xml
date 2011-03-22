@@ -20,8 +20,9 @@
 			android:layout_alignBottom="@id/canvas"
 			android:visibility="gone">	
 			<View 
-				android:background="@drawable/palette_shadow"
-				android:layout_width="match_parent" android:layout_height="6sp"
+				android:background="#FF000000"
+				android:layout_width="fill_parent" 
+				android:layout_height="1dip"
 				/>
 			<panama.android.fingercolors.PaletteView 
 				android:layout_width="fill_parent"
