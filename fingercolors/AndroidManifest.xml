@@ -2,7 +2,7 @@
 <manifest xmlns:android="http://schemas.android.com/apk/res/android"
       package="panama.android.fingercolors"
       android:versionCode="2"
-      android:versionName="2.0 RC1"
+      android:versionName="2.0"
       android---installLocation="auto"
       >
     <application 
