@@ -11,8 +11,6 @@
 
 	<string name="new_dialog_title">Select Background</string>
 	<string name="help_dialog_title">Finger Colors</string>
-	<string name="show_on_start_lbl">Show help at start-up.</string>
-	<string name="ok">OK</string>
 	<string name="image_saved_as">Image saved as %s</string>
 	<string name="share_image">Share Image</string>
 	

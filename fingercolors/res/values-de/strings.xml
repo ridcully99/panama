@@ -9,7 +9,6 @@
 	<string name="mi_help">Hilfe</string>
 
 	<string name="new_dialog_title">Hintergrund wählen</string>
-	<string name="show_on_start_lbl">Hilfe zeigen beim Start.</string>
 	<string name="ok">OK</string>
 	<string name="image_saved_as">Bild gespeichert als %s</string>
 	<string name="share_image">Bild freigeben</string>

@@ -16,6 +16,7 @@ import android.content.Intent;
 import android.graphics.Bitmap;
 import android.graphics.BitmapFactory;
 import android.media.MediaScannerConnection;
+import android.media.MediaScannerConnection.MediaScannerConnectionClient;
 import android.net.Uri;
 import android.os.Bundle;
 import android.os.Environment;
@@ -310,14 +311,17 @@ public class MainActivity extends Activity implements OnSeekBarChangeListener {
 	
 	/**
 	 * Saves image
-	 * based on http://developer.android.com/reference/android/os/Environment.html
+	 * based on 
+	 * http://developer.android.com/guide/topics/data/data-storage.html#filesExternal
+	 * http://developer.android.com/reference/android/os/Environment.html
 	 * @return absolute path of file (used for Info-Toast and Sharing)
 	 */
 	private String saveImage() throws Exception {
 		String fileName = "fingercolors-"+mDateFormat.format(new Date())+".png";
-		File path = Environment.getExternalStoragePublicDirectory(Environment.DIRECTORY_PICTURES);
-	    File file = new File(path, fileName);
+		File path = Environment.getExternalStorageDirectory();
+		path = new File(path, "Pictures");
 	    path.mkdirs();	// make sure the Pictures folder exists.
+	    File file = new File(path, fileName);
 		BufferedOutputStream outStream = new BufferedOutputStream(new FileOutputStream(file));
 		boolean success = mCanvas.saveBitmap(outStream);
 		outStream.flush();
@@ -325,18 +329,41 @@ public class MainActivity extends Activity implements OnSeekBarChangeListener {
 		if (success) {
 			// Tell the media scanner about the new file so that it is
 			// immediately available to the user.
-			MediaScannerConnection.scanFile(this,
-					new String[] { file.toString() }, null,
-					new MediaScannerConnection.OnScanCompletedListener() {
-						public void onScanCompleted(String path, Uri uri) {
-						}
-					});
+			MediaScannerClientProxy client = new MediaScannerClientProxy(file.getAbsolutePath(), "image/png");
+			MediaScannerConnection msc = new MediaScannerConnection(this, client);
+			client.mConnection = msc;
+			msc.connect();
 			return file.getAbsolutePath();
 		} else {
 			throw new Exception("canvas.saveBitmap did not succeed.");
 		}
 	}
 
+	/**
+	 * simplified backport of functionality provided by scanFile method as of API Level 8
+	 * http://www.devdaily.com/java/jwarehouse/android/media/java/android/media/MediaScannerConnection.java.shtml
+	 * @author ridcully
+	 *
+	 */
+    static class MediaScannerClientProxy implements MediaScannerConnectionClient {
+        final String mPath;
+        final String mMimeType;
+        MediaScannerConnection mConnection;
+
+        MediaScannerClientProxy(String path, String mimeType) {
+            mPath = path;
+            mMimeType = mimeType;
+        }
+
+        public void onMediaScannerConnected() {
+            mConnection.scanFile(mPath, mMimeType);
+        }
+
+        public void onScanCompleted(String path, Uri uri) {
+            mConnection.disconnect();
+        }
+    }	
+	
 	/* -- OnSeekBarListener methods ------------------------------------------------------------------------------ */
 	
 	@Override
