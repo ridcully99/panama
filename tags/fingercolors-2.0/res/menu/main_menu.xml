@@ -1,0 +1,10 @@
+<?xml version="1.0" encoding="utf-8"?>
+<menu xmlns:android="http://schemas.android.com/apk/res/android">
+	<item android:id="@+id/miNew" android:title="@string/mi_new" android:icon="@drawable/ic_menu_compose"></item>
+	<item android:id="@+id/miSave" android:title="@string/mi_save" android:icon="@drawable/ic_menu_save"></item>
+	<item android:id="@+id/miShare" android:title="@string/mi_share" android:icon="@drawable/ic_menu_share"></item>
+	<item android:id="@+id/miUndo" android:title="@string/mi_undo" android:icon="@drawable/ic_menu_revert"></item>
+	<item android:id="@+id/miRedo" android:title="@string/mi_redo" android:icon="@drawable/redo"></item>
+	<item android:id="@+id/miHelp" android:title="@string/mi_help" android:icon="@drawable/ic_menu_help"></item>
+</menu>
+
