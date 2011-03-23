@@ -27,7 +27,7 @@ public class Version {
 	// b: Revision (increases when cool new features are added)
 	// c: Minor	(increases when updates or fixes are made - even numbers mark stable releases)
 	
-	public final static String VERSION = "3.2.4";
+	public final static String VERSION = "3.2.6";
 	
 	public final static String LOGO_ASCIIART = 
 	" ______ _______ _______ _______ _______ _______ \n"+
@@ -40,6 +40,7 @@ public class Version {
 
 	/* 	History
 	 * ---------------------------------------------------------------------------------
+	 * 3.2.6	2011-03-23 Fixed massive bug with ThreadLocal context (Gott sei Dank gefunden!)
 	 * 3.2.4    2011-03-21 support for primitives in Form system
 	 * 3.2.3	2011-03-10 little fixes to allow derived versions of dispatcher.
 	 *          2010-12-31 switched to other name

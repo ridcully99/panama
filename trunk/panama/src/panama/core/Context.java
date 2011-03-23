@@ -75,7 +75,7 @@ public class Context {
 	/**
 	 * Current context for current thread.
 	 */
-	private static ThreadLocal<Context> threadContext;
+	private static ThreadLocal<Context> contextHolder = new ThreadLocal<Context>();
 	private Dispatcher core;
 	private HttpSession httpSession;
 	
@@ -97,21 +97,20 @@ public class Context {
 	 * @return newly created instance.
 	 * @throws Exception if creating the hibernateSupportClass
 	 */
-	public static synchronized Context createInstance(Dispatcher core, HttpSession sess, HttpServletRequest req, HttpServletResponse res, Locale defaultLocale) throws Exception {
+	public static Context createInstance(Dispatcher core, HttpSession sess, HttpServletRequest req, HttpServletResponse res, Locale defaultLocale) throws Exception {
 		Context ctx = new Context(core, sess, req, res, defaultLocale);
-		threadContext = new ThreadLocal<Context>();
-		threadContext.set(ctx);
-		log.debug("createInstance in ThreadLocal "+threadContext);
+		contextHolder.set(ctx);
+		log.debug("createInstance in ThreadLocal "+contextHolder);
 		return ctx;
 	}
 	
-	public static synchronized Context getInstance() {
-		log.debug("getInstance from "+threadContext);
-		return threadContext == null ? null : (Context)threadContext.get();
+	public static Context getInstance() {
+		log.debug("getInstance from "+contextHolder);
+		return contextHolder == null ? null : (Context)contextHolder.get();
 	}	
 	
-	public static synchronized void destroyInstance() {
-		threadContext.set(null);
+	public static void destroyInstance() {
+		contextHolder.set(null);
 	}
 	
 	public Context() {		
