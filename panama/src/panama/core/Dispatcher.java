@@ -244,9 +244,7 @@ public class Dispatcher implements Filter {
 			/* create a context for the controller */
 			HttpSession session = req.getSession(true);													// get session, create one if none exists
 			Locale defaultLocale = computeDefaultLocale(supportedLanguages, req.getLocales());
-			synchronized(ServletUtils.getMutex(session, PREFIX+".session.mutex", this)) {				// additional adempt not to mix up sessions (borrowed from ViewToolManager)
-				ctx = Context.createInstance(this, session, req, res, defaultLocale); 					// create context instance
-			}
+			ctx = Context.createInstance(this, session, req, res, defaultLocale); 						// create context instance
 			ctx.put(CONTEXT_KEY, ctx);																	// put context into itself - some tools may need a context passed to them
 			Target target = handleAction(ctx, req.getServletPath(), ACTION_INVOCATION_BY_URL);
 			if (target != null) {
