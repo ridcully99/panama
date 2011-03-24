@@ -41,7 +41,6 @@ import javax.servlet.http.HttpSession;
 
 import org.apache.commons.lang.StringUtils;
 import org.apache.velocity.app.VelocityEngine;
-import org.apache.velocity.tools.view.ServletUtils;
 import org.apache.velocity.tools.view.ViewToolManager;
 import org.grlea.log.SimpleLogger;
 import org.scannotation.AnnotationDB;
@@ -240,7 +239,7 @@ public class Dispatcher implements Filter {
 				HttpMultipartServletRequest mreq = new HttpMultipartServletRequest(req, maxFileSize, -1);
 				req = mreq;
 			}
-			
+			req.setCharacterEncoding("UTF-8");															// must set this before getParameter() to get the correct encoding
 			/* create a context for the controller */
 			HttpSession session = req.getSession(true);													// get session, create one if none exists
 			Locale defaultLocale = computeDefaultLocale(supportedLanguages, req.getLocales());
