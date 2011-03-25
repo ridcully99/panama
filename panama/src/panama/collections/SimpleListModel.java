@@ -15,6 +15,7 @@
  */
 package panama.collections;
 
+import java.io.Serializable;
 import java.util.ArrayList;
 import java.util.List;
 
@@ -23,7 +24,7 @@ import java.util.List;
  * @author Ridcully
  *
  */
-public class SimpleListModel implements ListModel {
+public class SimpleListModel implements ListModel, Serializable {
 
 	private List list;
 	protected Table table = null;
