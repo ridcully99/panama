@@ -15,6 +15,7 @@
  */
 package panama.collections;
 
+import java.io.Serializable;
 import java.util.List;
 import java.util.Map;
 
@@ -28,7 +29,7 @@ import com.avaje.ebean.Query;
  * @author ridcully
  *
  */
-public class QueryListModel implements ListModel {
+public class QueryListModel implements ListModel, Serializable {
 
 	protected Table table = null;
 	protected Query query = null;
