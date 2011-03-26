@@ -99,7 +99,7 @@ public class TableController extends BaseController {
 	 * - epp
 	 */	
 	@Action(alias="setepp")
-	public Target setEpp(Context context) throws ForceTargetException {
+	public Target setEpp() throws ForceTargetException {
 		String tableId = context.getParameter("tableid");
 		int epp = new Integer(context.getParameter("epp")).intValue();
 
