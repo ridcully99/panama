@@ -62,10 +62,24 @@ public class FormData {
 	
 	protected static SimpleLogger log = new SimpleLogger(Form.class);		
 
+	/**
+	 * Invokes {@link #FormData(Form, Map)} with null for inputMap
+	 * @param form
+	 */
 	public FormData(Form form) {
 		this(form, null);
 	}
 	
+	/**
+	 * Presets input for all boolean fields with FALSE (as normally these are used for checkboxes
+	 * and we do not get values for unchecked checkboxes) before applying the passed inputMap.
+	 * If you do not want this behaviour, you can call setInput(field, null) afterwards for the fields
+	 * you do not want to have FALSE set as input (e.g. if you have a Boolean field and some sort of threeway input
+	 * with TRUE, FALSE and "don't care")
+	 * 
+	 * @param form
+	 * @param inputMap
+	 */
 	public FormData(Form form, Map inputMap) {
 		this.form = form;
 		// default inputs for Boolean Fields to FALSE (as we only get TRUE from forms)
@@ -126,7 +140,7 @@ public class FormData {
 	 * using the valueToString method of the field
 	 * 
 	 * Note, that the value is not validated here and now, but just when it is fetched using
-	 * one of the getXXX() or the getValue() or getValues() methods.
+	 * one of the get[String|Integer|...]() or the getValue() or getValues() methods.
 	 * 
 	 * @param fieldName
 	 * @param value may be single string or object or an array of strings or objects
@@ -224,7 +238,8 @@ public class FormData {
 	}
 	
 	// ----------------------------------------------------------------------------
-	// getters for common types - on error (cast etc.) they simply return null
+	// getters for common types - on error (cast etc.) they simply return null 
+	// for non primitive types or a safe default value for primitive types.
 	// for how to get values of other types
 	// @see FormData#getValue()
 	// @see FormData#getValues()
