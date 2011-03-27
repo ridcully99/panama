@@ -54,7 +54,7 @@ public class FormTest extends TestCase {
 		assertTrue(0 == dest.getLng());
 		assertTrue(0 == fd.getLong("lng"));
 		fd.setInput("lng", "NaN");
-		assertTrue(null == fd.getLong("lng"));
+		assertTrue(0 == fd.getLong("lng"));
 	}
 
 }
