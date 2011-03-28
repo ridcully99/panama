@@ -402,6 +402,10 @@ public class FormData {
 	 */
 	private Object safeNullValue(String fieldName) {
 		Field field = (Field)form.getFields().get(fieldName);
+		if (field == null) {
+			log.warn("no field named '"+fieldName+"'");
+			return null;
+		}
 		if (field.getValueClass().isPrimitive()) {	
 			return DynaBeanUtils.getNullValueForPrimitive(field.getValueClass());
 		} else {
