@@ -1,4 +1,5 @@
 #summary Explains how to get started easily with Panama.
+#labels Featured,Phase-Deploy,Phase-Implementation
 
 == Introduction ==
 
