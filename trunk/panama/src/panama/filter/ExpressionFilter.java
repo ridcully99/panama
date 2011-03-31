@@ -18,6 +18,7 @@ package panama.filter;
 import java.util.Map;
 
 import com.avaje.ebean.Expression;
+import com.avaje.ebean.Query;
 
 /**
  * A Filter encapsulating a Ebean Expression.
@@ -35,7 +36,7 @@ public class ExpressionFilter extends Filter {
 	}
 	
 	@Override
-	public Expression asExpression(Map<String, FilterExtension> filterExtensions) {
+	public Expression asExpression(Query query, Map<String, FilterExtension> filterExtensions) {
 		return expression;
 	}
 }

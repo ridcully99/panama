@@ -20,6 +20,7 @@ import java.util.Map;
 
 import com.avaje.ebean.Ebean;
 import com.avaje.ebean.Expression;
+import com.avaje.ebean.Query;
 
 /**
  * Base class and Factory for filters of all kinds.
@@ -59,7 +60,7 @@ public class Filter {
 	 * @param filterExtensions A Map<propertyName, FilterExtension> with optional stuff for special filter treatments
 	 * @return an Expression representing the Filter. 
 	 */
-	public Expression asExpression(Map<String, FilterExtension> filterExtensions) {
+	public Expression asExpression(Query query, Map<String, FilterExtension> filterExtensions) {
 		return Ebean.getExpressionFactory().raw("1=1");
 	}
 	
