@@ -117,6 +117,7 @@ public class Dispatcher implements Filter {
 		applicationContext = filterConfig.getServletContext();
 		applicationContext.setAttribute(APP_NAME_KEY, filterConfig.getFilterName());
 		
+		@SuppressWarnings("rawtypes")
 		Enumeration names = filterConfig.getInitParameterNames();
 		while(names.hasMoreElements()) {
 			String key = (String)names.nextElement();
@@ -265,17 +266,6 @@ public class Dispatcher implements Filter {
 	}
 	
 	/**
-	 * Callback allowing additional stuff (e.g. rolblack database session)
-	 * This is called if during handling the action and target an exception is thrown that is not catched anywhere else.
-	 * The default implementation does nothing.
-	 * 
-	 * @param ctx
-	 * @param throwable 
-	 */
-	public void onExceptionWhileHandlingAction(Context ctx, Throwable throwable) {
-	}
-
-	/**
 	 * Scan WEB-INF/lib and WEB-INF/classes for Controller classes and puts all in controllerClasses map.
 	 * @throws IOException
 	 */
@@ -304,13 +294,18 @@ public class Dispatcher implements Filter {
 			collectActions(c);
 			String alias = c.getAnnotation(panama.annotations.Controller.class).alias();
 			if 	(StringUtils.isNotEmpty(alias)) {
+				alias = alias.trim();
+				if (alias.contains("/")) {
+					log.error("Controller alias '"+alias+"' contains illegal characters. Ignoring alias.");
+					continue;
+				}
 				if (controllerClasses.containsKey(alias)) {
 					log.error("Duplicate Controller alias '"+alias+"' detected. Used by "+n+
 							" and "+controllerClasses.get(alias).getName()+". Using alias only for the latter.");
-				} else {
-					controllerClasses.put(alias, c);
-					log.debug(alias+" -> "+n);
+					continue;
 				}
+				controllerClasses.put(alias, c);
+				log.debug(alias+" -> "+n);
 			}
 		}
 	}	
@@ -448,14 +443,18 @@ public class Dispatcher implements Filter {
 	 */
 	private String[] extractControllerAndActionNames(String path) {
 		path = path.replaceFirst("^/+", "");	// remove leading slashs
-		String[] parts = path.split("/");
 		String ctrlName = null;
 		String actionName = null;
-		if (parts.length == 1) {
-			ctrlName = parts[0].trim();
-		} else if (parts.length >= 2) {
-			ctrlName = parts[parts.length-2].trim();
-			actionName = parts[parts.length-1].trim();
+		if (path.length() > 0) {
+			int divider = path.lastIndexOf("/");
+			if (divider == -1) {
+				ctrlName = path;
+			} else {
+				ctrlName = path.substring(0, divider).trim();
+				if (divider+1 < path.length()) {
+					actionName = path.substring(divider+1).trim();
+				}
+			}
 		}
 		return new String[] {ctrlName, actionName};
 	}

@@ -104,7 +104,6 @@ public class BaseController {
 	 * To redirect to other action use /controller/action.now
 	 * 
 	 * Note: Use redirect only if you need the client browser's URL to have a new URL.
-	 *       Its <strong>much faster</strong> to use doAction().
 	 * 
 	 * @param url
 	 * @return A Target object
@@ -122,7 +121,7 @@ public class BaseController {
 	 * The URL has the form: ../controllerName/action
 	 * 
 	 * Note: Use redirect only if you need the client browser's URL to have a new URL.
-	 *       Its <strong>much faster</strong> to use doAction().
+	 *       Its <strong>much faster</strong> to use simply invoke the method of the required action and return it's result.
 	 * 
 	 * @param action
 	 * @return A Target object
@@ -141,7 +140,7 @@ public class BaseController {
 	 * The parameter names and values are url-encoded by this method.
 	 * 
 	 * Note: Use redirect only if you need the client browser's URL to have a new URL.
-	 *       Its <strong>much faster</strong> to use doAction().
+	 *       Its <strong>much faster</strong> to use simply invoke the method of the required action and return it's result.
 	 * 
 	 * @param action
 	 * @param parameterMap
@@ -159,7 +158,7 @@ public class BaseController {
 	 * The URL has the form: ../controllerName/action.now
 	 * 
 	 * Note: Use redirect only if you need the client browser's URL to have a new URL.
-	 *       Its <strong>much faster</strong> to use doAction().
+	 *       Its <strong>much faster</strong> to create a new instance of controllerClass, invoke the required action's method and return it's result.
 	 * 
 	 * @param controllerClass
 	 * @param action
@@ -179,10 +178,10 @@ public class BaseController {
 	 * The parameter names and values are url-encoded by this method.
 	 * 
 	 * Note: Use redirect only if you need the client browser's URL to have a new URL.
-	 *       Its <strong>much faster</strong> to use doAction().
+	 *       Its <strong>much faster</strong> to create a new instance of controllerClass, invoke the required action's method and return it's result.
 	 * 
 	 * @param controllerClass
-	 * @param action
+	 * @param action can be null to use default action
 	 * @param parameterMap A map of parameter/value pairs.
 	 * @return A Target object
 	 */	
@@ -190,7 +189,10 @@ public class BaseController {
 		Controller annotation = controllerClass.getAnnotation(Controller.class);
 		String ctrlName = annotation != null && !StringUtils.isEmpty(annotation.alias()) ? annotation.alias() : controllerClass.getName();
 		StringBuffer url = new StringBuffer();
-		url.append("../").append(ctrlName).append("/").append(action);
+		url.append("../").append(ctrlName).append("/");
+		if (action != null) {
+			url.append(action);
+		}
 		try {
 			if (parameterMap != null) {
 				boolean first = true;
