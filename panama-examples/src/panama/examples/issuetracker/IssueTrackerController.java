@@ -21,13 +21,16 @@ import panama.collections.QueryListModel;
 import panama.collections.QueryTable;
 import panama.collections.Table;
 import panama.core.BaseController;
+import panama.core.PlainTextTarget;
 import panama.core.Target;
 import panama.examples.issuetracker.entities.Issue;
+import panama.filter.Filter;
 import panama.form.Form;
 import panama.form.FormData;
 import panama.persistence.PersistentBean;
 
 import com.avaje.ebean.Ebean;
+import com.avaje.ebean.Query;
 
 /**
  * @author ridcully
@@ -52,6 +55,21 @@ public class IssueTrackerController extends BaseController {
 	@Action
 	public Target list() {
 		return render("issuelist.vm");
+	}
+	
+	/**
+	 * This action shows, how you can use Panama's filter framework to create
+	 * Ebean expressions ready to use with Ebean queries.
+	 * @return a nice ;-) text
+	 */
+	@Action
+	public Target filter() {
+		Filter f = Filter.and(
+						Filter.anyEq(new String[] {"title", "description"}, "bla"), 
+						Filter.allEq(new String[] {"title", "description"}, "bla"));
+		Query q = Ebean.createQuery(Issue.class);
+		q.where(f.asExpression(q, null)).findList();
+		return new PlainTextTarget("nice ;-)");
 	}
 	
 	@Action
