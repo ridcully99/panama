@@ -20,6 +20,7 @@ import java.util.Map;
 import com.avaje.ebean.Ebean;
 import com.avaje.ebean.Expression;
 import com.avaje.ebean.Junction;
+import com.avaje.ebean.Query;
 
 /**
  * Provides the logical operators AND, OR and NOT
@@ -77,21 +78,22 @@ public class LogicalExpression extends Filter {
 		return res.toString();
 	}
 	
-	public Expression asExpression(Map filterExtensions) {
+	@Override
+	public Expression asExpression(Query query, Map<String, FilterExtension> filterExtensions) {
 		switch (op) {
 			case AND : 
-				Junction all = Ebean.getExpressionFactory().conjunction(null);
+				Junction all = Ebean.getExpressionFactory().conjunction(query);
 				for (Filter f : filters) {
-					all.add(f.asExpression(filterExtensions));
+					all.add(f.asExpression(query, filterExtensions));
 				}
 				return all;
 			case OR : 
 				Junction any = Ebean.getExpressionFactory().disjunction(null);
 				for (Filter f : filters) {
-					any.add(f.asExpression(filterExtensions));
+					any.add(f.asExpression(query, filterExtensions));
 				}
 				return any;
-			case NOT : return Ebean.getExpressionFactory().not(filters[0].asExpression(filterExtensions));
+			case NOT : return Ebean.getExpressionFactory().not(filters[0].asExpression(query, filterExtensions));
 		}
 		return null;
 	}

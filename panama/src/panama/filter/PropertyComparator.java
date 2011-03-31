@@ -21,10 +21,10 @@ import java.util.Map;
 
 import panama.util.DynaBeanUtils;
 
-
 import com.avaje.ebean.Ebean;
 import com.avaje.ebean.Expression;
 import com.avaje.ebean.Junction;
+import com.avaje.ebean.Query;
 
 
 /**
@@ -113,14 +113,16 @@ public class PropertyComparator extends Filter {
 	 * Used by QueryListModel.
 	 * This method uses the forProperty() method and joins the results of that method
 	 * depending on this.mode. 
+	 * @param filterExtensions an optional Map of FilterExtensions to tweak the default behaviour of the filter for each property separately.
 	 * @return Some sort of Expression representing the Filter.
 	 */
-	public Expression asExpression(Map<String, FilterExtension> filterExtensions) {
+	@Override
+	public Expression asExpression(Query query, Map<String, FilterExtension> filterExtensions) {
 		Expression result = null;
 		if (getMode() == ALL_PROPERTIES) {
-			result = Ebean.getExpressionFactory().conjunction(null); 
+			result = Ebean.getExpressionFactory().conjunction(query); 
 		} else { // for NO_PROPERTIES we do a disjunction and at the end negate it -> NOT (A or B or C) 
-			result = Ebean.getExpressionFactory().disjunction(null);
+			result = Ebean.getExpressionFactory().disjunction(query);
 		}
 		for (String property : getProperties()) {
 			FilterExtension extension = filterExtensions != null ? filterExtensions.get(property) : null;
