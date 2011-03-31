@@ -75,7 +75,7 @@ public class QueryListModel implements ListModel, Serializable {
 			String k = e.getKey();
 			Filter f = e.getValue();
 			Map<String, FilterExtension> extensions = table.getFilterExtensions().get(k);
-			q.where(f.asExpression(extensions));
+			q.where(f.asExpression(q, extensions));
 		}
 		return q;
 	}	
