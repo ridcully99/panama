@@ -32,7 +32,7 @@ import com.avaje.ebean.Query;
 public class QueryListModel implements ListModel, Serializable {
 
 	protected Table table = null;
-	protected Query query = null;
+	protected transient Query query = null;
 	
 	public QueryListModel(Query query) {
 		this.query = query;
