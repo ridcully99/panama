@@ -46,32 +46,32 @@ public class FilterTest extends TestCase {
 	}
 	
 	public void testPropertyComparator() throws Exception {
-		assertTrue(Filter.anyEq(new String[] {"email", "name"}, "Mustrum Ridcully").match(e, null));
-		assertFalse(Filter.noneEq(new String[] {"email", "name"}, "Mustrum Ridcully").match(e, null));
-		assertFalse(Filter.allEq(new String[] {"email", "name"}, "Mustrum Ridcully").match(e, null));
+		assertTrue(Filter.anyEq("Mustrum Ridcully", "email", "name").match(e, null));
+		assertFalse(Filter.noneEq("Mustrum Ridcully", "email", "name").match(e, null));
+		assertFalse(Filter.allEq("Mustrum Ridcully", "email", "name").match(e, null));
 	}
 	
 	public void testLogicalExpressions() {
-		Filter f = Filter.or(Filter.anyEq(new String[] {"email", "name"}, "Mustrum Ridcully"),
-				 			 Filter.noneEq(new String[] {"email", "name"}, "Mustrum Ridcully"));
+		Filter f = Filter.or(Filter.anyEq("Mustrum Ridcully", "email", "name"),
+				 			 Filter.noneEq("Mustrum Ridcully", "email", "name"));
 		System.out.println(f);
 		assertTrue(f.match(e));
-		f = Filter.and(Filter.anyEq(new String[] {"email", "name"}, "Mustrum Ridcully"),
-	 			   	   Filter.noneEq(new String[] {"email", "name"}, "Mustrum Ridcully"));
+		f = Filter.and(Filter.anyEq("Mustrum Ridcully", "email", "name"),
+	 			   	   Filter.noneEq("Mustrum Ridcully", "email", "name"));
 		System.out.println(f);
 		assertFalse(f.match(e));
-		f = Filter.not(Filter.noneEq(new String[] {"email", "name"}, "Mustrum Ridcully"));
+		f = Filter.not(Filter.noneEq("Mustrum Ridcully", "email", "name"));
 		System.out.println(f);
 		assertTrue(f.match(e));
 	}
 	
 	public void testRegExpPropertyComparator() {
-		assertTrue(Filter.anyMatches(new String[] {"email", "name"}, "Mustrum Ridcully").match(e));
-		assertFalse(Filter.noneMatches(new String[] {"email", "name"}, "Mustrum Ridcully").match(e));
-		assertFalse(Filter.allMatch(new String[] {"email", "name"}, "Mustrum Ridcully").match(e));
+		assertTrue(Filter.anyMatches("Mustrum Ridcully", "email", "name").match(e));
+		assertFalse(Filter.noneMatches("Mustrum Ridcully", "email", "name").match(e));
+		assertFalse(Filter.allMatch("Mustrum Ridcully", "email", "name").match(e));
 
-		assertTrue(Filter.anyMatches(new String[] {"email", "name"}, "M.* Ridcully").match(e));
-		assertTrue(Filter.allMatch(new String[] {"email", "message"}, ".*").match(e));	
+		assertTrue(Filter.anyMatches("M.* Ridcully", "email", "name").match(e));
+		assertTrue(Filter.allMatch(".*", "email", "name").match(e));	
 	}
 	
 	public void testPat() {
@@ -80,17 +80,17 @@ public class FilterTest extends TestCase {
 	}
 	
 	public void testSearchPropertyComparator() {		
-		assertTrue(Filter.stdSearchFilter(new String[] {"email", "name"}, "rid").match(e));
+		assertTrue(Filter.stdSearchFilter("rid", "email", "name").match(e));
 		// complete pattern is quoted, so this does _not_ match ridcully!
-		assertFalse(Filter.stdSearchFilter(new String[] {"name"}, "rid.*").match(e));
-		assertFalse(Filter.stdSearchFilter(new String[] {"name"}, "+").match(e));
-		assertFalse(Filter.stdSearchFilter(new String[] {"name"}, "\\Qhuh\\E").match(e));
-		assertFalse(Filter.stdSearchFilter(new String[] {"name"}, "\\E+").match(e));
+		assertFalse(Filter.stdSearchFilter("rid.*", "email", "name").match(e));
+		assertFalse(Filter.stdSearchFilter("+", "email", "name").match(e));
+		assertFalse(Filter.stdSearchFilter("\\Qhuh\\E", "email", "name").match(e));
+		assertFalse(Filter.stdSearchFilter("\\E+", "email", "name").match(e));
 	}
 	
 	public void testToString() {
-		Filter f = Filter.or(Filter.anyEq(new String[] {"email", "name"}, "Mustrum Ridcully"),
-	 			 			 Filter.noneEq(new String[] {"email", "name"}, "Mustrum Ridcully"));
+		Filter f = Filter.or(Filter.anyEq("Mustrum Ridcully", "email", "name"),
+	 			 			 Filter.noneEq("Mustrum Ridcully", "email", "name"));
 		Filter f2 = Filter.and(f, f);
 		System.out.println(f2);
 	}
@@ -105,30 +105,30 @@ public class FilterTest extends TestCase {
 				return null;
 			}			
 		};
-		Map extensions = new HashMap();
+		Map<String, FilterExtension> extensions = new HashMap<String, FilterExtension>();
 		extensions.put("name", ex);
-		assertTrue(Filter.anyMatches(new String[] {"email", "name"}, "Mustrum Ridcully").match(e));
-		assertFalse(Filter.anyMatches(new String[] {"email", "name"}, "Mustrum Ridcully").match(e, extensions));
+		assertTrue(Filter.anyMatches("Mustrum Ridcully", "email", "name").match(e));
+		assertFalse(Filter.anyMatches("Mustrum Ridcully", "email", "name").match(e, extensions));
 	}
 	
-	public void _testPerformance() {
+	public void testPerformance() {
 		TestTimer tt = new TestTimer("anyMatches");
 		boolean b = false;
 		for (int i=0; i<10000; i++) {
-			b = Filter.anyMatches(new String[] {"email", "name"}, "M.* Ridcully").match(e);
+			b = Filter.anyMatches("M.* Ridcully", "email", "name").match(e);
 		}
 		tt.done();
 		assertTrue(b);
 		
 		tt = new TestTimer("stdSearchFilter");
 		for (int i=0; i<100000; i++) {
-			b = Filter.stdSearchFilter(new String[] {"email", "name"}, "rid").match(e);
+			b = Filter.stdSearchFilter("rid", "email", "name").match(e);
 		}
 		tt.done();
 		assertTrue(b);
 		
 		tt = new TestTimer("stdSearchFilter precompiled");
-		Filter f = Filter.stdSearchFilter(new String[] {"email", "name"}, "rid");
+		Filter f = Filter.stdSearchFilter("rid", "email", "name");
 		for (int i=0; i<100000; i++) {
 			b = f.match(e);
 		}

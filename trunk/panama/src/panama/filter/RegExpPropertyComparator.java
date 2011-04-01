@@ -34,14 +34,14 @@ public class RegExpPropertyComparator extends PropertyComparator {
 	
 	/**
 	 */
-	public RegExpPropertyComparator(String[] properties, String pattern, int mode) {
-		this(properties, pattern, Pattern.DOTALL, mode);
+	public RegExpPropertyComparator(String pattern, int mode, String... properties) {
+		this(pattern, Pattern.DOTALL, mode, properties);
 	}
 
 	/**
 	 */
-	public RegExpPropertyComparator(String[] properties, String pattern, int flags, int mode) {
-		super(properties, pattern, mode);
+	public RegExpPropertyComparator(String pattern, int flags, int mode, String... properties) {
+		super(pattern, mode, properties);
 		regExpPattern = Pattern.compile(pattern, flags);
 	}
 	
