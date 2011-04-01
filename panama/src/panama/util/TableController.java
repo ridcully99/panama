@@ -147,7 +147,7 @@ public class TableController extends BaseController {
 			if (query != null && query.trim().length() > 0) {
 				// \W == non Word-Characters
 				String[] propertyArray = properties != null ? properties.split("\\W+") : null;
-				SearchPropertyComparator searchfilter = (SearchPropertyComparator)Filter.stdSearchFilter(propertyArray, query);
+				SearchPropertyComparator searchfilter = (SearchPropertyComparator)Filter.stdSearchFilter(query, propertyArray);
 				table.getFilters().put(Table.SEARCH_FILTER, searchfilter);
 			} else {
 				table.getFilters().remove(Table.SEARCH_FILTER);

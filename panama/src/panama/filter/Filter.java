@@ -60,7 +60,7 @@ public class Filter {
 	 * @param filterExtensions A Map<propertyName, FilterExtension> with optional stuff for special filter treatments
 	 * @return an Expression representing the Filter. 
 	 */
-	public Expression asExpression(Query query, Map<String, FilterExtension> filterExtensions) {
+	public Expression asExpression(Query<?> query, Map<String, FilterExtension> filterExtensions) {
 		return Ebean.getExpressionFactory().raw("1=1");
 	}
 	
@@ -78,32 +78,32 @@ public class Filter {
 	/**
 	 * Creates a standard search filter that is case insensitive and matches ^.*pattern.*$.
 	 */
-	public static Filter stdSearchFilter(String[] propertyNames, String pattern) {
-		return new SearchPropertyComparator(propertyNames, pattern, PropertyComparator.ANY_PROPERTIES);
+	public static Filter stdSearchFilter(String pattern, String... propertyNames) {
+		return new SearchPropertyComparator(pattern, PropertyComparator.ANY_PROPERTIES, propertyNames);
 	}
 	
-	public static Filter anyEq(String[] propertyNames, String pattern) {
-		return new PropertyComparator(propertyNames, pattern, PropertyComparator.ANY_PROPERTIES);
+	public static Filter anyEq(String pattern, String... propertyNames) {
+		return new PropertyComparator(pattern, PropertyComparator.ANY_PROPERTIES, propertyNames);
 	}
 
-	public static Filter noneEq(String[] propertyNames, String pattern) {
-		return new PropertyComparator(propertyNames, pattern, PropertyComparator.NO_PROPERTIES);
+	public static Filter noneEq(String pattern, String... propertyNames) {
+		return new PropertyComparator(pattern, PropertyComparator.NO_PROPERTIES, propertyNames);
 	}
 	
-	public static Filter allEq(String[] propertyNames, String pattern) {
-		return new PropertyComparator(propertyNames, pattern, PropertyComparator.ALL_PROPERTIES);
+	public static Filter allEq(String pattern, String... propertyNames) {
+		return new PropertyComparator(pattern, PropertyComparator.ALL_PROPERTIES, propertyNames);
 	}	
 	
-	public static Filter anyMatches(String[] propertyNames, String pattern) {
-		return new RegExpPropertyComparator(propertyNames, pattern, PropertyComparator.ANY_PROPERTIES);
+	public static Filter anyMatches(String pattern, String... propertyNames) {
+		return new RegExpPropertyComparator(pattern, PropertyComparator.ANY_PROPERTIES, propertyNames);
 	}
 
-	public static Filter noneMatches(String[] propertyNames, String pattern) {
-		return new RegExpPropertyComparator(propertyNames, pattern, PropertyComparator.NO_PROPERTIES);
+	public static Filter noneMatches(String pattern, String... propertyNames) {
+		return new RegExpPropertyComparator(pattern, PropertyComparator.NO_PROPERTIES, propertyNames);
 	}
 	
-	public static Filter allMatch(String[] propertyNames, String pattern) {
-		return new RegExpPropertyComparator(propertyNames, pattern, PropertyComparator.ALL_PROPERTIES);
+	public static Filter allMatch(String pattern, String... propertyNames) {
+		return new RegExpPropertyComparator(pattern, PropertyComparator.ALL_PROPERTIES, propertyNames);
 	}
 	
 	public static Filter and(Filter lhs, Filter rhs) {
@@ -137,5 +137,4 @@ public class Filter {
 	public static Filter withExpression(Expression expression) {
 		return new ExpressionFilter(expression);
 	}
-
 }

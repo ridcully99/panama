@@ -36,7 +36,7 @@ public class ExpressionFilter extends Filter {
 	}
 	
 	@Override
-	public Expression asExpression(Query query, Map<String, FilterExtension> filterExtensions) {
+	public Expression asExpression(Query<?> query, Map<String, FilterExtension> filterExtensions) {
 		return expression;
 	}
 }

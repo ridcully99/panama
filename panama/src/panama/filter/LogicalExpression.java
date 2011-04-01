@@ -79,16 +79,16 @@ public class LogicalExpression extends Filter {
 	}
 	
 	@Override
-	public Expression asExpression(Query query, Map<String, FilterExtension> filterExtensions) {
+	public Expression asExpression(Query<?> query, Map<String, FilterExtension> filterExtensions) {
 		switch (op) {
 			case AND : 
-				Junction all = Ebean.getExpressionFactory().conjunction(query);
+				Junction<?> all = Ebean.getExpressionFactory().conjunction(query);
 				for (Filter f : filters) {
 					all.add(f.asExpression(query, filterExtensions));
 				}
 				return all;
 			case OR : 
-				Junction any = Ebean.getExpressionFactory().disjunction(null);
+				Junction<?> any = Ebean.getExpressionFactory().disjunction(null);
 				for (Filter f : filters) {
 					any.add(f.asExpression(query, filterExtensions));
 				}

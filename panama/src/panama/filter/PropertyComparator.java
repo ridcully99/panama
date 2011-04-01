@@ -60,7 +60,7 @@ public class PropertyComparator extends Filter {
 	 * @param mode
 	 * @param pattern
 	 */
-	public PropertyComparator(String[] properties, String pattern, int mode) {
+	public PropertyComparator(String pattern, int mode, String... properties) {
 		this.properties = properties == null || properties.length == 0 ? null : Arrays.asList(properties);
 		this.pattern = pattern == null || pattern.equals("") ? null : pattern;
 		this.mode = mode >= ALL_PROPERTIES && mode <= NO_PROPERTIES ? mode : ANY_PROPERTIES;
@@ -117,7 +117,7 @@ public class PropertyComparator extends Filter {
 	 * @return Some sort of Expression representing the Filter.
 	 */
 	@Override
-	public Expression asExpression(Query query, Map<String, FilterExtension> filterExtensions) {
+	public Expression asExpression(Query<?> query, Map<String, FilterExtension> filterExtensions) {
 		Expression result = null;
 		if (getMode() == ALL_PROPERTIES) {
 			result = Ebean.getExpressionFactory().conjunction(query); 
@@ -128,7 +128,7 @@ public class PropertyComparator extends Filter {
 			FilterExtension extension = filterExtensions != null ? filterExtensions.get(property) : null;
 			Expression exp = extension == null ? forProperty(property) : extension.forProperty(property, pattern);
 			if (exp != null) {
-				((Junction)result).add(exp);
+				((Junction<?>)result).add(exp);
 			}
 		}
 		if (getMode() == NO_PROPERTIES) {

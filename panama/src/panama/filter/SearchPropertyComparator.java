@@ -30,8 +30,8 @@ public class SearchPropertyComparator extends RegExpPropertyComparator {
 	/**
 	 * the specified pattern is quoted, so regular expressions in it are treated as normal text.
 	 */
-	public SearchPropertyComparator(String[] properties, String pattern, int mode) {
-		super(properties, "", mode); // super compiles the pattern - to avoid errors, we give it an empty pattern here
+	public SearchPropertyComparator(String pattern, int mode, String... properties) {
+		super("", mode, properties); // super compiles the pattern - to avoid errors, we give it an empty pattern here
 		setPattern(pattern);		 // and set the pattern-string here (it is required in it's original form by the forProperty() method
 		pattern = pattern.replace("\\Q", "\\\\q");	// quote the quoters
 		pattern = pattern.replace("\\E", "\\\\e");	// quote the quoters
