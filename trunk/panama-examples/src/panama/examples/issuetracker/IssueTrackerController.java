@@ -65,8 +65,8 @@ public class IssueTrackerController extends BaseController {
 	@Action
 	public Target filter() {
 		Filter f = Filter.and(
-						Filter.anyEq(new String[] {"title", "description"}, "bla"), 
-						Filter.allEq(new String[] {"title", "description"}, "bla"));
+						Filter.anyEq("bla", "title", "description"), 
+						Filter.allEq("bla", "title", "description"));
 		Query q = Ebean.createQuery(Issue.class);
 		q.where(f.asExpression(q, null)).findList();
 		return new PlainTextTarget("nice ;-)");
