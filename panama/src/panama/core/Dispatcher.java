@@ -296,11 +296,11 @@ public class Dispatcher implements Filter {
 			if 	(StringUtils.isNotEmpty(alias)) {
 				alias = alias.trim();
 				if (alias.contains("/")) {
-					log.error("Controller alias '"+alias+"' contains illegal characters. Ignoring alias.");
+					log.warn("Controller alias '"+alias+"' contains illegal characters. Ignoring alias.");
 					continue;
 				}
 				if (controllerClasses.containsKey(alias)) {
-					log.error("Duplicate Controller alias '"+alias+"' detected. Used by "+n+
+					log.warn("Duplicate Controller alias '"+alias+"' detected. Used by "+n+
 							" and "+controllerClasses.get(alias).getName()+". Using alias only for the latter.");
 					continue;
 				}
@@ -336,12 +336,17 @@ public class Dispatcher implements Filter {
 						}
 						String alias = m.getAnnotation(Action.class).alias();
 						if (!StringUtils.isEmpty(alias)) {
-							key = clazz.getName()+"#"+alias;
-							actionMethods.put(key, m);	
-							log.debug(key+" -> "+m.getName());
-							if (alias.equals(defaultActionName)) {
-								actionMethods.put(defaultActionKey, m);
-								log.debug(defaultActionKey+" -> "+alias+" (default action)");
+							alias = alias.trim();
+							if (alias.contains("/")) {
+								log.warn("Action alias '"+alias+"' in "+clazz.getName()+" contains illegal characters. Ignoring alias.");
+							} else {
+								key = clazz.getName()+"#"+alias;
+								actionMethods.put(key, m);	
+								log.debug(key+" -> "+m.getName());
+								if (alias.equals(defaultActionName)) {
+									actionMethods.put(defaultActionKey, m);
+									log.debug(defaultActionKey+" -> "+alias+" (default action)");
+								}
 							}
 						}
 						break;
