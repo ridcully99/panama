@@ -15,51 +15,20 @@
  */
 package panama.exceptions;
 
-import java.text.ParseException;
-import java.util.List;
+
 
 /**
  * @author Robert
  * 
  */
+@SuppressWarnings("serial")
 public class ValidatorException extends RuntimeException {
 
-	private List parameters = null;
-	
-	/**
-	 * 
-	 * @param msg Should be a key for messages.properties 
-	 */
 	public ValidatorException(String msg) {
-		this(msg, null, null);
+		super(msg);
 	}
 
-	public ValidatorException(String msg, List parameters) {
-		this(msg, parameters, null);
+	public ValidatorException(String msg, Exception e) {
+		super(msg, e);
 	}
-	
-	/**
-	 * @param msg
-	 * @param pe
-	 */
-	public ValidatorException(String msg, ParseException pe) {
-		this(msg, null, pe);
-	}
-	
-	/**
-	 * @param msg
-	 * @param pe
-	 */
-	public ValidatorException(String msg, List parameters, ParseException pe) {
-		super(msg, pe);
-		setParameters(parameters);		
-	}
-
-	public List getParameters() {
-		return parameters;
-	}
-
-	public void setParameters(List parameters) {
-		this.parameters = parameters;
-	}	
 }

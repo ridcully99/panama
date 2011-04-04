@@ -16,6 +16,7 @@
 package panama.core;
 
 import java.lang.reflect.Array;
+import java.text.MessageFormat;
 import java.util.Arrays;
 import java.util.Collection;
 import java.util.Date;
@@ -23,6 +24,7 @@ import java.util.HashMap;
 import java.util.Iterator;
 import java.util.Locale;
 import java.util.Map;
+import java.util.ResourceBundle;
 
 import javax.servlet.ServletContext;
 import javax.servlet.http.HttpServletRequest;
@@ -186,13 +188,45 @@ public class Context {
 		session.put(LOCALE_KEY, locale);
 	}
 	
+	/**
+	 * Gets localized string for specified key and optional args, 
+	 * based on default resource bundle (resources.properties and it's variations for 
+	 * other languages like resources_de.properties) and current locale.
+	 * 
+	 * e.g. hello = Hello {1}!
+	 * getResource("hello", "World") -> Hello World!
+	 * 
+	 * @param key
+	 * @param args values for placesholders in resource value.
+	 * @return the formatted string
+	 */
+	public String getLocalizedString(String key, Object... args) {
+		return getLocalizedString("resources", key, args);
+	}
+		
+	/**
+	 * Gets localized string for specified key and optional args, based on specified resource bundle and current locale.
+	 * @param bundleName name of resource bundle to use
+	 * @param key
+	 * @param args values for placesholders in resource value.
+	 * @return the formatted string
+	 */
+	public String getLocalizedString(String bundleName, String key, Object... args) {
+		ResourceBundle bundle = ResourceBundle.getBundle(bundleName, getLocale());
+		if (bundle.containsKey(key)) {
+			return MessageFormat.format(bundle.getString(key), args);
+		} else {
+			return "???"+key+"???";
+		}
+	}	
+	
 	// -------------------------------------------------------------------------------------
 	// Parameter methods
 	// -------------------------------------------------------------------------------------
 	
 	public void setParameterMap(Map parameterMap) {
-		 this.parameterMap = new HashMap();
-		 this.parameterMap.putAll(parameterMap);
+		this.parameterMap = new HashMap();
+		this.parameterMap.putAll(parameterMap);
 	}
 	
 	public Map getParameterMap() {
