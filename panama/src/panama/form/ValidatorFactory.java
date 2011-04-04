@@ -15,6 +15,7 @@
  */
 package panama.form;
 
+import panama.core.Context;
 import panama.exceptions.ValidatorException;
 
 /**
@@ -28,7 +29,8 @@ public class ValidatorFactory {
 	private static Validator notEmptyValidator = new Validator() {
 		public synchronized void validate(Object value) throws ValidatorException {
 			if (value == null || value.toString().trim().length() == 0) {
-				throw new ValidatorException(Validator.NOTEMPTY_VALIDATION_FAILED);
+				String msg = Context.getInstance().getLocalizedString(Validator.NOTEMPTY_VALIDATION_FAILED);
+				throw new ValidatorException(msg);
 			}
 		}			
 	};
@@ -39,7 +41,8 @@ public class ValidatorFactory {
 		
 		public synchronized void validate(Object value) throws ValidatorException {
 			if (value != null && !value.toString().toLowerCase().matches(EMAIL_PATTERN)) {
-				throw new ValidatorException(Validator.EMAIL_VALIDATION_FAILED);
+				String msg = Context.getInstance().getLocalizedString(Validator.EMAIL_VALIDATION_FAILED);
+				throw new ValidatorException(msg);
 			}
 		}		
 	};
@@ -50,7 +53,8 @@ public class ValidatorFactory {
 		
 		public synchronized void validate(Object value) throws ValidatorException {
 			if (value != null && !value.toString().toLowerCase().matches(URL_PATTERN)) {
-				throw new ValidatorException(Validator.URL_VALIDATION_FAILED);
+				String msg = Context.getInstance().getLocalizedString(Validator.URL_VALIDATION_FAILED);
+				throw new ValidatorException(msg);
 			}
 		}		
 	};

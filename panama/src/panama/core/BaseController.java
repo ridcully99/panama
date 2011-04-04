@@ -17,13 +17,11 @@ package panama.core;
 
 import java.io.UnsupportedEncodingException;
 import java.net.URLEncoder;
-import java.text.MessageFormat;
 import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.Iterator;
 import java.util.List;
 import java.util.Map;
-import java.util.ResourceBundle;
 
 import org.apache.commons.lang.StringUtils;
 import org.grlea.log.SimpleLogger;
@@ -306,36 +304,4 @@ public class BaseController {
 		}
 		return tree;
 	}	
-	
-	/**
-	 * Gets localized string for specified key and optional args, 
-	 * based on default resource bundle (resources.properties and it's variations for 
-	 * other languages like resources_de.properties) and current locale.
-	 * 
-	 * e.g. hello = Hello {1}!
-	 * getResource("hello", "World") -> Hello World!
-	 * 
-	 * @param key
-	 * @param args values for placesholders in resource value.
-	 * @return the formatted string
-	 */
-	public String getLocalizedString(String key, Object... args) {
-		return getLocalizedString("resources", key, args);
-	}
-		
-	/**
-	 * Gets localized string for specified key and optional args, based on specified resource bundle and current locale.
-	 * @param bundleName name of resource bundle to use
-	 * @param key
-	 * @param args values for placesholders in resource value.
-	 * @return the formatted string
-	 */
-	public String getLocalizedString(String bundleName, String key, Object... args) {
-		ResourceBundle bundle = ResourceBundle.getBundle(bundleName, context.getLocale());
-		if (bundle.containsKey(key)) {
-			return MessageFormat.format(bundle.getString(key), args);
-		} else {
-			return "???"+key+"???";
-		}
-	}
 }

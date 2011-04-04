@@ -29,6 +29,7 @@ import java.util.Set;
 import org.apache.commons.fileupload.FileItem;
 import org.grlea.log.SimpleLogger;
 
+import panama.core.Context;
 import panama.exceptions.NoSuchFieldException;
 import panama.exceptions.ValidatorException;
 import panama.util.DynaBeanUtils;
@@ -495,7 +496,8 @@ public class FormData {
 					Object[] actualValues = f.stringsToValues((String[])values);
 					return validateValues(f, actualValues);
 				} catch (ParseException pe) {
-					throw new ValidatorException(Validator.PARSING_FAILED, pe);
+					String msg = Context.getInstance().getLocalizedString(Validator.PARSING_FAILED);
+					throw new ValidatorException(msg, pe);
 				}				
 			} else {
 				return validateValues(f, (Object[])values);					
