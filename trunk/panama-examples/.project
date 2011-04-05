@@ -3,7 +3,6 @@
 	<name>panama-examples</name>
 	<comment></comment>
 	<projects>
-		<project>panama</project>
 	</projects>
 	<buildSpec>
 		<buildCommand>
