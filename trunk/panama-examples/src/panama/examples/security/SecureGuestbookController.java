@@ -13,7 +13,7 @@
  *  See the License for the specific language governing permissions and 
  *  limitations under the License. 
  */
-package panama.examples.guestbook;
+package panama.examples.security;
 
 import java.util.ArrayList;
 import java.util.Date;
@@ -27,6 +27,7 @@ import panama.collections.SimpleListModel;
 import panama.collections.Table;
 import panama.core.BaseController;
 import panama.core.Target;
+import panama.examples.guestbook.GuestbookEntry;
 import panama.form.Form;
 import panama.form.FormData;
 import panama.form.StringField;
@@ -52,7 +53,7 @@ public class SecureGuestbookController extends BaseController {
 	}
 	
 	public SecureGuestbookController() {
-		registerTable(new DefaultTable("guestbookentries", model).setSortBy("date", Table.SORT_DESC));
+		registerTable(new DefaultTable("secureguestbookentries", model).setSortBy("date", Table.SORT_DESC));
 	}
 	
 	@Action

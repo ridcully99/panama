@@ -1,25 +1,24 @@
 <html>
 <head>
-	<title>Panama Examples - Guestbook</title>
+	<title>Panama Examples - Secure Guestbook</title>
 	<link rel="stylesheet" href="../simple.css" type="text/css">
 </head>
 <body>
   <form name="fm" method="POST" action="add">
+	<input type="hidden" name="token" value="$context.tokens.secure" />
     Add your comment here:
     <p>
-    <textarea name="text">Your comment goes here.</textarea>
+    <textarea name="text">This is a comment</textarea>
 	</p>
     <input type="submit" value="Submit" />
   </form>
   <p></p>
   <table>
-  $guestbookentries
-  $guestbookentries.rows.size()
 	<tr>
 		<th>Date</th>
 		<th>Comment</th>
 	</tr>
-    #foreach($entry in $guestbookentries.rows)
+    #foreach($entry in $secureguestbookentries.rows)
 	<tr>
 		<td>$entry.date</td>
 		<td>$entry.text</td>

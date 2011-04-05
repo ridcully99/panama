@@ -43,7 +43,6 @@ public class GuestbookController extends BaseController {
 		/* create form model based on GuestbookEntry class. This may be done static as long as the form is not changed later (make it final to ensure this) */
 		form = new Form();
 		form.addFields(GuestbookEntry.class, Form.EXCLUDE_PROPERTIES, "date");
-		form.addField(new StringField("token"));
 	}
 	
 	public GuestbookController() {
@@ -52,11 +51,13 @@ public class GuestbookController extends BaseController {
 	
 	@Action
 	public Target list() {
+		System.out.println(entries);
 		return render("guestbook.vm");
 	}
 
 	@Action(alias="add")
 	public Target addEntry() {
+		System.out.println(entries);
 		GuestbookEntry entry = new GuestbookEntry();
 		FormData fd = new FormData(form);							// get input values according to form model
 		fd.setInput(context.getParameterMap());	
