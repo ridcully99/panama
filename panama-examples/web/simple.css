@@ -13,3 +13,22 @@ td, th {
 	padding: 2px;
 	text-align: left;
 }
+
+th {
+	font-weight: normal;
+	background: #ccc;
+}
+
+fieldset {
+	border: 1px solid #999;
+	margin-bottom: 1em;
+}
+
+form {
+	width:100%;
+}
+
+textarea {
+	width:100%;
+	height: 4em;
+}
