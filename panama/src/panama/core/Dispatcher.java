@@ -46,6 +46,8 @@ import org.grlea.log.SimpleLogger;
 import org.scannotation.AnnotationDB;
 import org.scannotation.WarUrlFinder;
 
+import com.avaje.ebeaninternal.server.lib.ShutdownManager;
+
 import panama.annotations.Action;
 import panama.annotations.Controller;
 import panama.exceptions.AuthorizationException;
@@ -582,8 +584,10 @@ public class Dispatcher implements Filter {
 		return s == null ? defaultValue : s;
 	}	
 	
+	@Override
 	public void destroy() {
 		System.out.println("Good Bye and Good Luck. "+applicationContext.getAttribute(APP_NAME_KEY)+" was up for "+getFormattedUptime()+".");
+		ShutdownManager.shutdown();	// Experimental...
 	}
 	
 	/**

@@ -27,6 +27,18 @@ public interface Tree {
 	public String getKey();
 	
 	/**
+	 * Sets model for the table.
+	 * @param model
+	 */
+	public Tree setModel(ListModel model);
+	
+	/**
+	 * Gets model of table.
+	 * @return a ListModel
+	 */
+	public ListModel getModel();	
+	
+	/**
 	 * Gets a list of all root nodes of the tree
 	 * @return a list of objects or null
 	 */
