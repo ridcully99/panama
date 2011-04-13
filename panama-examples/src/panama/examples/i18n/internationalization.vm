@@ -1,8 +1,11 @@
 <html>
 <head>
 	<title>Panama Examples - Internationalization</title>
+	<link rel="stylesheet" href="../simple.css" type="text/css">
 </head>
 <body>
+  #set($examplename="Internationalization")
+  #parse("/panama/examples/exampleheader.vm")
   <p>
   $text.supported_languages.insert($context.core.getInitParam("panama.languages"))
   </p>
@@ -10,7 +13,7 @@
 	<ul>
 		<li><a href="./set?language=en">english</a></li>
 		<li><a href="./set?language=de">deutsch</a></li>
-		<li><a href="./set?language=fr">francais</a></li>
+		<li><a href="./set?language=fr">francais</a> (shows fallback to english because no french translations are available)</li>
 		<li><a href="./clear">default</a></li>
 	</ul>
   <p>

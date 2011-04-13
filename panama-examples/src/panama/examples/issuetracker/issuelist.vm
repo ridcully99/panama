@@ -4,6 +4,8 @@
 		<link rel="stylesheet" href="../simple.css" type="text/css">
 	</head>
 	<body>
+		#set($examplename="Issue Tracker")
+		#parse("/panama/examples/exampleheader.vm")	
 		<div style="float:left"><a href="edit">Create Issue...</a></div>
 		<div style="float:right">
 			<form method="post" action="$issuetable.searchLink('title','description')">

@@ -4,7 +4,7 @@
 	<link rel="stylesheet" href="simple.css" type="text/css">
 </head>
 <body>
-	<h2>Panama Examples</h2>
+	<div class="examplesheader">Panama Examples</div>
 	<fieldset>
 		<legend>Basic</legend>
 		<h4><a href="guestbook">Guestbook</a></h4>
@@ -14,9 +14,14 @@
 		<legend>Advanced</legend>
 		<h4><a href="i18n">Internationalization</a></h4>
 		<h4><a href="secureguestbook">Security</a></h4>
-		<p>Panama provides an easy to use token mechanism you can use to prevent your applications from cross site scripting (and double submits). This example shows a secure version of the basic guestbook example.</p>
+		<p>This example shows some security related features of Panama.</p>
+		<ul>
+			<li>The token mechanism to prevent your applications from cross site scripting (and double submits).</li>
+			<li>An easy way to implement a login to access (parts of) your application using the beforeAction() method.</li>
+			
+		</ul>
 		<h4><a href="tilesexample">Tiles</a></h4>
-		<h4><a href="issues">Issue Tracker [1]</a></h4>
+		<h4><a href="issues">Issue Tracker</a><sup>[1]</sup></h4>
 	</fieldset>
 	<p style="font-size:90%">[1] Database required. Please see <a href="http://code.google.com/p/panama/wiki/GettingStarted" target="_blank">Getting Started</a> for details.</p>
 </body>

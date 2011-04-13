@@ -28,6 +28,8 @@ import panama.collections.Table;
 import panama.core.BaseController;
 import panama.core.Target;
 import panama.examples.guestbook.GuestbookEntry;
+import panama.exceptions.AuthorizationException;
+import panama.exceptions.ForceTargetException;
 import panama.form.Form;
 import panama.form.FormData;
 import panama.form.StringField;
@@ -40,6 +42,9 @@ import panama.form.StringField;
 @Controller(alias="secureguestbook", defaultAction="list")
 public class SecureGuestbookController extends BaseController {
 
+	private final static String USERNAME = "panama";
+	private final static String PASSWORD = "42";
+	
 	/* create ListModel backed by a simple list. As this should be shared by all users, we make it static */
 	private static List<GuestbookEntry> entries = new ArrayList<GuestbookEntry>();
 	private static ListModel model = new SimpleListModel(entries);
@@ -54,6 +59,36 @@ public class SecureGuestbookController extends BaseController {
 	
 	public SecureGuestbookController() {
 		registerTable(new DefaultTable("secureguestbookentries", model).setSortBy("date", Table.SORT_DESC));
+	}
+
+	@Override
+	public void beforeAction(String actionName) throws ForceTargetException, AuthorizationException {
+		Boolean loggedIn = (Boolean)context.session.get("logged-in");
+		if (loggedIn == null || !loggedIn) {	// if not logged in
+			if ("login".equals(actionName)) {	// allow, if it's the login action
+			} else {							// otherwise show login form 
+				throw new ForceTargetException(render("loginform.vm"));
+			}
+		}
+	}
+	
+	@Action
+	public Target login() {
+		String username = context.getParameter("username");
+		String password = context.getParameter("password");
+		if (USERNAME.equals(username) && PASSWORD.equals(password)) {
+			context.session.put("logged-in", true);
+			return redirectToAction("list");
+		} else {
+			context.put("loginfailed", true);	// flag used in form to show error message
+			return render("loginform.vm");
+		}
+	}
+	
+	@Action
+	public Target logout() {
+		context.session.put("logged-in", null);
+		return redirectToAction("list");							// will be directed to login-page by beforeAction()
 	}
 	
 	@Action
