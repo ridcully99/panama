@@ -51,7 +51,12 @@ public class DefaultTable implements Table, Comparator, Serializable {
 	protected static SimpleLogger log = new SimpleLogger(DefaultTable.class);	
 	
 	protected final String key;
-	protected ListModel model = null;
+	/* model should be transient so registerTable can detect that the session was restored, 
+	 * and take the model from the inital table; 
+	 * at least for QueryTable this is mandatory as it's query is transient too 
+	 * and would be null otherwise after a restored session 
+	 */
+	protected transient ListModel model = null;
 	protected Set selected = new HashSet();
 	protected Map<String, Filter> filters = new HashMap<String, Filter>();
 	protected Map<String, Map<String, FilterExtension>> filterExtensions = new HashMap<String, Map<String, FilterExtension>>();

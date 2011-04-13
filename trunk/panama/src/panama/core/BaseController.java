@@ -283,6 +283,13 @@ public class BaseController {
 		if (table == null) {
 			table = initialTable;
 			tableCtrl.addTable(initialTable);
+		} else {
+			/* table model is intentionally transient, so it might be null even if the table is still there, 
+			 * after a session got restored. In that case, we take the model from the initialTable.
+			 */
+			if (table.getModel() == null) {
+				table.setModel(initialTable.getModel());
+			}
 		}
 		context.put(table.getKey(), table);
 		return table;
@@ -301,6 +308,13 @@ public class BaseController {
 		if (tree == null) {
 			tree = initialTree;
 			trees.addTree(initialTree);
+		} else {
+			/* tree model is intentionally transient, so it might be null even if the tree is still there, 
+			 * after a session got restored. In that case, we take the model from the initialTree.
+			 */
+			if (tree.getModel() == null) {
+				tree.setModel(initialTree.getModel());
+			}
 		}
 		return tree;
 	}	

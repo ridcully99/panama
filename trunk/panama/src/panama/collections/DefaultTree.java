@@ -32,7 +32,7 @@ import panama.util.TreeController;
  */
 public class DefaultTree implements Tree, Serializable {
 	
-	protected ListModel rootModel = null;
+	protected transient ListModel rootModel = null;
 	protected Map openNodes = new HashMap();
 	protected Set selected = new HashSet();
 	
@@ -55,8 +55,9 @@ public class DefaultTree implements Tree, Serializable {
 		return rootModel;
 	}
 
-	public void setModel(ListModel model) {
+	public Tree setModel(ListModel model) {
 		this.rootModel = model;
+		return this;
 	}
 
 	public List getRootNodes() {

@@ -27,7 +27,7 @@ public class Version {
 	// b: Revision (increases when cool new features are added)
 	// c: Minor	(increases when updates or fixes are made - even numbers mark stable releases)
 	
-	public final static String VERSION = "3.3.0";
+	public final static String VERSION = "3.3.1";
 	
 	public final static String LOGO_ASCIIART = 
 	" ______ _______ _______ _______ _______ _______ \n"+
@@ -40,7 +40,8 @@ public class Version {
 
 	/* 	History
 	 * ---------------------------------------------------------------------------------
-	 * 3.3.0    2001-04-01 Reduced allowed URLs to controller[/action], checking for illegal aliases; update to Ebean 7.2.3 and adaptions to Filters to work with it.
+	 * 3.3.1    2011-04-13 Fixed a problem when tomcat restores tables in session scope after restart and query is gone.
+	 * 3.3.0    2011-04-01 Reduced allowed URLs to controller[/action], checking for illegal aliases; update to Ebean 7.2.3 and adaptions to Filters to work with it.
 	 * 3.2.6	2011-03-23 Fixed massive bug with ThreadLocal context (Gott sei Dank gefunden!)
 	 * 3.2.4    2011-03-21 support for primitives in Form system
 	 * 3.2.3	2011-03-10 little fixes to allow derived versions of dispatcher.
