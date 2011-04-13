@@ -3,6 +3,18 @@ body, td, th {
 	font-size: 90%;
 }
 
+.examplesheader {
+	background-color:black;
+	font-size:1.5em;
+	padding:0.25em;
+	color: #eee;
+	margin-bottom:0.5em;
+}
+
+.examplesheader a {
+	color: #9999ff;
+}
+
 table {
 	width: 100%;
 	border-collapse: collapse;

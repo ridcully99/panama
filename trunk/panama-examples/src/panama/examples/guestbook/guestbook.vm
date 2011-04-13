@@ -4,6 +4,9 @@
 	<link rel="stylesheet" href="../simple.css" type="text/css">
 </head>
 <body>
+  #set($examplename="Guestbook")
+  #parse("/panama/examples/exampleheader.vm")
+
   <form name="fm" method="POST" action="add">
     Add your comment here:
     <p>
@@ -13,8 +16,6 @@
   </form>
   <p></p>
   <table>
-  $guestbookentries
-  $guestbookentries.rows.size()
 	<tr>
 		<th>Date</th>
 		<th>Comment</th>

@@ -4,6 +4,8 @@
 		<link rel="stylesheet" href="../simple.css" type="text/css">
 	</head>
 	<body>
+		#set($examplename="Issue Tracker")
+		#parse("/panama/examples/exampleheader.vm")		
 		<form action="save" method="post">
 		<input type="hidden" name="id" value="$formdata.id" />
 		<table>
