@@ -1,0 +1,13 @@
+#summary An overview of Panama's general approach and philosophy.
+#labels Phase-Design,Phase-Implementation
+
+= Philosophy =
+
+The goal of Panama is, to make it easy to create web applications with Java. Panama tries not to hide the mechanics of a web-server. There are no secrets and no magic. Panama aims to be as simple as possible in itself and to make it as simple and easy as possible to create web applications. Therefore if comes with "some batteries included": There's [http://velocity.apache.org Velocity] for the templates and there's [http://avaje.org Avaje Ebean] ORM as a database layer, both of which tightly integrated.
+
+
+= General approach =
+
+Panama consists of a Dispatcher which is implemented as a Filter and Controller classes (written by you) providing Action methods. Every request sent to a Panama application contains the name (or alias) of a Controller and an Action. The Dispatcher parses the request and invokes the action. Every action returns a Target which mosten times is a Velocity template to be rendered but can also be another Action to be invoked or a redirect or a JSON result etc.
+
+In regard to databases and templates, Panama uses the "open session in view" pattern, which means that the database-session is still open while the template is rendered. This way, your application can make great use of lazy loading (see the Tree example for a very impressive example how little code is needed this way).
