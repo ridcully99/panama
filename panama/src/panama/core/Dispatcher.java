@@ -587,7 +587,7 @@ public class Dispatcher implements Filter {
 	@Override
 	public void destroy() {
 		System.out.println("Good Bye and Good Luck. "+applicationContext.getAttribute(APP_NAME_KEY)+" was up for "+getFormattedUptime()+".");
-		ShutdownManager.shutdown();	// Experimental...
+		ShutdownManager.shutdown();	// Automatic shutdown of Ebean sometimes throws NPE when invoked too late, so we do it here explicitly.
 	}
 	
 	/**
