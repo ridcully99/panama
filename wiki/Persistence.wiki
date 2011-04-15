@@ -1,4 +1,4 @@
-#summary Use databases made easy.
+#summary Using databases made easy.
 
 = Introduction =
 
