@@ -17,7 +17,7 @@ Panama consists of a Dispatcher which is implemented as a Filter and Controller 
 
 Panama uses the "open session in view" pattern for database connections, which means that the database-session is still open while the template is rendered. This way, your application can make great use of lazy loading (see the Tree example for a very impressive example how little code is needed this way).
 
-= Coding =
+= Main Coding Parts =
 
 This section describes the coding part of your web application (in contrast to the template part, which is described below). There are four main parts you will need to know. 
 
