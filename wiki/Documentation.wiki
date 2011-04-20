@@ -17,7 +17,7 @@ Panama consists of a Dispatcher which is implemented as a Filter and Controller 
 
 Panama uses the "open session in view" pattern for database connections, which means that the database-session is still open while the template is rendered. This way, your application can make great use of lazy loading (see the Tree example for a very impressive example how little code is needed this way).
 
-= Controllers, Actions, Context and Targets =
+= The Main Parts =
 
 == Controllers ==
 
@@ -34,3 +34,134 @@ Actions are methods of a controller class. To be recognized as an action by Pana
 Per Controller you may specify one of the actions to be the default action. The default action will be invoked if an URL only specifies a controller but no action. You specify the name of the default action using the optional `defaultAction` attribute of the `@Controller` annotation.
 
 *Caution:* The aliases for controllers and actions must not contain any slashes (/). Aliases containing slashes are ignored and a warning is logged at startup. The controllers resp. actions can still be accessed via their real name (FQCN for controllers, method name for the actions).
+
+==Context==
+
+For each and every request, the system creates an initializes a thread-local instance of the `Context` class, which provides you with all you’ll need in your actions:
+
+  * current request
+  * current response
+  * current session
+  * access to application scope
+  * access to all request parameters
+  * the locale preferred by the current user
+  * localized strings
+  * token support
+  * easy ways to put values into request-, session- and application scope for use in templates
+  * ...
+
+There are two ways for you, to get access to the current context:
+
+  * From within controller classes, i.e. when you’re writing your action methods, you can use the `context` member variable, which is provided by the `BaseController` class and is automatically initialized with the current context (even if you create a controller instance yourself).
+
+  * Outside of controller classes - e.g. in some helper class - you can use the static method `Context.getInstance()` to get your `Context` instance for the current request.
+
+=== One `Context` instance per request
+
+Note, that for each request there is _exactly one instance_ of the `Context` class. All controllers created and all calls to `Context.getInstance()` during one request will always return the same object. This is quite useful, as anything you put into context at some place will also be there everywhere else, so there is no need to pass a lot of objects around. Very importantly, even during render-time in your Velocity templates you’ll have the same context instance at your disposal as `$context`.
+
+Note that for your convinience everything you put into context with `context.put()` is directly available in the template by it’s key, without need for `$context`. That means, if you do `context.put(“foo”, “bar”)` in your action, the value is directly available as variable `$foo` in your template (`$context.foo` is possible too).
+
+So if you put something into the context in your action class like so: 
+{{{
+context.put(“foo”, “bar”)
+context.session.put(“answer”, 42)
+context.application.put(“list”, new ArrayList<String>())
+}}}
+
+you can access it in your template like so:
+
+{{{
+$foo
+$context.foo
+$context.session.answer
+$context.application.list
+}}}
+
+*Caution:* Panama automatically puts the controller object itself into the `context` by it's FQCN and it's alias if one is specified. So instead of putting stuff into the context you also can provide public methods in your controller and invoke them from within your templates. Thus, make sure you do not give your controller an alias name that matches any of the velocity tools you intend to use in templates rendered by that controller, because putting the controller object into request context using that alias would “shadow” the tool.
+
+== Targets ==
+
+Targets are objects returned by Actions and tell Panama what to do next. Most of the time the `TemplateTarget` will be used,  but there’s also `RedirectTarget`, `PlainTextTarget` and even `JSONTarget (useful for responding to AJAX requests). And you can easily provide your own Targets as well, just extend the abstract `Target` class and implement the `go()` method.
+
+= Templates =
+
+Panama uses Apache Velocity for it’s templates. Velocity is fully integrated with Panama, no entry in `web.xml` is required.
+
+The configuration is done via `velocity.properties` in the _src_ root directory. A minimal version would look something like this:
+
+{{{
+resource.loader = class
+class.resource.loader.class = org.apache.velocity.runtime.resource.loader.ClasspathResourceLoader
+runtime.log.logsystem.class=panama.util.SimpleLogChute
+input.encoding = UTF-8
+output.encoding = UTF-8
+}}}
+
+Please see the `velocity.properties` of the _panama-examples_ project for more options and explanations and of course the [http://velocity.apache.org/engine/releases/velocity-1.6/developer-guide.html#Velocity_Configuration_Keys_and_Values official documentation].
+
+== Pre-Set Variables ==
+
+There are a bunch of preset variables available for use in your templates:
+
+===`$context`===
+
+This is the `Context` object you also have in your controller (see above). 
+
+===`$request`, `$response`===
+
+Access to the request and response objects.
+
+===`$<controller-FQCN>` and `$<controller-alias>`
+ 
+Panama automatically puts the controller instance of the executed action into the context by it’s fully qualified class name, as well as by it’s alias name (if any is set in the @Controller annotation). In both cases, each dot in the name is replaced by an underscore, as dots are understood by velocity as a separation of objects. So the `GuestbookController` from the _panama-examples_ project is available via `$panama_examples_guestbook_GuestbookController` as well as via `$guestbook`.
+
+== Tools ==
+
+Tools are a powerful feature of Velocity as described [http://velocity.apache.org/tools/devel/ here].
+
+=== Default-Tools===
+
+Panama has [http://velocity.apache.org/tools/releases/2.0/ VelocityTools 2.0] included. All its [http://velocity.apache.org/tools/releases/2.0/generic.html GenericTools] and [http://velocity.apache.org/tools/releases/2.0/view.html VelocityView Tools] are automatically available for use in the templates. They are available via their default names.
+
+  * `$math`
+  * `$field`
+  * `$text`
+  * `$alternator`
+  * `$sorter`
+  * `$esc`
+  * `$convert`
+  * `$class`
+  * `$xml`
+  * `$number`
+  * `$display`
+  * `$date`
+  * `$browser`
+  * `$pager`
+  * `$link`
+  * `$loop`
+  * `$import`
+  * `$params`
+  * `$cookies`
+  * `$render`
+
+Additionally the following Panama tools are also automatically available:
+
+  * $tiles
+  * $null (this tool is taken from Velocity Wiki)
+
+===Your own Tools===
+
+You can also provide your own Velocity tools. To do so, create your tool classes and `tools.xml` file as explained here. Place your `tools.xml` file in your _src_ root directory. See the _panama-examples_ for an example.
+
+===Overwriting===
+
+Note, that you can overwrite the tools with your own stuff, using #set(). <br>
+Hint: If you need e.g. a variable `$xml` and still want to use the `$xml` tool, just assign the tool to another variable in your template:
+
+{{{
+#set($xmltool = $xml)
+#set($xml = ‘foo’)
+}}}
+
+Note, that overwriting only takes place within your template. You do not remove or delete the tool itself and it can still be accessed by it’s default name in other templates.
