@@ -1,0 +1,16 @@
+#summary Entry point for the documentation.
+#labels Featured
+
+= Welcome to Panama =
+
+This Wiki will provide all the documentation of the framework.
+
+= Table of Contents =
+
+== The Basics ==
+* Introduction
+* MainParts
+
+== Advanced usage ==
+
+== Extending Panama ==
