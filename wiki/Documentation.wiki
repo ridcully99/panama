@@ -56,7 +56,7 @@ There are two ways for you, to get access to the current context:
 
   * Outside of controller classes - e.g. in some helper class - you can use the static method `Context.getInstance()` to get your `Context` instance for the current request.
 
-=== One `Context` instance per request
+=== One `Context` instance per request ===
 
 Note, that for each request there is _exactly one instance_ of the `Context` class. All controllers created and all calls to `Context.getInstance()` during one request will always return the same object. This is quite useful, as anything you put into context at some place will also be there everywhere else, so there is no need to pass a lot of objects around. Very importantly, even during render-time in your Velocity templates you’ll have the same context instance at your disposal as `$context`.
 
@@ -112,7 +112,7 @@ This is the `Context` object you also have in your controller (see above).
 
 Access to the request and response objects.
 
-===`$<controller-FQCN>` and `$<controller-alias>`
+===`$<controller-FQCN>` and `$<controller-alias>` ===
  
 Panama automatically puts the controller instance of the executed action into the context by it’s fully qualified class name, as well as by it’s alias name (if any is set in the @Controller annotation). In both cases, each dot in the name is replaced by an underscore, as dots are understood by velocity as a separation of objects. So the `GuestbookController` from the _panama-examples_ project is available via `$panama_examples_guestbook_GuestbookController` as well as via `$guestbook`.
 
@@ -124,26 +124,26 @@ Tools are a powerful feature of Velocity as described [http://velocity.apache.or
 
 Panama has [http://velocity.apache.org/tools/releases/2.0/ VelocityTools 2.0] included. All its [http://velocity.apache.org/tools/releases/2.0/generic.html GenericTools] and [http://velocity.apache.org/tools/releases/2.0/view.html VelocityView Tools] are automatically available for use in the templates. They are available via their default names.
 
-  * `$math`
-  * `$field`
-  * `$text`
-  * `$alternator`
-  * `$sorter`
-  * `$esc`
-  * `$convert`
-  * `$class`
-  * `$xml`
-  * `$number`
-  * `$display`
-  * `$date`
-  * `$browser`
-  * `$pager`
-  * `$link`
-  * `$loop`
-  * `$import`
-  * `$params`
-  * `$cookies`
-  * `$render`
+  * [http://velocity.apache.org/tools/releases/2.0/javadoc/org/apache/velocity/tools/generic/MathTool.html $math]
+  * [http://velocity.apache.org/tools/releases/2.0/javadoc/org/apache/velocity/tools/generic/FieldTool.html $field]
+  * [http://velocity.apache.org/tools/releases/2.0/javadoc/org/apache/velocity/tools/generic/ResourceTool.html $text]
+  * [http://velocity.apache.org/tools/releases/2.0/javadoc/org/apache/velocity/tools/generic/AlternatorTool.html $alternator]
+  * [http://velocity.apache.org/tools/releases/2.0/javadoc/org/apache/velocity/tools/generic/SortTool.html $sorter]
+  * [http://velocity.apache.org/tools/releases/2.0/javadoc/org/apache/velocity/tools/generic/EscapeTool.html $esc]
+  * [http://velocity.apache.org/tools/releases/2.0/javadoc/org/apache/velocity/tools/generic/ConversionTool.html $convert]
+  * [http://velocity.apache.org/tools/releases/2.0/javadoc/org/apache/velocity/tools/generic/ClassTool.html $class]
+  * [http://velocity.apache.org/tools/releases/2.0/javadoc/org/apache/velocity/tools/generic/XmlTool.html $xml]
+  * [http://velocity.apache.org/tools/releases/2.0/javadoc/org/apache/velocity/tools/generic/NumberTool.html $number]
+  * [http://velocity.apache.org/tools/releases/2.0/javadoc/org/apache/velocity/tools/generic/DisplayTool.html $display]
+  * [http://velocity.apache.org/tools/releases/2.0/javadoc/org/apache/velocity/tools/generic/ComparisionDateTool.html $date]
+  * [http://velocity.apache.org/tools/releases/2.0/javadoc/org/apache/velocity/tools/generic/BrowserTool.html $browser]
+  * [http://velocity.apache.org/tools/releases/2.0/javadoc/org/apache/velocity/tools/generic/PagerTool.html $pager]
+  * [http://velocity.apache.org/tools/releases/2.0/javadoc/org/apache/velocity/tools/generic/LinkTool.html $link]
+  * [http://velocity.apache.org/tools/releases/2.0/javadoc/org/apache/velocity/tools/generic/LoopTool.html $loop]
+  * [http://velocity.apache.org/tools/releases/2.0/javadoc/org/apache/velocity/tools/view/ImportTool.html $import]
+  * [http://velocity.apache.org/tools/releases/2.0/javadoc/org/apache/velocity/tools/view/ParameterTool.html $params]
+  * [http://velocity.apache.org/tools/releases/2.0/javadoc/org/apache/velocity/tools/view/CookieTool.html $cookies]
+  * [http://velocity.apache.org/tools/releases/2.0/javadoc/org/apache/velocity/tools/generic/RenderTool.html] $render]
 
 Additionally the following Panama tools are also automatically available:
 
