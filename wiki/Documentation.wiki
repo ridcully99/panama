@@ -137,7 +137,7 @@ Panama has [http://velocity.apache.org/tools/releases/2.0/ VelocityTools 2.0] in
   * [http://velocity.apache.org/tools/releases/2.0/javadoc/org/apache/velocity/tools/generic/XmlTool.html $xml]
   * [http://velocity.apache.org/tools/releases/2.0/javadoc/org/apache/velocity/tools/generic/NumberTool.html $number]
   * [http://velocity.apache.org/tools/releases/2.0/javadoc/org/apache/velocity/tools/generic/DisplayTool.html $display]
-  * [http://velocity.apache.org/tools/releases/2.0/javadoc/org/apache/velocity/tools/generic/ComparisionDateTool.html $date]
+  * [http://velocity.apache.org/tools/releases/2.0/javadoc/org/apache/velocity/tools/generic/ComparisonDateTool.html $date]
   * [http://velocity.apache.org/tools/releases/2.0/javadoc/org/apache/velocity/tools/generic/LoopTool.html $loop]
   * [http://velocity.apache.org/tools/releases/2.0/javadoc/org/apache/velocity/tools/generic/RenderTool.html $render]
   * [http://velocity.apache.org/tools/releases/2.0/javadoc/org/apache/velocity/tools/view/BrowserTool.html $browser]
