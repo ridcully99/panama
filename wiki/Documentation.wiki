@@ -1,16 +1,36 @@
-#summary Entry point for the documentation.
+#summary The Documentation.
 #labels Featured
-
-= Welcome to Panama =
-
-This Wiki will provide all the documentation of the framework.
 
 = Table of Contents =
 
-== The Basics ==
-* Introduction
-* MainParts
+<wiki:toc max_depth="3" />
 
-== Advanced usage ==
+= Introduction =
 
-== Extending Panama ==
+== Philosophy ==
+
+The goal of Panama is, to make it easy to create web applications with Java. Panama tries not to hide the mechanics of a web-server. There are no secrets and no magic. Panama aims to be as simple as possible in itself and to make it as simple and easy as possible to create web applications. Therefore if comes with "some batteries included": There's Velocity for the templates and there's Avaje Ebean ORM as a database layer, both of which tightly integrated.
+
+== General approach ==
+
+Panama consists of a Dispatcher which is implemented as a Filter and Controller classes (written by you) providing Action methods. Every request sent to a Panama application contains the name (or alias) of a Controller and an Action. The Dispatcher parses the request and invokes the action. Every action returns a Target which mosten times is a Velocity template to be rendered but can also be another Action to be invoked or a redirect or a JSON result etc.
+
+Panama uses the "open session in view" pattern for database connections, which means that the database-session is still open while the template is rendered. This way, your application can make great use of lazy loading (see the Tree example for a very impressive example how little code is needed this way).
+
+= Controllers, Actions, Context and Targets =
+
+== Controllers ==
+
+Controllers are classes that provide a set of action methods. Which and how many actions you put in one controller is up to you, but normally you’d put actions together that a logically connected (like create, update, delete and list for some entity type). A simple rule of thumb could be to put all actions in one controller that should share the same URL prefix. 
+
+To be recognized as a controller by Panama, a class must be derived from the `BaseController` class and must be annotated with the `@Controller` annotation. This annotation has an optional `alias` property that allows you to give your controller class a nice short name, which can also be used in the URL. If you do not provide an alias, you have to specify the fully qualified class name of your controller in the URL (which might look a bit odd). Note, that even if your controller has an alias, you can also use the fully qualified class name instead. 
+
+== Actions ==
+
+Actions are methods of a controller class. To be recognized as an action by Panama, a method must have the signature `public Target actionName()` and must be annotated with the `@Action` annotation. This annotation has an optional `alias` property that allows you to give your action a name that differs from the method name.
+
+=== Default Action ===
+
+Per Controller you may specify one of the actions to be the default action. The default action will be invoked if an URL only specifies a controller but no action. You specify the name of the default action using the optional `defaultAction` attribute of the `@Controller` annotation.
+
+*Caution:* The aliases for controllers and actions must not contain any slashes (/). Aliases containing slashes are ignored and a warning is logged at startup. The controllers resp. actions can still be accessed via their real name (FQCN for controllers, method name for the actions).
