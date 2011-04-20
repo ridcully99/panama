@@ -136,14 +136,14 @@ Panama has [http://velocity.apache.org/tools/releases/2.0/ VelocityTools 2.0] in
   * [http://velocity.apache.org/tools/releases/2.0/javadoc/org/apache/velocity/tools/generic/NumberTool.html $number]
   * [http://velocity.apache.org/tools/releases/2.0/javadoc/org/apache/velocity/tools/generic/DisplayTool.html $display]
   * [http://velocity.apache.org/tools/releases/2.0/javadoc/org/apache/velocity/tools/generic/ComparisionDateTool.html $date]
-  * [http://velocity.apache.org/tools/releases/2.0/javadoc/org/apache/velocity/tools/generic/BrowserTool.html $browser]
-  * [http://velocity.apache.org/tools/releases/2.0/javadoc/org/apache/velocity/tools/generic/PagerTool.html $pager]
-  * [http://velocity.apache.org/tools/releases/2.0/javadoc/org/apache/velocity/tools/generic/LinkTool.html $link]
   * [http://velocity.apache.org/tools/releases/2.0/javadoc/org/apache/velocity/tools/generic/LoopTool.html $loop]
+  * [http://velocity.apache.org/tools/releases/2.0/javadoc/org/apache/velocity/tools/generic/RenderTool.html] $render]
+  * [http://velocity.apache.org/tools/releases/2.0/javadoc/org/apache/velocity/tools/view/BrowserTool.html $browser]
+  * [http://velocity.apache.org/tools/releases/2.0/javadoc/org/apache/velocity/tools/view/PagerTool.html $pager]
+  * [http://velocity.apache.org/tools/releases/2.0/javadoc/org/apache/velocity/tools/view/LinkTool.html $link]
   * [http://velocity.apache.org/tools/releases/2.0/javadoc/org/apache/velocity/tools/view/ImportTool.html $import]
   * [http://velocity.apache.org/tools/releases/2.0/javadoc/org/apache/velocity/tools/view/ParameterTool.html $params]
   * [http://velocity.apache.org/tools/releases/2.0/javadoc/org/apache/velocity/tools/view/CookieTool.html $cookies]
-  * [http://velocity.apache.org/tools/releases/2.0/javadoc/org/apache/velocity/tools/generic/RenderTool.html] $render]
 
 Additionally the following Panama tools are also automatically available:
 
