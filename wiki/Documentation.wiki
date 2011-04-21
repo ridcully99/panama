@@ -167,3 +167,29 @@ Hint: If you need e.g. a variable `$xml` and still want to use the `$xml` tool, 
 }}}
 
 Note, that overwriting only takes place within your template. You do not remove or delete the tool itself and it can still be accessed by it’s default name in other templates.
+
+= Internationalization =
+
+Externalize strings to `resources.properties` resp. `resources_<lang>.properties` files in your _src_ root directory.
+
+== Usage in Templates ==
+
+In your templates use the `$text` tool to write the strings:
+
+|| `$text.hello.world`         || Hello World!              ||
+|| `$text.bar`                 || The args are {0} and {1}. ||
+|| `$text.bar.insert(4)`       ||  The args are 4 and {1}.  ||
+|| `$text.bar.insert(4, true)` ||  The args are 4 and true. ||
+
+== Usage in Code ==
+
+In your code, use the `Context#getLocalizedString()` methods provided by the `Context` class:
+
+|| `context.getLocalizedString("hello.world")`  || Hello World!             ||
+|| `context.getLocalizedString("bar", 4, true)`	|| The args are 4 and true. ||
+
+== How Panama selects the language to use ==
+
+By default, Panama matches the user's preferred languages (as set in her browser) and the languages your application supports (see [#Configuration] below). Alternatively, you can explicitly use the `Context#putLocale()` method to set the language to use, e.g. if you allow the user to explicitly select a language in your application. The locale is stored in session scope. 
+
+If no resources property file exists for the selected language, the standard fallback procedure to the default resources happens.
