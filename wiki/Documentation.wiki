@@ -208,7 +208,7 @@ Use the `$tiles` tool to embed the result of actions within your template like s
 
 {{{
 $tiles.embed("controller", "action", {"param1":"value"})
-}}}`
+}}}
 
 The optional parameter map extends or the alters the original request parameters while invoking the action. Afterwards the parameters are restored to the original values.
 
