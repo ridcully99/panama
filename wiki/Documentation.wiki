@@ -88,7 +88,7 @@ Targets are objects returned by Actions and tell Panama what to do next. Most of
 
 = Templates =
 
-Panama uses [http://velocity.apache.org Apache Velocity for it’s templates. Velocity is fully integrated with Panama, no entry in `web.xml` is required.
+Panama uses [http://velocity.apache.org Apache Velocity for it’s templates. Velocity is fully integrated with Panama, no entry in _web.xml_ is required.
 
 The configuration of Velocity is done via `velocity.properties` in the _src_ root directory. A minimal version would look something like this:
 
@@ -193,3 +193,46 @@ In your code, use the `Context#getLocalizedString()` methods provided by the `Co
 By default, Panama matches the user's preferred languages (as set in her browser) and the languages your application supports (see [#Configuration] below). Alternatively, you can explicitly use the `Context#putLocale()` method to set the language to use, e.g. if you allow the user to explicitly select a language in your application. The locale is stored in session scope. 
 
 If no resources property file exists for the selected language, the standard fallback procedure to the default resources happens.
+
+*See also* the [http://code.google.com/p/panama/source/browse/#svn%2Ftrunk%2Fpanama-examples%2Fsrc%2Fpanama%2Fexamples%2Fi18n Internationalization example] in the panama-examples project.
+
+= Tiles =
+
+Panama allows you to embed the results of other actions within your templates. This is different from the simple `#include()` or `#parse()` functionality provided by Velocity, in that it allows the reuse of business logic in different places -- in some way it’s a lightweight version of portlets.
+
+Imagine you have a webshop and want to show the user’s current shopping cart on every page. Without tiles, you’d have to ensure in every action that everything needed for rendering the cart is provided and calculated and in every template you’d have to include another template that renders the cart.
+
+With tiles you simply create an action that’s only responsible for the shopping cart. It might provide a list of all the user’s items and computes some total sum and shipping costs and so on and renders on to a velocity template that is not a complete HTML page, but just a snippet showing the items and costs.
+
+Use the `$tiles` tool to embed the result of actions within your template like so:
+
+{{{
+$tiles.embed("controller", "action", {"param1":"value"})
+}}}`
+
+The optional parameter map extends or the alters the original request parameters while invoking the action. Afterwards the parameters are restored to the original values.
+
+*See also* the [http://code.google.com/p/panama/source/browse/#svn%2Ftrunk%2Fpanama-examples%2Fsrc%2Fpanama%2Fexamples%2Ftiles Tiles example] in the panama-examples project.
+
+
+= Configuration =
+
+== Panama ==
+
+Panama does not require any configuration to work. However there are a few optional parameters, which can be set as init-parameters for the filter declaration in _web.xml_.
+
+|| param-name         || param-value || Explanation ||
+|| `panama.languages` || `en,de,fr` || A comma separated list of languages your application supports. See chapter [#Internationalization] for details. ||
+|| `panama.maxfileuploadsize` || `16` || The maximum file upload size in MByte. The default values is 1 MByte. ||
+
+== !SimpleLog ==
+
+SimpleLog requires a `simplelog.properties` file in the _src_ root directory. Actually the file may even be empty, but please see the [http://code.google.com/p/panama/source/browse/trunk/panama-kickstart/src/simplelog.properties simplelog.properties] file from _panama-kickstart_, which contains a good documentation in form of comments.
+
+== Avaje Ebean ORM ==
+
+If you're using the integrated Persistence layer based on Avaje Ebean ORM, you'll have to provide an `ebean.properties` file in the _src_ root directory. Please see the chapter about [Persistence] and http://www.avaje.org for further information.
+
+== Custom ==
+
+If you need some configuration of your own, Panama has limited support for that, in that you can add your own custom init-parameters to the filter declaration in _web.xml_ and access them via `context.getCore().getInitParam(key)` from within your controller classes. If that is not enough for your needs you'll have to come up with something by your own.
