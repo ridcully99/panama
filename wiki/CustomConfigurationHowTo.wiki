@@ -4,7 +4,7 @@
 
 If the possibilities described in [Documentation#Configuration] are not enough for your configuration needs, you might want to consider one of the ways described here.
 
-== Custom `Dispatcher` with extended `init()` ==
+== Custom Dispatcher with extended `init()` ==
 
 To be as plain and simple as it wants to be, Panama does not provide any callbacks or whatever to allow customization of the Dispatcher.
 
