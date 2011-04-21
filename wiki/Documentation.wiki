@@ -222,7 +222,7 @@ The optional parameter map extends or the alters the original request parameters
 Panama does not require any configuration to work. However there are a few optional parameters, which can be set as init-parameters for the filter declaration in _web.xml_.
 
 || param-name         || param-value || Explanation ||
-|| `panama.languages` || `en,de,fr` || A comma separated list of languages your application supports. See chapter [#Internationalization] for details. ||
+|| `panama.languages` || `en,de,fr` || A comma separated list of languages your application supports.<br>See chapter [#Internationalization] for details. ||
 || `panama.maxfileuploadsize` || `16` || The maximum file upload size in MByte. The default values is 1 MByte. ||
 
 == !SimpleLog ==
@@ -235,4 +235,4 @@ If you're using the integrated Persistence layer based on Avaje Ebean ORM, you'l
 
 == Custom ==
 
-If you need some configuration of your own, Panama has limited support for that, in that you can add your own custom init-parameters to the filter declaration in _web.xml_ and access them via `context.getCore().getInitParam(key)` from within your controller classes. If that is not enough for your needs you'll have to come up with something by your own.
+If you need some configuration of your own, Panama has limited support for that, in that you can add your own custom init-parameters to the filter declaration in _web.xml_ and access them via `context.getCore().getInitParam(key)` from within your controller classes. If that is not enough for your needs you'll have to come up with something by your own ([CustomConfigurationHowTo Hint]).
