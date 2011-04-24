@@ -1,13 +1,16 @@
-#summary About identification, authentification and safety.
+#summary How to implement aspects like authentification, XSS protection etc. with Panama.
 
 = Introduction =
 
-Add your content here.
+Security is extremly important for any application. This page explains how you can implement the different aspects of security with Panama.
 
+= Authentification =
 
-= Details =
+Many web application have restricted areas, only users with proper permissions should have access to. To achieve this in Panama, there's a single method: `BaseController#beforeAction()`. This method is invoked always before an action of the controller is invoked. Although the default implementation of the `BaseController` does nothing, you can easily implement this method in your controllers to check if a user is logged in and has the proper rights to execute the requested action.
 
-Add your content here.  Format your content with:
-  * Text in *bold* or _italic_
-  * Headings, paragraphs, and lists
-  * Automatic links to other wiki pages
+A simple implementation, based on container based security as provided by e.g. Tomcat, could look like this:
+
+public void beforeAction() {
+} 
+
+= XSS (Cross Site Scripting) Protection =
