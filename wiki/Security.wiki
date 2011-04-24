@@ -19,7 +19,7 @@ public void beforeAction(String actionName) throws ForceTargetException, Authori
         return;
     }
 	
-    // supposed, that every logged in user has role 'user' 
+    // supposing that every logged in user has role 'user' 
     if (!context.getRequest().isUserInRole("user")) {
         // not logged in? simply render the login-form.
         throw new ForceTargetException(new TemplateTarget("login.vm"));
@@ -47,3 +47,5 @@ Throwing an `AuthorizationException` simply creates a 403 (Access Denied) HTTP E
 
 
 = XSS (Cross Site Scripting) Protection =
+
+Panama provides support for tokens that allow for detection of cross site scripting. See the SecureGuestbook example of the _panama-examples_ project.
