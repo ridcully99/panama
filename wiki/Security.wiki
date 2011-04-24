@@ -12,22 +12,22 @@ A simple implementation, based on container based security as provided by e.g. T
 
 {{{
 public void beforeAction(String actionName) throws ForceTargetException, AuthorizationException {
-	// the login action is allowed for everyone
-	if (actionName.equals("login")) {	
-		return;
-	}
+    // the login action is allowed for everyone
+    if (actionName.equals("login")) {	
+        return;
+    }
 	
-		// supposed, that every logged in user has role 'user' 
-	if (!context.getRequest().isUserInRole("user")) {
-		// not logged in? simply render the login-form.
-		throw new ForceTargetException(new TemplateTarget("login.vm"));
-	} 
+    // supposed, that every logged in user has role 'user' 
+    if (!context.getRequest().isUserInRole("user")) {
+        // not logged in? simply render the login-form.
+        throw new ForceTargetException(new TemplateTarget("login.vm"));
+    } 
 		
-	// check if currently logged in user has 'access-all-areas' role
-	if (!context.getRequest().isUserInRole("access-all-areas")) {
-		// if not, create a 401 (Access Denied) HTTP Error
-		throw new AuthorizationException();
-	}
+    // check if currently logged in user has 'access-all-areas' role
+    if (!context.getRequest().isUserInRole("access-all-areas")) {
+        // if not, create a 401 (Access Denied) HTTP Error
+        throw new AuthorizationException();
+    }
 }
 }}}
 
