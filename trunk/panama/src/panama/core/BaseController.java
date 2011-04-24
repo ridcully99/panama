@@ -77,19 +77,6 @@ public class BaseController {
 	}
 	
 	/**
-	 * This method is invoked if access to given action of given controller is not allowed.
-	 * according to plugged Authorization class.
-	 * Default implemention does nothing.
-	 * May be used to redirect to specific page (e.g. login)
-	 * 
-	 * @param controller
-	 * @param action
-	 * @throws ForceTargetException
-	 */
-	public void handleNotAuthorized(BaseController controller, String action) throws ForceTargetException {
-	}
-	
-	/**
 	 * Defines a redirect to other url (relative or absolute).
 	 *
 	 * Sends a temporary redirect response to the client using the specified redirect location 
