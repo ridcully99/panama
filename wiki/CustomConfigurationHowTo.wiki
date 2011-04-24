@@ -1,4 +1,4 @@
-#summary Hints on how to implement custom configuration.
+#summary how to implement custom configuration.
 
 = Custom Configuration How To =
 
