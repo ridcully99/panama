@@ -168,6 +168,28 @@ Hint: If you need e.g. a variable `$xml` and still want to use the `$xml` tool, 
 
 Note, that overwriting only takes place within your template. You do not remove or delete the tool itself and it can still be accessed by it’s default name in other templates.
 
+= Configuration =
+
+== Panama ==
+
+Panama does not require any configuration to work. However there are a few optional parameters, which can be set as init-parameters for the filter declaration in _web.xml_.
+
+|| param-name         || param-value || Explanation ||
+|| `panama.languages` || `en,de,fr` || A comma separated list of languages your application supports.<br>See chapter [#Internationalization] for details. ||
+|| `panama.maxfileuploadsize` || `16` || The maximum file upload size in MByte. The default values is 1 MByte. ||
+
+== !SimpleLog ==
+
+SimpleLog requires a `simplelog.properties` file in the _src_ root directory. Actually the file may even be empty, but please see the [http://code.google.com/p/panama/source/browse/trunk/panama-kickstart/src/simplelog.properties simplelog.properties] file from _panama-kickstart_, which contains a good documentation in form of comments.
+
+== Avaje Ebean ORM ==
+
+If you're using the integrated Persistence layer based on Avaje Ebean ORM, you'll have to provide an `ebean.properties` file in the _src_ root directory. Please see the chapter about [Persistence] and http://www.avaje.org for further information.
+
+== Custom ==
+
+If you need some configuration of your own, Panama has limited support for that, in that you can add your own custom init-parameters to the filter declaration in _web.xml_ and access them via `context.getCore().getInitParam(key)` from within your controller classes. If that is not enough for your needs you'll have to come up with something by your own ([CustomConfigurationHowTo Hint]).
+
 = Internationalization =
 
 Externalize strings to `resources.properties` resp. `resources_<lang>.properties` files in your _src_ root directory.
@@ -213,26 +235,3 @@ $tiles.embed("controller", "action", {"param1":"value"})
 The optional parameter map extends or the alters the original request parameters while invoking the action. Afterwards the parameters are restored to the original values.
 
 *See also* the [http://code.google.com/p/panama/source/browse/#svn%2Ftrunk%2Fpanama-examples%2Fsrc%2Fpanama%2Fexamples%2Ftiles Tiles example] in the panama-examples project.
-
-
-= Configuration =
-
-== Panama ==
-
-Panama does not require any configuration to work. However there are a few optional parameters, which can be set as init-parameters for the filter declaration in _web.xml_.
-
-|| param-name         || param-value || Explanation ||
-|| `panama.languages` || `en,de,fr` || A comma separated list of languages your application supports.<br>See chapter [#Internationalization] for details. ||
-|| `panama.maxfileuploadsize` || `16` || The maximum file upload size in MByte. The default values is 1 MByte. ||
-
-== !SimpleLog ==
-
-SimpleLog requires a `simplelog.properties` file in the _src_ root directory. Actually the file may even be empty, but please see the [http://code.google.com/p/panama/source/browse/trunk/panama-kickstart/src/simplelog.properties simplelog.properties] file from _panama-kickstart_, which contains a good documentation in form of comments.
-
-== Avaje Ebean ORM ==
-
-If you're using the integrated Persistence layer based on Avaje Ebean ORM, you'll have to provide an `ebean.properties` file in the _src_ root directory. Please see the chapter about [Persistence] and http://www.avaje.org for further information.
-
-== Custom ==
-
-If you need some configuration of your own, Panama has limited support for that, in that you can add your own custom init-parameters to the filter declaration in _web.xml_ and access them via `context.getCore().getInitParam(key)` from within your controller classes. If that is not enough for your needs you'll have to come up with something by your own ([CustomConfigurationHowTo Hint]).
