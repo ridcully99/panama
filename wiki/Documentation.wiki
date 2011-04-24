@@ -88,7 +88,7 @@ Targets are objects returned by Actions and tell Panama what to do next. Most of
 
 = Templates =
 
-Panama uses [http://velocity.apache.org Apache Velocity for it’s templates. Velocity is fully integrated with Panama, no entry in _web.xml_ is required.
+Panama uses [http://velocity.apache.org Apache Velocity] for it’s templates. Velocity is fully integrated with Panama, no entry in _web.xml_ is required.
 
 The configuration of Velocity is done via `velocity.properties` in the _src_ root directory. A minimal version would look something like this:
 
