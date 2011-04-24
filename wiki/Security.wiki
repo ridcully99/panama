@@ -27,7 +27,7 @@ public void beforeAction(String actionName) throws ForceTargetException, Authori
 		
     // check if currently logged in user has 'access-all-areas' role
     if (!context.getRequest().isUserInRole("access-all-areas")) {
-        // if not, create a 401 (Access Denied) HTTP Error
+        // if not, create a 403 (Access Denied) HTTP Error
         throw new AuthorizationException();
     }
 }
@@ -37,9 +37,13 @@ As  you can see, the basic idea is to make some checks and -- if needed -- chang
 
 === `ForceTargetException` ===
 
-By throwing a `ForceTargetException` you can force the user to a target of your liking. You can pass any type of `Target` when creating the exception. In our example we'll just render a login page, but you could also provide an instance of `RedirectTarget` or any other kind of target.
+By throwing a `ForceTargetException` you can force the user to a target of your liking. You can pass any type of `Target` when creating the exception. In our example we'll just render a login page, but you could also provide an instance of `RedirectTarget` or any other kind of target. You should use this, if you want to give the user a chance to provide some credentials, etc.
 
 *Hint:* _As for the `RedirectTarget`, instead of creating one yourself, you can use the result of one of the `redirectToAction()` methods as well, which might be better readable. E.g. `throw new ForceTargetException(redirectToAction("login"))`._ 
+
+=== `AuthorizationException` ===
+
+Throwing an `AuthorizationException` simply creates a 403 (Access Denied) HTTP Error. 
 
 
 = XSS (Cross Site Scripting) Protection =
