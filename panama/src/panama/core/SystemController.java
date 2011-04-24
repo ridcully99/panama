@@ -34,11 +34,4 @@ public class SystemController extends BaseController {
 	public Target info() throws ForceTargetException {
 		return new PlainTextTarget(Version.LOGO_ASCIIART+"\n Uptime: "+context.getCore().getFormattedUptime());
 	}	
-	
-	@Override
-	public void handleNotAuthorized(BaseController controller, String action) throws ForceTargetException {
-		// override authorization!
-		Target target = this.executeAction(action);
-		throw new ForceTargetException(target);
-	}
 }
