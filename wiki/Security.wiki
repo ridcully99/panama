@@ -12,7 +12,7 @@ A simple implementation, based on container based security as provided by e.g. T
 
 {{{
 public void beforeAction(String actionName) throws ForceTargetException, AuthorizationException {
-    // the login action is allowed for everyone
+    // the login action is an action allowed for everyone
     if (actionName.equals("login")) {	
         return;
     }
@@ -30,5 +30,7 @@ public void beforeAction(String actionName) throws ForceTargetException, Authori
     }
 }
 }}}
+
+So at first we have an example for an unprotected action. The `actionName` ...
 
 = XSS (Cross Site Scripting) Protection =
