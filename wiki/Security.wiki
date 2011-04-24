@@ -6,6 +6,8 @@ Security is extremly important for any application. This page explains how you c
 
 = Authentification =
 
+== `beforeAction()` ==
+
 Many web application have restricted areas, only users with proper permissions should have access to. To achieve this in Panama, there's a single method: `BaseController#beforeAction()`. This method is invoked always before an action of the controller is invoked. Although the default implementation of the `BaseController` does nothing, you can easily implement this method in your controllers to check if a user is logged in and has the proper rights to execute the requested action.
 
 A simple implementation, based on container based security as provided by e.g. Tomcat, could look like this:
@@ -31,6 +33,13 @@ public void beforeAction(String actionName) throws ForceTargetException, Authori
 }
 }}}
 
-So at first we have an example for an unprotected action. The `actionName` ...
+As  you can see, the basic idea is to make some checks and -- if needed -- change the normal course of events (executing the action) by throwing exceptions. There are two different exceptions you can throw:
+
+=== `ForceTargetException` ===
+
+By throwing a `ForceTargetException` you can force the user to a target of your liking. You can pass any type of `Target` when creating the exception. In our example we'll just render a login page, but you could also provide an instance of `RedirectTarget` or any other kind of target.
+
+*Hint:* _As for the `RedirectTarget`, instead of creating one yourself, you can use the result of one of the `redirectToAction()` methods as well, which might be better readable. E.g. `throw new ForceTargetException(redirectToAction("login"))`._ 
+
 
 = XSS (Cross Site Scripting) Protection =
