@@ -6,8 +6,10 @@ package panama.tests.form;
 
 import java.util.Date;
 import java.util.List;
+import java.util.Locale;
 
 import junit.framework.TestCase;
+import panama.core.Context;
 import panama.form.Form;
 import panama.form.FormData;
 import panama.form.LongField;
@@ -19,6 +21,11 @@ public class FormDataTest extends TestCase {
 		super(arg0);
 	}
 
+	@Override
+	protected void setUp() throws Exception {
+		Context.createInstance(null, null, null, null, Locale.getDefault());
+	}
+	
 	public void testApplyTo() {
 		Form f = new Form();
 		f.addFields(TestBean.class);
