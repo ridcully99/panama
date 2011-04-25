@@ -124,7 +124,6 @@ public class Context {
 		setResponse(res);
 		if (req != null) {
 			setRequest(req);
-			setParameterMap(req.getParameterMap());
 		}
 		this.defaultLocale = defaultLocale;
 	}
@@ -212,11 +211,16 @@ public class Context {
 	 * @return the formatted string
 	 */
 	public String getLocalizedString(String bundleName, String key, Object... args) {
-		ResourceBundle bundle = ResourceBundle.getBundle(bundleName, getLocale());
-		if (bundle.containsKey(key)) {
-			return MessageFormat.format(bundle.getString(key), args);
-		} else {
-			return "???"+key+"???";
+		try {
+			ResourceBundle bundle = ResourceBundle.getBundle(bundleName, getLocale());
+			if (bundle.containsKey(key)) {
+				return MessageFormat.format(bundle.getString(key), args);
+			} else {
+				return "???"+key+"???";
+			}
+		} catch (Exception e) {
+			log.errorException(e);
+			return "??!"+key+"??!";
 		}
 	}	
 	
@@ -230,6 +234,10 @@ public class Context {
 	}
 	
 	public Map getParameterMap() {
+		if (parameterMap == null) {
+			// get parameterMap from request lazily, so client apps can also read the raw request data if needed.
+			setParameterMap(request.getParameterMap());
+		}
 		return parameterMap;
 	}
 	
@@ -239,18 +247,18 @@ public class Context {
 	}
 		
 	public void setParameter(String key, String value) {
-		parameterMap.put(key, new Object[]{value});
+		getParameterMap().put(key, new Object[]{value});
 	}
 	
 	public void setParameter(String key, Object[] values) {
-		parameterMap.put(key, values);
+		getParameterMap().put(key, values);
 	}
 	
 	public String[] getParameterValues(String key) {
 		// some effort to return a String array always
 		// values from request-parameters are always string arrays but
 		// userdefined parameters might be everything
-		Object o = parameterMap.get(key);
+		Object o = getParameterMap().get(key);
 		if (o == null) {
 			return null;
 		}
