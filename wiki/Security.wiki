@@ -43,7 +43,7 @@ By throwing a `ForceTargetException` you can force the user to a target of your 
 
 === `AuthorizationException` ===
 
-Throwing an `AuthorizationException` simply creates a 403 (Access Denied) HTTP Error. 
+Throwing an `AuthorizationException` simply creates a 403 (Access Forbidden) HTTP Error. 
 
 
 = XSS (Cross Site Scripting) Protection =
