@@ -112,7 +112,7 @@ public class Context {
 	}	
 	
 	public static void destroyInstance() {
-		contextHolder.set(null);
+		contextHolder.remove();
 	}
 	
 	public Context() {		

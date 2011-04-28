@@ -46,14 +46,14 @@ import org.grlea.log.SimpleLogger;
 import org.scannotation.AnnotationDB;
 import org.scannotation.WarUrlFinder;
 
-import com.avaje.ebeaninternal.server.lib.ShutdownManager;
-
 import panama.annotations.Action;
 import panama.annotations.Controller;
 import panama.exceptions.AuthorizationException;
 import panama.exceptions.ForceTargetException;
 import panama.exceptions.NoSuchActionException;
 import panama.util.TestTimer;
+
+import com.avaje.ebeaninternal.server.lib.ShutdownManager;
 
 
 /**
@@ -264,6 +264,7 @@ public class Dispatcher implements Filter {
 				log.fatalException(e);
 			}
 		} finally {	
+			Context.destroyInstance();
 		}
 	}
 	

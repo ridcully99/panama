@@ -27,7 +27,7 @@ public class Version {
 	// b: Revision (increases when cool new features are added)
 	// c: Minor	(increases when updates or fixes are made - even numbers mark stable releases)
 	
-	public final static String VERSION = "3.3.2";
+	public final static String VERSION = "3.3.3";
 	
 	public final static String LOGO_ASCIIART = 
 	" ______ _______ _______ _______ _______ _______ \n"+
@@ -40,6 +40,7 @@ public class Version {
 
 	/* 	History
 	 * ---------------------------------------------------------------------------------
+	 * 3.3.3    2011-04-28 Explicity destroying/removing value of Context-ThreadLocal at the end of handleRequest (obviously it's a memory leak otherwise)
 	 * 3.3.2    2011-04-25 Read parameter map from request lazily (See Issue #10) 
 	 * 3.3.1    2011-04-13 Fixed a problem when tomcat restores tables in session scope after restart and query is gone.
 	 * 3.3.0    2011-04-01 Reduced allowed URLs to controller[/action], checking for illegal aliases; update to Ebean 7.2.3 and adaptions to Filters to work with it.
