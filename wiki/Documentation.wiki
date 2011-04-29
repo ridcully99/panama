@@ -246,7 +246,7 @@ myForm.addField(new DateField("birthday", false, "yyyy-MM-dd"));
 }}}
 Usually this is done within a `static` block in your controller class, as this is only a definition of the form and as long as it isn't changed during run time, only one instance is needed and can be shared by all instances of your controller.
 
-== `Field`s ==
+== Fields ==
 
 Panama provides `Field` classes for all kinds of input: There's `StringField`, `IntegerField`, `BooleanField` and even a `DateField`. Please see the [http://panama.googlecode.com/svn/trunk/panama/doc/panama/form/package-summary.html JavaDoc] for a complete list. And you can easily create and use your own `Field` classes as well, if needed.
 
@@ -254,10 +254,10 @@ Panama provides `Field` classes for all kinds of input: There's `StringField`, `
 
 While a `Form` is merely a set of `Field`s, an instance of `FormData` represents one set of input data, entered into the form. `FormData` is used in two directions:
 
-  # Mapping input into a HTML form to a Java representation of the entered data.
-  # Providing Java data in a convenient way to be used within templates.
+  # HTML => Java : Mapping input into a HTML form to a Java representation of the entered data
+  # Java => HTML : Providing Java data in a convenient way to be used within templates
 
-=== HTML form ===
+=== HTML => Java ===
 
 Let's start with a simple HTML form for our example from above:
 
@@ -271,8 +271,6 @@ Your birthday: <input type="text" name="birthday" /><br />
 
 This will give us a simple form with two input fields and a Submit button.
 
-=== Action to handle the input ===
-
 Now let's implement the action to handle the input.
 
 {{{
@@ -285,6 +283,13 @@ public Target save() {
 }
 }}}
 
+In line (1) we create an instance of `FormData` based on our form.
+In line (2) we provide our form data with some input. Here we take all the input coming from the HTML form using a convenient method provided by `Context`.
+In line (3) we fetch the first name, entered into the HTML form; nothing special here.
+In line (4) we fetch the birthday, entered into the HTML form; here the input is automatically converted to a `Date` object, using the pattern we provided when creating the `DateField`. If this goes wrong, `getDate()` returns `null` and the error is remembered within our form data's `errors` structure. This is explained in depth in the section about [#Input Validation] below.
 
+=== Java => HTML ===
 
-== Input validation ==
+TODO
+
+== Input Validation ==
