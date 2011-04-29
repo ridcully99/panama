@@ -66,9 +66,9 @@ Note that for your convinience everything you put into context with `context.put
 
 So if you put something into the context in your action class like so: 
 {{{
-context.put(“foo”, “bar”)
-context.session.put(“answer”, 42)
-context.application.put(“list”, new ArrayList<String>())
+context.put("foo", "bar")
+context.session.put("answer", 42)
+context.application.put("list", new ArrayList<String>())
 }}}
 
 you can access it in your template like so:
@@ -80,7 +80,7 @@ $context.session.answer
 $context.application.list
 }}}
 
-*Caution:* Panama automatically puts the controller object itself into the `context` by it's FQCN and it's alias if one is specified. So instead of putting stuff into the context you also can provide public methods in your controller and invoke them from within your templates. Thus, make sure you do not give your controller an alias name that matches any of the velocity tools you intend to use in templates rendered by that controller, because putting the controller object into request context using that alias would “shadow” the tool.
+*Caution:* Panama automatically puts the controller object itself into the `context` by it's FQCN and it's alias if one is specified. So instead of putting stuff into the context you also can provide public methods in your controller and invoke them from within your templates. Thus, make sure you do not give your controller an alias name that matches any of the velocity tools you intend to use in templates rendered by that controller, because putting the controller object into request context using that alias would "shadow" the tool.
 
 == Targets ==
 
@@ -163,7 +163,7 @@ Hint: If you need e.g. a variable `$xml` and still want to use the `$xml` tool, 
 
 {{{
 #set($xmltool = $xml)
-#set($xml = ‘foo’)
+#set($xml = 'foo')
 }}}
 
 Note, that overwriting only takes place within your template. You do not remove or delete the tool itself and it can still be accessed by it’s default name in other templates.
@@ -235,3 +235,7 @@ $tiles.embed("controller", "action", {"param1":"value"})
 The optional parameter map extends or the alters the original request parameters while invoking the action. Afterwards the parameters are restored to the original values.
 
 *See also* the [http://code.google.com/p/panama/source/browse/#svn%2Ftrunk%2Fpanama-examples%2Fsrc%2Fpanama%2Fexamples%2Ftiles Tiles example] in the panama-examples project.
+
+= Forms =
+
+TODO
