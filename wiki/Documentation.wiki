@@ -238,4 +238,53 @@ The optional parameter map extends or the alters the original request parameters
 
 = Forms =
 
-TODO
+In Panama, forms are defined using the `Form` and `Field` classes like so:
+{{{
+Form myForm = new Form();
+myForm.addField(new StringField("firstname"));
+myForm.addField(new DateField("birthday", false, "yyyy-MM-dd"));
+}}}
+Usually this is done within a `static` block in your controller class, as this is only a definition of the form and as long as it isn't changed during run time, only one instance is needed and can be shared by all instances of your controller.
+
+== `Field`s ==
+
+Panama provides `Field` classes for all kinds of input: There's `StringField`, `IntegerField`, `BooleanField` and even a `DateField`. Please see the [http://panama.googlecode.com/svn/trunk/panama/doc/panama/form/package-summary.html JavaDoc] for a complete list. And you can easily create and use your own `Field` classes as well, if needed.
+
+== `FormData` == 
+
+While a `Form` is merely a set of `Field`s, an instance of `FormData` represents one set of input data, entered into the form. `FormData` is used in two directions:
+
+  # Mapping input into a HTML form to a Java representation of the entered data.
+  # Providing Java data in a convenient way to be used within templates.
+
+=== HTML form ===
+
+Let's start with a simple HTML form for our example from above:
+
+{{{
+<form name="f" method="post" action="save">
+Your name: <input type="text" name="firstname" /><br />
+Your birthday: <input type="text" name="birthday" /><br />
+<input type="submit" name="submit" value="Submit" />
+</form> 
+}}}
+
+This will give us a simple form with two input fields and a Submit button.
+
+=== Action to handle the input ===
+
+Now let's implement the action to handle the input.
+
+{{{
+@Action
+public Target save() {
+  FormData fd = new FormData(myForm);            // 1
+  fd.setInput(context.getParameterMap());        // 2
+  String firstName = fd.getString("firstName");  // 3
+  Date birthday = fd.getDate("birthday");        // 4
+}
+}}}
+
+
+
+== Input validation ==
