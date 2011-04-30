@@ -17,6 +17,8 @@ Panama consists of a Dispatcher which is implemented as a Filter and Controller 
 
 Panama uses the "open session in view" pattern for database connections, which means that the database-session is still open while the template is rendered. This way, your application can make great use of lazy loading (see the Tree example for a very impressive example how little code is needed this way).
 
+----
+
 = Main Coding Parts =
 
 This section describes the coding part of your web application (in contrast to the template part, which is described below). There are four main parts you will need to know. 
@@ -85,6 +87,8 @@ $context.application.list
 == Targets ==
 
 Targets are objects returned by Actions and tell Panama what to do next. Most of the time the `TemplateTarget` will be used,  but there’s also `RedirectTarget`, `PlainTextTarget` and even `JSONTarget (useful for responding to AJAX requests). And you can easily provide your own Targets as well, just extend the abstract `Target` class and implement the `go()` method.
+
+----
 
 = Templates =
 
@@ -168,6 +172,8 @@ Hint: If you need e.g. a variable `$xml` and still want to use the `$xml` tool, 
 
 Note, that overwriting only takes place within your template. You do not remove or delete the tool itself and it can still be accessed by it’s default name in other templates.
 
+----
+
 = Configuration =
 
 == Panama ==
@@ -190,6 +196,7 @@ If you're using the integrated Persistence layer based on Avaje Ebean ORM, you'l
 
 If you need some configuration of your own, Panama has limited support for that, in that you can add your own custom init-parameters to the filter declaration in _web.xml_ and access them via `context.getCore().getInitParam(key)` from within your controller classes. If that is not enough for your needs you'll have to come up with something by your own ([CustomConfigurationHowTo Hint]).
 
+----
 
 = Forms =
 
@@ -256,7 +263,6 @@ TODO
 
 ----
 
-
 = Internationalization =
 
 Externalize strings to `resources.properties` resp. `resources_<lang>.properties` files in your _src_ root directory.
@@ -284,6 +290,8 @@ By default, Panama matches the user's preferred languages (as set in her browser
 If no resources property file exists for the selected language, the standard fallback procedure to the default resources happens.
 
 *See also* the [http://code.google.com/p/panama/source/browse/#svn%2Ftrunk%2Fpanama-examples%2Fsrc%2Fpanama%2Fexamples%2Fi18n Internationalization example] in the panama-examples project.
+
+----
 
 = Tiles =
 
