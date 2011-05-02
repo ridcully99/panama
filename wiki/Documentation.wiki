@@ -153,8 +153,8 @@ Panama has [http://velocity.apache.org/tools/releases/2.0/ VelocityTools 2.0] in
 
 Additionally the following Panama tools are also automatically available:
 
-  * $tiles
-  * $null (this tool is taken from Velocity Wiki)
+  * [#Tiles $tiles]
+  * [http://wiki.apache.org/velocity/NullTool $null] (this tool is taken from Velocity Wiki)
 
 ===Your own Tools===
 
