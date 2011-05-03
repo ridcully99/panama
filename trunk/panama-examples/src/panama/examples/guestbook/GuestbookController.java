@@ -29,7 +29,6 @@ import panama.core.BaseController;
 import panama.core.Target;
 import panama.form.Form;
 import panama.form.FormData;
-import panama.form.StringField;
 
 @Controller(alias="guestbook", defaultAction="list")
 public class GuestbookController extends BaseController {
