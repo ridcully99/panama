@@ -50,7 +50,6 @@ public class GuestbookController extends BaseController {
 	
 	@Action
 	public Target list() {
-		System.out.println(entries);
 		return render("guestbook.vm");
 	}
 
