@@ -18,6 +18,7 @@
 				<th><a href="$issuetable.sortLink("id")">ID</a></th>
 				<th><a href="$issuetable.sortLink("createdAt")">created at</a></th>
 				<th><a href="$issuetable.sortLink("title")">Title</a></th>
+				<th># of Foos</th>
 				<th></th>
 			</tr>
 			#foreach($issue in $issuetable.rows)
@@ -25,6 +26,7 @@
 				<td>$issue.id</td>
 				<td>$issue.createdAt</td>
 				<td>$issue.title</td>
+				<td>$issue.foos.size()</td>
 				<td><a href="edit?id=$issue.id">edit</a> | <a href="delete?id=$issue.id">delete</a></td>
 			</tr>
 			#end

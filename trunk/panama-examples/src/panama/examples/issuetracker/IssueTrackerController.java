@@ -15,6 +15,8 @@
  */
 package panama.examples.issuetracker;
 
+import java.util.List;
+
 import panama.annotations.Action;
 import panama.annotations.Controller;
 import panama.collections.QueryListModel;
@@ -23,6 +25,7 @@ import panama.collections.Table;
 import panama.core.BaseController;
 import panama.core.PlainTextTarget;
 import panama.core.Target;
+import panama.examples.issuetracker.entities.Foo;
 import panama.examples.issuetracker.entities.Issue;
 import panama.filter.Filter;
 import panama.form.Form;
@@ -96,6 +99,10 @@ public class IssueTrackerController extends BaseController {
 				context.put(FORMDATA_KEY, fd);
 				return edit();
 			}
+			Query q = Ebean.createQuery(Foo.class);
+			List<Foo> foos = q.findList();
+			e.getFoos().addAll(foos);
+			// TODO also add e to all of the foos?
 			Ebean.save(e);
 		}
 		return redirectToAction("list");
@@ -108,5 +115,16 @@ public class IssueTrackerController extends BaseController {
 			int is = Ebean.delete(Issue.class, id);
 		}
 		return redirectToAction("list");
+	}
+	
+	@Action
+	public Target createFoos() {
+		Foo foo = new Foo();
+		foo.setName("foo");
+		Ebean.save(foo);
+		Foo bar= new Foo();
+		bar.setName("bar");
+		Ebean.save(bar);
+		return new PlainTextTarget("created two foos -- will be added to every issue you create later.");
 	}
 }
