@@ -16,8 +16,13 @@
 package panama.examples.issuetracker.entities;
 
 import java.util.Date;
+import java.util.Set;
 
+import javax.persistence.CascadeType;
 import javax.persistence.Entity;
+import javax.persistence.JoinColumn;
+import javax.persistence.JoinTable;
+import javax.persistence.ManyToMany;
 
 import panama.persistence.PersistentBean;
 
@@ -36,7 +41,19 @@ public class Issue extends PersistentBean {
 	@CreatedTimestamp
 	private Date createdAt;
 	private String state;
+	@ManyToMany(cascade=CascadeType.ALL)
+	@JoinTable(
+		      name="issue_foo",
+		      joinColumns={@JoinColumn(name="issue_id", referencedColumnName="id")},
+		      inverseJoinColumns={@JoinColumn(name="foo_id", referencedColumnName="id")})
+	private Set<Foo> foos;
 	
+	public Set<Foo> getFoos() {
+		return foos;
+	}
+	public void setFoos(Set<Foo> foos) {
+		this.foos = foos;
+	}
 	public String getTitle() {
 		return title;
 	}
