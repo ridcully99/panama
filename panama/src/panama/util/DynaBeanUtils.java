@@ -56,7 +56,7 @@ public class DynaBeanUtils {
 		try {
 			Method getterMethod = c.getMethod(getterName);
 			value = getterMethod.invoke(bean);
-			if (subProperty != null && value != null && value instanceof DynaBeanUtils) {
+			if (subProperty != null && value != null) {
 				value = getProperty(value, subProperty); 
 			}
 		}

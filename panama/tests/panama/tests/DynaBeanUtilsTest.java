@@ -1,7 +1,7 @@
 package panama.tests;
 
-import panama.util.DynaBeanUtils;
 import junit.framework.TestCase;
+import panama.util.DynaBeanUtils;
 
 public class DynaBeanUtilsTest extends TestCase {
 
@@ -11,6 +11,15 @@ public class DynaBeanUtilsTest extends TestCase {
 	protected void setUp() throws Exception {
 		super.setUp();
 		b = new BeanSupportTestBean();
+	}
+	
+	public void testGetProperty() {
+		b.setString("foo");
+		assertEquals("foo", DynaBeanUtils.getProperty(b, "string"));
+		BeanSupportTestBean e = new BeanSupportTestBean();
+		b.setEntity(e);
+		e.setString("bar");
+		assertEquals("bar", DynaBeanUtils.getProperty(b, "entity.string"));
 	}
 	
 	public void testSetProperty1() {
@@ -31,6 +40,7 @@ public class DynaBeanUtilsTest extends TestCase {
 		private String[] strings;
 		private Long number;
 		private Long[] numbers;
+		private BeanSupportTestBean entity;
 		
 		public String getString() {
 			return string;
@@ -55,6 +65,12 @@ public class DynaBeanUtilsTest extends TestCase {
 		}
 		public void setNumbers(Long[] numbers) {
 			this.numbers = numbers;
+		}
+		public BeanSupportTestBean getEntity() {
+			return entity;
+		}
+		public void setEntity(BeanSupportTestBean entity) {
+			this.entity = entity;
 		}
 	}
 }
