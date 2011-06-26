@@ -19,6 +19,7 @@ import java.io.Serializable;
 import java.rmi.dgc.VMID;
 import java.util.Date;
 
+import javax.persistence.Column;
 import javax.persistence.Id;
 import javax.persistence.MappedSuperclass;
 import javax.persistence.Version;
@@ -38,7 +39,7 @@ public class PersistentBean implements Serializable {
 	 * We use an assigned ID to avoid having to build equals/hashCode methods for each entity class
 	 * VMID() contains an ID unique accross all Java Virtual Machines
 	 */
-	@Id
+	@Id @Column(length=64)
 	protected String id = new VMID().toString().replace(':', 'x');	// replacing colons as they are not allowed for id attributes in HTML tags.
 	
 	/**
