@@ -55,7 +55,6 @@ public class GuestbookController extends BaseController {
 
 	@Action(alias="add")
 	public Target addEntry() {
-		System.out.println(entries);
 		GuestbookEntry entry = new GuestbookEntry();
 		FormData fd = new FormData(form);							// get input values according to form model
 		fd.setInput(context.getParameterMap());	
