@@ -87,9 +87,11 @@ public class Field {
 	 * Adds validator at given position to validator-list 
 	 * @param position
 	 * @param validator
+	 * @return the Field itself, to allow fluid adding of more than one validator.
 	 */
-	public void addValidator(int position, Validator validator) {
+	public Field addValidator(int position, Validator validator) {
 		validators.add(position, validator);
+		return this;
 	}	
 	
 	/**

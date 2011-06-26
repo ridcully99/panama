@@ -88,12 +88,12 @@ public class Dispatcher implements Filter {
 	/** Simply! Logging */
 	protected static SimpleLogger log = new SimpleLogger(Dispatcher.class);
 
-	/** Mapping controller alias or FQCN to Class itself */
+	/** Mapping controller alias or FQCN to Class itself; filled in init(), later on only read from */
 	private Map<String, Class<? extends BaseController>> controllerClasses = new HashMap<String, Class<? extends BaseController>>();
 	
-	/** Mapping Controller-FQCN#actionName to Method */
+	/** Mapping Controller-FQCN#actionName to Method; ; filled in init(), later on only read from */
 	private Map<String, Method> actionMethods = new HashMap<String, Method>();
-	
+
 	/** Configuration (from FilterConfig.InitParameters) */
 	private Map<String, String> initParams = new HashMap<String, String>();
 	
@@ -203,26 +203,29 @@ public class Dispatcher implements Filter {
 		if (!(req instanceof HttpServletRequest && res instanceof HttpServletResponse)) {
 			return CAN_HANDLE_REQUEST_NO;
 		}
-		String path = ((HttpServletRequest)req).getServletPath();	
+		String path = ((HttpServletRequest)req).getServletPath();
+		int result = CAN_HANDLE_REQUEST_NO;
 		String[] ca = extractControllerAndActionNames(path);
 		String ctrlName = ca[0];
 		if (!controllerClasses.containsKey(ctrlName)) {
-			return CAN_HANDLE_REQUEST_NO;
-		}
-		String actionName = ca[1];
-		if (StringUtils.isEmpty(actionName)) {
-			if (StringUtils.isEmpty(getDefaultActionName(controllerClasses.get(ctrlName)))) {
-				return CAN_HANDLE_REQUEST_NO;
-			} else if (path.trim().endsWith("/")) {
-				return CAN_HANDLE_REQUEST_YES;
-			} else {
-				return CAN_HANDLE_REQUEST_REDIRECT;
-			}
+			result = CAN_HANDLE_REQUEST_NO;
 		} else {
-			StringBuffer actionKey = new StringBuffer(controllerClasses.get(ctrlName).getName()).append("#").append(actionName);
-			Method method = actionMethods.get(actionKey.toString());
-			return (method != null) ? CAN_HANDLE_REQUEST_YES : CAN_HANDLE_REQUEST_NO;
+			String actionName = ca[1];
+			if (StringUtils.isEmpty(actionName)) {
+				if (StringUtils.isEmpty(getDefaultActionName(controllerClasses.get(ctrlName)))) {
+					result = CAN_HANDLE_REQUEST_NO;
+				} else if (path.trim().endsWith("/")) {
+					result = CAN_HANDLE_REQUEST_YES;
+				} else {
+					result = CAN_HANDLE_REQUEST_REDIRECT;
+				}
+			} else {
+				StringBuffer actionKey = new StringBuffer(controllerClasses.get(ctrlName).getName()).append("#").append(actionName);
+				Method method = actionMethods.get(actionKey.toString());
+				result = (method != null) ? CAN_HANDLE_REQUEST_YES : CAN_HANDLE_REQUEST_NO;
+			}
 		}
+		return result;
 	}	
 	
 	/**

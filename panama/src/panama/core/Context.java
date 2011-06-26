@@ -311,6 +311,7 @@ public class Context {
 	
 	// -------------------------------------------------------------------------------------
 	// FileItem methods (return null for non-MultipartServletRequests)
+	// Normally you'd not use these methods directly, but use the FileItemField class
 	// -------------------------------------------------------------------------------------
 	
 	public boolean hasFileItems() {
