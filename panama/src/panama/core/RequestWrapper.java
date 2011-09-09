@@ -36,7 +36,8 @@ public class RequestWrapper extends HttpServletRequestWrapper implements HttpSer
 
 	@Override
 	public String getCharacterEncoding() {
-		return "UTF-8";
+		String enc = super.getCharacterEncoding();
+		return enc != null ? enc : "UTF-8";
 	}
 	
 	/**
