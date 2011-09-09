@@ -413,17 +413,9 @@ public class Dispatcher implements Filter {
 		
 		/* create new instance of controller for specified ctrlName */
 		BaseController ctrl = getController(ctrlName);
-		assert ctrl != null : "No controller found, means canHandleRequest() is wrong!";
-			
-		/* put controller object into context - so it's accessible from template! 
-		 * always use Alias (if available) AND FQCN
-		 * replace . with _ for sake of velocity
-		 */
-		String alias = ctrl.getClass().getAnnotation(panama.annotations.Controller.class).alias();
-		if (!StringUtils.isEmpty(alias)) {
-			ctx.put(alias.replace(".", "_"), ctrl);					/* Alias */
+		if (ctrl == null) {
+			throw new RuntimeException("No controller found, means canHandleRequest() is wrong!");
 		}
-		ctx.put(ctrl.getClass().getName().replace(".", "_"), ctrl);	/* FQCN */
 		
 		TestTimer timer = new TestTimer("execute");
 		try {
