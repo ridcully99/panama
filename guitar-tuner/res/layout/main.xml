@@ -1,0 +1,13 @@
+<?xml version="1.0" encoding="utf-8"?>
+<LinearLayout xmlns:android="http://schemas.android.com/apk/res/android"
+    android:orientation="vertical"
+    android:layout_width="fill_parent"
+    android:layout_height="fill_parent"
+    >
+    <panama.android.guitartuner.FrequenceView android:layout_width="wrap_content" android:layout_height="wrap_content" android:id="@+id/frequenceView" android:layout_weight="1"></panama.android.guitartuner.FrequenceView>
+    <LinearLayout android:id="@+id/linearLayout1" android:layout_width="match_parent" android:layout_height="wrap_content">
+        <Button android:id="@+id/startButton" android:text="Start" android:layout_width="wrap_content" android:layout_height="wrap_content" android:onClick="onButtonClick"></Button>
+        <Button android:layout_width="wrap_content" android:layout_height="wrap_content" android:id="@+id/stopButton" android:text="Stop"></Button>
+        <TextView android:text="TextView" android:layout_height="wrap_content" android:textAppearance="?android:attr/textAppearanceLarge" android:layout_width="wrap_content" android:layout_marginLeft="10dp" android:id="@+id/hertzLabel"></TextView>
+    </LinearLayout>
+</LinearLayout>
