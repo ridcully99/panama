@@ -2,9 +2,8 @@ package panama.tests;
 
 import panama.core.BaseController;
 import panama.core.TemplateTarget;
-import junit.framework.TestCase;
 
-public class BaseControllerTest extends TestCase {
+public class BaseControllerTest extends ContextTestCase {
 
 	public void testRenderPathCreation() {
 		BaseController ctrl = new BaseController();
