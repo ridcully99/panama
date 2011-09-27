@@ -1,0 +1,21 @@
+<?xml version="1.0" encoding="utf-8"?>
+<LinearLayout xmlns:android="http://schemas.android.com/apk/res/android"
+    android:orientation="vertical"
+    android:layout_width="fill_parent"
+    android:layout_height="fill_parent"
+    >
+    <!-- apiKey ist für debug.keystore; später für meinen echten keystore entsprechend generieren. siehe http://code.google.com/intl/de-DE/android/add-ons/google-apis/mapkey.html -->
+    <com.google.android.maps.MapView
+        android:id="@+id/mapview"
+        android:layout_width="fill_parent"
+        android:clickable="true"
+        android:apiKey="0b1q8jJRIEIM__hPmDWDTiVFhc58Z9QxamMPRGA" android:layout_weight="1" android:layout_height="0dp"/>
+    <TextView android:layout_height="wrap_content" android:layout_width="wrap_content" android:id="@+id/time" android:text="00:00" android:textSize="40dp" android:textColor="#ffffff" android:layout_gravity="right"></TextView>
+    <TextView android:layout_height="wrap_content" android:layout_width="wrap_content" android:id="@+id/distance" android:text="0m" android:textSize="40dp" android:textColor="#ffffff" android:layout_gravity="right"></TextView>
+    <TextView android:layout_height="wrap_content" android:layout_width="wrap_content" android:id="@+id/tacho" android:text="0.00km/h" android:textSize="40dp" android:textColor="#ffffff" android:layout_gravity="right"></TextView>
+    <LinearLayout android:layout_width="match_parent" android:layout_height="wrap_content" android:id="@+id/linearLayout1">
+        <Button android:layout_height="wrap_content" android:id="@+id/start" android:text="Start" android:fadeScrollbars="false" android:layout_weight="1" android:layout_width="0dp" android:onClick="onStartClicked" android:enabled="false"></Button>
+        <Button android:layout_height="wrap_content" android:id="@+id/stop" android:text="Stop" android:layout_weight="1" android:layout_width="0dp" android:onClick="onStopClicked" android:enabled="false"></Button>
+    </LinearLayout>
+
+</LinearLayout>

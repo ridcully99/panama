@@ -1,0 +1,47 @@
+22.09.2011
+  
+23.09.2011
+  - PathOverlay fertig
+  
+24.09.2011
+  - Stoppuhr via AsyncTask
+  
+25.09.2011
+  - Tacho via AsynTask:
+    - akt. Geschwindigkeit berechnen
+    - über parallelen Thread der einfach z.B. alle n Sekunden die pathLength abfragt, die vorige gemerkt hat und dann die Differenz
+      in n Sekunden auf km/h umrechnet --> brauch ich mir keine Knoten/Zeiten merken und erkennt auch 0 km/h wenn ich mich nicht bewege.
+  - akt. Pos als Pfeilchen in Bewegungsrichtung oder Kreis wenn keine Bewegung  
+
+  TODO: Am besten Locations mit allem drum und dran speichern (Speed, Höhenmeter, Richtung, Zeitstempel usw.)
+
+  TODO: Start -> Pause | Stop -> nach Pause: Resume | Stop bzw. nach Stop: Discard | Save --> Start
+  
+  TODO: Speichern mit Kommentar, Typ (Laufen, Radln, Wandern, ...), Route (Auswahl aus bereits eingegebenen, oder neuen Namen eingeben)
+  
+  TODO: Altitude tracken und Anzeigen von Rauf- und Runter Höhen?
+
+  TODO: Ev. "Minihistory" für Session, mit Zeit für jede Aktion, zum Durchscrollen_
+        14:35:00 Start
+        14:41:25 1000m erreicht, Kilometerzeit 6:25 [wenn automat. Markierung eingeschaltet]
+        14:55:21 Pause
+        14:57:51 Resume
+        15:22:00 Stop 
+  
+  TODO: ev. eigene Ansichten für Session | Map | History oder Map als Background und andere Sachen überlagern (e.v. horiz. Scroll für verschiedene Infoblöcke) 
+  
+  TODO: Durch Touch auf Pfad überall auch nachträglich "Lap" Informationen anzeigbar machen.
+  
+  TODO: Notification wenn aufgezeichnet wird  
+  
+  TODO: Tacho rechnet nicht ganz richtig bzw. 10 Sek. sind nicht ideal.
+        doch besser, jede Sekunde zu messen und Durchschnitt aus den letzten n zu berechnen?
+    
+  TODO: wenn geht (oder als Option) die Karte drehen sodass Pfeil immer "nach oben" zeigt, i.e. in Laufrichtung.
+  
+  TODO: Export in Standardformaten (GPX?) via Share oder so?
+
+  TODO: Optionen: 
+        - Umschalten zw. km und Meilen (auch für km/h, mph verwenden); 
+        - Größe, Gewicht, Geschlecht für Kalorienberechnung?
+        - Automatische Marker alle Kilometer/Meilen
