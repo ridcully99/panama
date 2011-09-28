@@ -14,8 +14,12 @@
     <TextView android:layout_height="wrap_content" android:layout_width="wrap_content" android:id="@+id/distance" android:text="0m" android:textSize="40dp" android:textColor="#ffffff" android:layout_gravity="right"></TextView>
     <TextView android:layout_height="wrap_content" android:layout_width="wrap_content" android:id="@+id/tacho" android:text="0.00km/h" android:textSize="40dp" android:textColor="#ffffff" android:layout_gravity="right"></TextView>
     <LinearLayout android:layout_width="match_parent" android:layout_height="wrap_content" android:id="@+id/linearLayout1">
-        <Button android:layout_height="wrap_content" android:id="@+id/start" android:text="Start" android:fadeScrollbars="false" android:layout_weight="1" android:layout_width="0dp" android:onClick="onStartClicked" android:enabled="false"></Button>
-        <Button android:layout_height="wrap_content" android:id="@+id/stop" android:text="Stop" android:layout_weight="1" android:layout_width="0dp" android:onClick="onStopClicked" android:enabled="false"></Button>
+        <Button android:layout_weight="1" android:fadeScrollbars="false" android:text="Start" android:onClick="onStartClicked" android:layout_height="wrap_content" android:layout_width="0dp" android:id="@+id/start" android:textAppearance="?android:attr/textAppearanceLarge"></Button>
+        <Button android:layout_height="wrap_content" android:layout_weight="1" android:layout_width="0dp" android:id="@+id/pause" android:text="Pause" android:visibility="gone" android:onClick="onPauseClicked" android:textAppearance="?android:attr/textAppearanceLarge"></Button>
+        <Button android:layout_height="wrap_content" android:layout_weight="1" android:layout_width="0dp" android:id="@+id/resume" android:text="Resume" android:visibility="gone" android:onClick="onResumeClicked" android:textAppearance="?android:attr/textAppearanceLarge"></Button>
+        <Button android:layout_height="wrap_content" android:id="@+id/stop" android:text="Stop" android:layout_weight="1" android:layout_width="0dp" android:onClick="onStopClicked" android:visibility="gone" android:textAppearance="?android:attr/textAppearanceLarge"></Button>
+        <Button android:layout_height="wrap_content" android:layout_weight="1" android:layout_width="0dp" android:text="Discard" android:id="@+id/discard" android:visibility="gone" android:onClick="onDiscardClicked" android:textAppearance="?android:attr/textAppearanceLarge"></Button>
+        <Button android:layout_height="wrap_content" android:layout_weight="1" android:layout_width="0dp" android:id="@+id/save" android:text="Save" android:visibility="gone" android:onClick="onSaveClicked" android:textAppearance="?android:attr/textAppearanceLarge"></Button>
     </LinearLayout>
 
 </LinearLayout>

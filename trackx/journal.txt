@@ -13,9 +13,21 @@
       in n Sekunden auf km/h umrechnet --> brauch ich mir keine Knoten/Zeiten merken und erkennt auch 0 km/h wenn ich mich nicht bewege.
   - akt. Pos als Pfeilchen in Bewegungsrichtung oder Kreis wenn keine Bewegung  
 
+26.9.2011
+  - Tacho auf 1 Sekunde reduziert --> TESTEN
+  - Alle möglichen Buttons in LinearLayout; via visibility = visible | gone die passenden anzeigen
+  - "Trackster"?
+  - Discard implementiert
+  
+28.9.2011
+  - Discard fertig gemacht
+  - min_distance auf 5m
+  - paceTask geändert, geht aber nicht richtig <-- TODO
+  
+
   TODO: Am besten Locations mit allem drum und dran speichern (Speed, Höhenmeter, Richtung, Zeitstempel usw.)
 
-  TODO: Start -> Pause | Stop -> nach Pause: Resume | Stop bzw. nach Stop: Discard | Save --> Start
+  TODO: Pause, Resume, Save implementieren
   
   TODO: Speichern mit Kommentar, Typ (Laufen, Radln, Wandern, ...), Route (Auswahl aus bereits eingegebenen, oder neuen Namen eingeben)
   
@@ -42,6 +54,6 @@
   TODO: Export in Standardformaten (GPX?) via Share oder so?
 
   TODO: Optionen: 
-        - Umschalten zw. km und Meilen (auch für km/h, mph verwenden); 
+        - Umschalten zw. km und Meilen (auch für km/h, mph verwenden) -- Berechnungen immer metrisch, erst für Anzeige ggf. umrechnen!
         - Größe, Gewicht, Geschlecht für Kalorienberechnung?
         - Automatische Marker alle Kilometer/Meilen

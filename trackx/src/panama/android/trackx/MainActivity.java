@@ -21,8 +21,8 @@ import com.google.android.maps.MapView;
 public class MainActivity extends MapActivity implements LocationListener {
 
 	private final static int MILLIS = 1000;
-	private final static int MIN_DISTANCE = 10; 						// in meters
-	private final static int MIN_TIME = 3*MILLIS;
+	private final static int MIN_DISTANCE = 5; 						   // in meters; 5 ist in MyTracks empfohlen das von Google-Leuten gemacht wird
+	private final static int MIN_TIME = 1*MILLIS;
 	private final static int COLOR_IDLE = 0xffffffff;					// white
 	private final static int COLOR_RUNNING = 0xff00ff00;				// green
 	private final static int CURRENT_SPEED_INTERVAL_MILLIS = 1*MILLIS;	//  
@@ -35,19 +35,26 @@ public class MainActivity extends MapActivity implements LocationListener {
 	private PathOverlay mPathOverlay;
 	private TextView mDistanceView;
 	private TextView mTimerView;
-	private TextView mTachoView;
+	private TextView mPaceView;
 	private Button mStartButton;
+	private Button mPauseButton;
+	private Button mResumeButton;
 	private Button mStopButton;
+	private Button mDiscardButton;
+	private Button mSaveButton;
 	private ProgressDialog mWaitingDialog;
 
 	// Logic
 	private LocationManager mLocationMgr;
 	private Location mCurrentLocation;
 	private Location mPrevLocation;
-	private TimerTask mTimer;
-	private TachoTask mTacho;
+	private TimerTask mTimerTask;
+	private PaceTask mPaceTask;
 	private boolean mIsRunning;	// flag if tracking started by user (then we do not pause tracking when app is paused)
-
+	private float mDistance;
+	private long mTime;
+	private float mPace;
+	
 	/** Called when the activity is first created. */
 	@Override
 	public void onCreate(Bundle savedInstanceState) {
@@ -57,9 +64,13 @@ public class MainActivity extends MapActivity implements LocationListener {
 
 		mDistanceView = (TextView)findViewById(R.id.distance);
 		mTimerView = (TextView)findViewById(R.id.time);
-		mTachoView = (TextView)findViewById(R.id.tacho);
+		mPaceView = (TextView)findViewById(R.id.tacho);
 		mStartButton = (Button)findViewById(R.id.start);
+		mPauseButton = (Button)findViewById(R.id.pause);
+		mResumeButton = (Button)findViewById(R.id.resume);
 		mStopButton = (Button)findViewById(R.id.stop);
+		mDiscardButton = (Button)findViewById(R.id.discard);
+		mSaveButton = (Button)findViewById(R.id.save);
 
 		mMapView = (MapView) findViewById(R.id.mapview);
 		mMapView.setBuiltInZoomControls(true);
@@ -72,8 +83,6 @@ public class MainActivity extends MapActivity implements LocationListener {
 		if (l != null) {
 			mMapView.getController().animateTo(Util.locationToGeoPoint(l));
 		}
-		
-		refreshDistanceView();
 	}
 
 	/** 
@@ -94,7 +103,7 @@ public class MainActivity extends MapActivity implements LocationListener {
     	} else {
     		if (!mIsRunning && !Util.isUpToDate(mCurrentLocation)) {
     			mCurrentLocation = null;
-    			mWaitingDialog = ProgressDialog.show(this, "", "Finding current location...", true);
+    			// TEST mWaitingDialog = ProgressDialog.show(this, "", "Finding current location...", true);
     			mLocationMgr.requestLocationUpdates(LocationManager.GPS_PROVIDER, 0, 0, this);
     		}
     	}
@@ -137,17 +146,16 @@ public class MainActivity extends MapActivity implements LocationListener {
 		return null;
 	}
 	
-	/**
-	 * @param view
-	 */
+
 	public void onStartClicked(View view) {
-		mStartButton.setEnabled(false);
-		mStopButton.setEnabled(true);
+		mStartButton.setVisibility(View.GONE);
+		mPauseButton.setVisibility(View.VISIBLE);
+		mStopButton.setVisibility(View.VISIBLE);
 		mIsRunning = true;
-		mTimer = new TimerTask();
-		mTimer.execute(0L);	// TODO bei start/stop/start später andere Startzeit
-		mTacho = new TachoTask();
-		mTacho.execute((Long)null);
+		mTimerTask = new TimerTask();
+		mTimerTask.execute(0L);	// TODO bei start/stop/start später andere Startzeit
+		mPaceTask = new PaceTask();
+		mPaceTask.execute((Long)null);
 		mDistanceView.setTextColor(COLOR_RUNNING);
 		mTimerView.setTextColor(COLOR_RUNNING);
 		mLocationMgr.requestLocationUpdates(LocationManager.GPS_PROVIDER, MIN_TIME, MIN_DISTANCE, this);
@@ -155,21 +163,50 @@ public class MainActivity extends MapActivity implements LocationListener {
 		// TODO unterscheiden zw. Neustart und Continue nach Pause (auch noch zu implementieren)
 		//      Bei Neustart alles Resetten, bei Continue einfach weitermachen (ohne Reset)
 		// folgende Zeilen dann nur bei Neustart:
-		mPathOverlay.reset(mLocationMgr.getLastKnownLocation(LocationManager.GPS_PROVIDER));
-		refreshDistanceView();
+		//mPathOverlay.reset(mLocationMgr.getLastKnownLocation(LocationManager.GPS_PROVIDER));
+		//refreshDistanceView();
 	}
 
+	public void onPauseClicked(View view) {
+		mPauseButton.setVisibility(View.GONE);
+		mResumeButton.setVisibility(View.VISIBLE);
+	}
+	
+	public void onResumeClicked(View view) {
+		mPauseButton.setVisibility(View.VISIBLE);
+		mResumeButton.setVisibility(View.GONE);
+	}
+	
 	public void onStopClicked(View view) {
-		findViewById(R.id.start).setEnabled(true);
-		findViewById(R.id.stop).setEnabled(false);
+		mPauseButton.setVisibility(View.GONE);
+		mResumeButton.setVisibility(View.GONE);
+		mStopButton.setVisibility(View.GONE);
+		mDiscardButton.setVisibility(View.VISIBLE);
+		mSaveButton.setVisibility(View.VISIBLE);
 		mIsRunning = false;
-		mTimer.cancel(true);
-		mTimer = null;
-		mTacho.cancel(true);
-		mTacho = null;
+		mTimerTask.cancel(true);
+		mTimerTask = null;
+		mPaceTask.cancel(true);
+		mPaceTask = null;
 		mDistanceView.setTextColor(COLOR_IDLE);
 		mTimerView.setTextColor(COLOR_IDLE);
 		mLocationMgr.removeUpdates(this);
+	}
+
+	public void onDiscardClicked(View view) {
+		mDiscardButton.setVisibility(View.GONE);
+		mSaveButton.setVisibility(View.GONE);
+		mStartButton.setVisibility(View.VISIBLE);
+		mPathOverlay.reset(mLocationMgr.getLastKnownLocation(LocationManager.GPS_PROVIDER));
+		setDistance(0);
+		setTime(0);
+		setPace(0);
+	}
+	
+	public void onSaveClicked(View view) {
+		mDiscardButton.setVisibility(View.GONE);
+		mSaveButton.setVisibility(View.GONE);
+		mStartButton.setVisibility(View.VISIBLE);
 	}
 	
 	@Override
@@ -180,17 +217,6 @@ public class MainActivity extends MapActivity implements LocationListener {
     			showDialog(DIALOG_ENABLE_GPS);	// if not, once again ask to enable it.
     		}
 		}
-	}
-	
-	/** use only in UI Thread (e.g. in on...() methods */
-	private void refreshDistanceView() {
-		int meters = (int)mPathOverlay.getPathLength();
-		if (meters < 1000) {
-		mDistanceView.setText(String.format("%dm", meters));
-		} else {
-			mDistanceView.setText(String.format("%.3fkm", meters/1000f));
-		}
-		mDistanceView.invalidate();
 	}
 	
 	private Location getPreliminaryCurrentPosition() {
@@ -209,6 +235,29 @@ public class MainActivity extends MapActivity implements LocationListener {
 		}
 	}
 
+	/** call from UI thread */
+	private void setDistance(float meters) {
+		mDistance = meters;
+		if (meters < 1000) {
+			mDistanceView.setText(String.format("%dm", (int)meters));
+		} else {
+			mDistanceView.setText(String.format("%.3fkm", meters/1000f));
+		}
+		mDistanceView.invalidate();		
+	}
+	
+	private void setPace(float metersPerSecond) {
+		mPace = metersPerSecond;
+		mPaceView.setText(Util.formatSpeed(metersPerSecond));
+		mPaceView.invalidate();
+	}
+	
+	private void setTime(long millis) {
+		mTime = millis;
+		mTimerView.setText(Util.formatTime(millis));
+		mTimerView.invalidate();
+	}
+	
 	// -------------------------------------------------------------------------------------- MapActivity Implementation
 
 	@Override
@@ -226,7 +275,9 @@ public class MainActivity extends MapActivity implements LocationListener {
 			if (mCurrentLocation == null) {
 				mLocationMgr.requestLocationUpdates(LocationManager.GPS_PROVIDER, MIN_TIME, MIN_DISTANCE, this);
 				mStartButton.setEnabled(true);
-				mWaitingDialog.dismiss();
+				if (mWaitingDialog != null) {
+					mWaitingDialog.dismiss();
+				}
 			}
 			mPrevLocation = mCurrentLocation;
 			mCurrentLocation = location;	// used for displaying where we are and where we're heading to.
@@ -235,7 +286,7 @@ public class MainActivity extends MapActivity implements LocationListener {
 
 			if (mIsRunning) {
 				mPathOverlay.appendLocation(location);
-				refreshDistanceView();
+				setDistance(mPathOverlay.getPathLength());
 			}
 		}
 	}
@@ -261,7 +312,7 @@ public class MainActivity extends MapActivity implements LocationListener {
 		if ((mCurrentLocation == null || mPrevLocation == null) && location.getAccuracy() <= 20) {
 			return true;
 		}
-		float dist = location.distanceTo(mPrevLocation);
+		float dist = mPrevLocation == null ? 0 : location.distanceTo(mPrevLocation);
 		if (location.hasAccuracy() && location.getAccuracy() < dist) {	// genau genug?
 			return true;
 		}
@@ -276,7 +327,7 @@ public class MainActivity extends MapActivity implements LocationListener {
 	 * 
 	 * @author ridcully
 	 */
-	class TimerTask extends AsyncTask<Long, String, String> {
+	class TimerTask extends AsyncTask<Long, Long, String> {
 
 		private long mMillis;
 		private long mOffsetMillis;
@@ -290,7 +341,7 @@ public class MainActivity extends MapActivity implements LocationListener {
 			mOffsetMillis = System.currentTimeMillis();
 			while (mIsRunning) {
 				mMillis = System.currentTimeMillis() - mOffsetMillis;
-				publishProgress(Util.formatTime(mMillis));
+				publishProgress(mMillis);
 				try {
 					Thread.sleep(500);	// nur 1/2 Sekunde, damit ich sicher keine Sekunde verpasse
 				} catch (InterruptedException e) {
@@ -300,8 +351,8 @@ public class MainActivity extends MapActivity implements LocationListener {
 		}
 		
 		@Override
-		protected void onProgressUpdate(String... values) {
-			mTimerView.setText(values[0]);
+		protected void onProgressUpdate(Long... values) {
+			setTime(values[0]);
 		}
 
 		public long getTimeMillis() {
@@ -309,14 +360,14 @@ public class MainActivity extends MapActivity implements LocationListener {
 		}
 	}
 
-	// -------------------------------------------------------------------------------- TachoTask
+	// -------------------------------------------------------------------------------- PaceTask
 	
 	/**
 	 * Läuft parallel und berechnet die aktuelle Geschwindigkeit und postet sie ebenso schön formatiert
 	 * 
 	 * @author ridcully
 	 */
-	class TachoTask extends AsyncTask<Long, String, String> {
+	class PaceTask extends AsyncTask<Long, Float, String> {
 
 		@Override
 		protected String doInBackground(Long... params) {
@@ -327,15 +378,16 @@ public class MainActivity extends MapActivity implements LocationListener {
 				} catch (InterruptedException e) {
 				}
 				float newLength = mPathOverlay.getPathLength();
-				publishProgress(Util.formatSpeed(newLength-oldLength, CURRENT_SPEED_INTERVAL_MILLIS));
+				float metersPerSecond = newLength-oldLength/(CURRENT_SPEED_INTERVAL_MILLIS/1000f);
+				publishProgress(metersPerSecond);
 				oldLength = newLength;
 			}
 			return null;
 		}
 		
 		@Override
-		protected void onProgressUpdate(String... values) {
-			mTachoView.setText(values[0]);
+		protected void onProgressUpdate(Float... values) {
+			setPace(values[0]);
 		}
 	}	
 }
