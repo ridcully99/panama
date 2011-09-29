@@ -37,31 +37,29 @@ public class PathOverlay extends Overlay {
 
 	private ArrayList<GeoPoint> mPoints = new ArrayList<GeoPoint>();
 	private Location mCurrentLocation;
-	private Location mPrevLocation;		// for calculating distances
 	private Path mPath;
 	private Paint mPathPaint;
 	private Paint mArrowPaint;
 	private Point mHelperPoint = new Point();
-	private float mPathLength = 0;
 	
 	public PathOverlay(Bundle savedInstanceState) {
 		mPath = new Path();
 		mPathPaint = new Paint();
-        mPathPaint.setAntiAlias(true);
-        mPathPaint.setColor(0xAA00AA00);	// transparent green
-        mPathPaint.setStyle(Paint.Style.STROKE);
-        mPathPaint.setStrokeJoin(Paint.Join.ROUND);
-        mPathPaint.setStrokeCap(Paint.Cap.ROUND);
-        mPathPaint.setStrokeWidth(5);
+		mPathPaint.setAntiAlias(true);
+		mPathPaint.setColor(0xAA00AA00);	// transparent green
+		mPathPaint.setStyle(Paint.Style.STROKE);
+		mPathPaint.setStrokeJoin(Paint.Join.ROUND);
+		mPathPaint.setStrokeCap(Paint.Cap.ROUND);
+		mPathPaint.setStrokeWidth(5);
 
-        mArrowPaint = new Paint();
-        mArrowPaint.setAntiAlias(true);
-        mArrowPaint.setColor(0x880000AA);	// slightly transparent blue
-        mArrowPaint.setStyle(Paint.Style.STROKE);
-        mArrowPaint.setStrokeJoin(Paint.Join.BEVEL);
-        mArrowPaint.setStrokeCap(Paint.Cap.BUTT);
+		mArrowPaint = new Paint();
+		mArrowPaint.setAntiAlias(true);
+		mArrowPaint.setColor(0x880000AA);	// slightly transparent blue
+		mArrowPaint.setStyle(Paint.Style.STROKE);
+		mArrowPaint.setStrokeJoin(Paint.Join.BEVEL);
+		mArrowPaint.setStrokeCap(Paint.Cap.BUTT);
 
-        // TODO rebuild mPoints from savedInstanceState (if not null)
+		// TODO rebuild mPoints from savedInstanceState (if not null)
 	}
 	
 	/**
@@ -72,37 +70,18 @@ public class PathOverlay extends Overlay {
 		mCurrentLocation = location;
 	}
 	
-	public void reset(Location startingPoint) {
+	public void reset(Location location) {
 		mPoints.clear();
-		mPoints.add(Util.locationToGeoPoint(startingPoint));
-		mCurrentLocation = startingPoint;
-		mPrevLocation = startingPoint;
-		mPathLength = 0;
+		setCurrentLocation(location);
 	}
 	
 	/**
-	 * Appends specified location and returns new total path length.
-	 * 
-	 * To comensate GPS inaccuracies, if location is closer to previous location than it's accuracy is, 
-	 * the location is ignored and not added to the path.
+	 * Appends specified location.
 	 * 
 	 * @param location
-	 * @return true if location was added, false if not
 	 */
-	public boolean appendLocation(Location location) {
-		float dist = location.distanceTo(mPrevLocation);
-//		if (location.hasAccuracy() && location.getAccuracy() > dist) {	// zu ungenau?
-//			return false;
-//		} else {
-			mPoints.add(Util.locationToGeoPoint(location));
-			mPathLength += dist;
-			mPrevLocation = location;
-			return true;
-		//}
-	}
-	
-	public float getPathLength() {
-		return mPathLength;
+	public void appendLocation(Location location) {
+		mPoints.add(Util.locationToGeoPoint(location));
 	}
 	
 	@Override
@@ -133,7 +112,7 @@ public class PathOverlay extends Overlay {
 			canvas.save();
 			canvas.translate(mHelperPoint.x, mHelperPoint.y);
 			canvas.rotate(mCurrentLocation.getBearing());
-			canvas.scale(0.5f, -0.5f);	// scale to adopt size -- easier than changing all coords below ;-)
+			canvas.scale(0.5f, -0.5f);	// scale to mirror on x-axis and adopt size -- easier than changing all coords below ;-)
 			mPath.reset();
 			mPath.moveTo(0, 0);
 			if (!mCurrentLocation.hasBearing() || mCurrentLocation.getSpeed() == 0.0) {
