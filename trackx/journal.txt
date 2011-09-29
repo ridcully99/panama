@@ -27,6 +27,7 @@
 29.9.2011
 - Pfadlängenberechung ganz ins MainActivity getan - gab schon Doppelungen mit dem Merken der prevPosition...  
 - Geschwindigkeitsberechnung (paceTask) überarbeitet - merken der letzten Werte und Durchschnitt errechnen und anzeigen
+- mSessionState statt mIsRunning um auch Pause-Status handhaben zu können
 
 TODO: Pause, Resume, Save implementieren
 
