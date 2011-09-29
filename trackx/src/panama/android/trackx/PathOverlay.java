@@ -19,6 +19,7 @@ import java.util.ArrayList;
 
 import android.graphics.Canvas;
 import android.graphics.Paint;
+import android.graphics.Paint.Style;
 import android.graphics.Path;
 import android.graphics.Path.Direction;
 import android.graphics.Point;
@@ -35,6 +36,7 @@ import com.google.android.maps.Overlay;
  */
 public class PathOverlay extends Overlay {
 
+	private MainActivity mMainActivity;
 	private ArrayList<GeoPoint> mPoints = new ArrayList<GeoPoint>();
 	private Location mCurrentLocation;
 	private Path mPath;
@@ -42,7 +44,8 @@ public class PathOverlay extends Overlay {
 	private Paint mArrowPaint;
 	private Point mHelperPoint = new Point();
 	
-	public PathOverlay(Bundle savedInstanceState) {
+	public PathOverlay(MainActivity activity, Bundle savedInstanceState) {
+		mMainActivity = activity;
 		mPath = new Path();
 		mPathPaint = new Paint();
 		mPathPaint.setAntiAlias(true);
@@ -70,9 +73,8 @@ public class PathOverlay extends Overlay {
 		mCurrentLocation = location;
 	}
 	
-	public void reset(Location location) {
+	public void clear() {
 		mPoints.clear();
-		setCurrentLocation(location);
 	}
 	
 	/**
@@ -122,6 +124,11 @@ public class PathOverlay extends Overlay {
 				mPath.lineTo(0, 60);
 				mPath.lineTo(45f, -30f);
 				mPath.lineTo(0, 0);
+			}
+			if (mMainActivity.mSessionState != MainActivity.IDLE) {
+				mArrowPaint.setStyle(Style.FILL);
+				canvas.drawPath(mPath, mArrowPaint);
+				mArrowPaint.setStyle(Style.STROKE);
 			}
 			canvas.drawPath(mPath, mArrowPaint);
 			canvas.restore();

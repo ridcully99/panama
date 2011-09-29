@@ -40,12 +40,12 @@ public class MainActivity extends MapActivity implements LocationListener {
 	private ProgressDialog mWaitingDialog;
 
 	// Logic
-	private final static int MILLIS = 1000;
-	private final static int MIN_DISTANCE = 5; 						   // in meters; 5 ist in MyTracks empfohlen das von Google-Leuten gemacht wird
-	private final static int MIN_TIME = 1*MILLIS;
-	private final static int IDLE = 0;
-	private final static int PAUSED = 1;
-	private final static int RUNNING = 2;
+	public final static int MILLIS = 1000;
+	public final static int MIN_DISTANCE = 5; 						   // in meters; 5 ist in MyTracks empfohlen das von Google-Leuten gemacht wird
+	public final static int MIN_TIME = 1*MILLIS;
+	public final static int IDLE = 0;
+	public final static int PAUSED = 1;
+	public final static int RUNNING = 2;
 	
 	private LocationManager mLocationMgr;
 	private Location mCurrentLocation;
@@ -55,7 +55,7 @@ public class MainActivity extends MapActivity implements LocationListener {
 	private float mPathLength;
 	private long mTime;
 	private float mPace;
-	private int mSessionState = IDLE;	// IDLE, PAUSED, RUNNING
+	public int mSessionState = IDLE;	// IDLE, PAUSED, RUNNING
 	
 	/** Called when the activity is first created. */
 	@Override
@@ -78,7 +78,7 @@ public class MainActivity extends MapActivity implements LocationListener {
 		mMapView.setBuiltInZoomControls(true);
 		mMapView.getController().setZoom(20);
 		
-		mPathOverlay = new PathOverlay(savedInstanceState);
+		mPathOverlay = new PathOverlay(this, savedInstanceState);
 		mMapView.getOverlays().add(mPathOverlay);
 
 		Location l = getPreliminaryCurrentPosition();
@@ -153,8 +153,11 @@ public class MainActivity extends MapActivity implements LocationListener {
 		mStartButton.setVisibility(View.GONE);
 		mPauseButton.setVisibility(View.VISIBLE);
 		mStopButton.setVisibility(View.VISIBLE);
-		mPathOverlay.reset(mCurrentLocation);
 		setPathLength(0);
+		mPathOverlay.clear();
+		mPathOverlay.setCurrentLocation(mCurrentLocation);
+		mPathOverlay.appendLocation(mCurrentLocation);		// set first point of path
+		mMapView.invalidate();
 		mSessionState = RUNNING;
 		mTimerTask = new TimerTask();
 		mTimerTask.execute(0L);	// TODO bei start/stop/start später andere Startzeit
@@ -195,7 +198,8 @@ public class MainActivity extends MapActivity implements LocationListener {
 		mDiscardButton.setVisibility(View.GONE);
 		mSaveButton.setVisibility(View.GONE);
 		mStartButton.setVisibility(View.VISIBLE);
-		mPathOverlay.reset(mLocationMgr.getLastKnownLocation(LocationManager.GPS_PROVIDER));
+		mPathOverlay.clear();
+		mMapView.invalidate();
 		setPathLength(0);
 		setTime(0);
 		setPace(0);
@@ -245,6 +249,9 @@ public class MainActivity extends MapActivity implements LocationListener {
 	}
 	
 	private void setPace(float metersPerSecond) {
+		if (mCurrentLocation != null) {
+			metersPerSecond = mCurrentLocation.getSpeed();	// TEST - simply take value from Location
+		}
 		mPace = metersPerSecond;
 		mPaceView.setText(Util.formatSpeed(metersPerSecond));
 		mPaceView.invalidate();
@@ -283,7 +290,6 @@ public class MainActivity extends MapActivity implements LocationListener {
 			mCurrentLocation = location;				// used for displaying where we are and where we're heading to.
 			mMapView.getController().animateTo(Util.locationToGeoPoint(location));
 			mPathOverlay.setCurrentLocation(location);
-
 			if (mSessionState == RUNNING) {
 				mPathOverlay.appendLocation(location);
 				setPathLength(mPathLength+dist);
