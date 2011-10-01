@@ -34,9 +34,14 @@
 
 30.9.2011
 > immer alle n Sekunden tracken, Distanz selbst auswerten --> sonst krieg ich während IDLE keine aktuellen Positionen
-> GPS nicht voraussetzen, dafür immer mit Kreis die Genauigkeit anzeigen
++ GPS nicht voraussetzen, dafür immer mit Kreis die Genauigkeit anzeigen
 > Layout wieder ändern: Für Session Werte/Map auf 2 Views flippable haben (Buttons bleiben fix), andere Sachen über Menü und eigene Activities 
-> CurrentLocation aus PathOverlay rausnehmen und eigenes Overlay dafür machen (dann kann ich auch das Blinken usw. besser handhaben)
++ CurrentLocation aus PathOverlay rausnehmen und eigenes Overlay dafür machen (dann kann ich auch das Blinken usw. besser handhaben)
+
+1.10.2011
++ Position und Distanzberechnung gefixt und (hoffentlich) stabil gemacht
+
+TODO: Während Running das Display nicht abschalten bzw. sperren
 
 TODO: Pause, Resume, Save implementieren
 

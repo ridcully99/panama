@@ -63,7 +63,6 @@ public class MyMapActivity extends MapActivity implements LocationListener {
 	private LocationManager mLocationMgr;
 	private List<Position> mPositions;
 	public Location mCurrentLocation;
-	private Location mPrevLocation;
 	private TimerTask mTimerTask;
 	private float mPathLength;
 	private long mTime;
@@ -99,7 +98,6 @@ public class MyMapActivity extends MapActivity implements LocationListener {
 
 		mCurrentLocation = getPreliminaryCurrentPosition();
 		if (mCurrentLocation != null) {
-			mPrevLocation = mCurrentLocation;
 			mMapView.getController().animateTo(Util.locationToGeoPoint(mCurrentLocation));
 		}
 	}
@@ -211,12 +209,11 @@ public class MyMapActivity extends MapActivity implements LocationListener {
 		mStartButton.setVisibility(View.GONE);
 		mPauseButton.setVisibility(View.VISIBLE);
 		mStopButton.setVisibility(View.VISIBLE);
-		mPrevLocation = mCurrentLocation;					// 0 distance at first
+		mPositions.clear();
 		mPositions.add(new Position(mCurrentLocation));		// set first point of path
 		setPathLength(0);
-		mPositions.clear();
-		mMapView.invalidate();								// re-render path
 		mSessionState = RUNNING;
+		mMapView.invalidate();								// re-render path
 		mTimerTask = new TimerTask();
 		mTimerTask.execute(0L);	// TODO bei start/stop/start später andere Startzeit???
 		mDistanceView.setTextColor(COLOR_RUNNING);
@@ -324,32 +321,25 @@ public class MyMapActivity extends MapActivity implements LocationListener {
 	
 	@Override
 	public void onLocationChanged(Location location) {
-		
-		// wenn Genauigkeit deutlich schlechter als vorheriger Wert und voriger noch ziemlich neu, dann ignorieren.
-		
+
+		if (!isAcceptableLocation(location)) {
+			return;
+		}
 		
 		if (mSessionState == RUNNING) {					// while running check distance too
-			float dist = location.distanceTo(mPrevLocation);
-			if (dist >= MIN_DISTANCE && dist >= location.getAccuracy()) {
-				mMapView.getController().animateTo(Util.locationToGeoPoint(location));
-				Position p = new Position(location);
-				p.distance = dist;
-				mPositions.add(p);
-				Toast.makeText(MyMapActivity.this, p.toString(), Toast.LENGTH_LONG).show();
-				setPathLength(mPathLength+dist);
-				setPace(location.getSpeed());
-				mPrevLocation = mCurrentLocation;
-				mCurrentLocation = location;
-				mMapView.invalidate();
+			float dist = location.distanceTo(mCurrentLocation);
+			if (dist < MIN_DISTANCE) {
+				return;	// no adding to path _AND_ no update of current pos. (otherwise current pos would move away from path)
 			}
-		} else {
-			if (isAcceptableLocation(location)) {
-				// simply tracking current location
-				mCurrentLocation = location;
-				mMapView.getController().animateTo(Util.locationToGeoPoint(location));
-				mMapView.invalidate();
-			}
+			Position p = new Position(location);
+			p.distance = dist;
+			mPositions.add(p);
+			setPathLength(mPathLength+dist);
+			setPace(location.getSpeed());
 		}
+		mCurrentLocation = location;
+		mMapView.getController().animateTo(Util.locationToGeoPoint(location));
+		mMapView.invalidate();
 	}
 
 	private boolean isAcceptableLocation(Location location) {
