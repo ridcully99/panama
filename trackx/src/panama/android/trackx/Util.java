@@ -15,9 +15,11 @@
  */
 package panama.android.trackx;
 
-import com.google.android.maps.GeoPoint;
-
 import android.location.Location;
+import android.util.FloatMath;
+
+import com.google.android.maps.GeoPoint;
+import com.google.android.maps.MapView;
 
 /**
  * @author ridcully
@@ -45,6 +47,19 @@ public class Util {
 		GeoPoint point = new GeoPoint((int)(location.getLatitude()*1E6), (int)(location.getLongitude()*1E6));
 		return point;
 	}
+
+	/**
+	 * Meters to pixel-distance radius for specified latitude.
+	 * From http://www.anddev.org/viewtopic.php?p=16075 (via http://stackoverflow.com/questions/2077054/how-to-compute-a-radius-around-a-point-in-an-android-mapview)
+	 * WARNING: Division für latitude == +/-90 (am Nord- und Südpol)
+	 * @param meters
+	 * @param map
+	 * @param latitude
+	 * @return
+	 */
+	public static int metersToRadius(float meters, MapView map, double latitude) {
+		return (int) (map.getProjection().metersToEquatorPixels(meters) * (1/FloatMath.cos((float)Math.toRadians(latitude))));
+	}	
 	
 	public static String formatTime(long millis) {
 		long secs = millis / 1000;	// sekundengenau reicht

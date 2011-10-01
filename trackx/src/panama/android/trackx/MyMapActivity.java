@@ -1,5 +1,12 @@
 package panama.android.trackx;
 
+import java.io.BufferedWriter;
+import java.io.File;
+import java.io.FileWriter;
+import java.io.IOException;
+import java.util.ArrayList;
+import java.util.List;
+
 import android.app.AlertDialog;
 import android.app.Dialog;
 import android.app.ProgressDialog;
@@ -11,14 +18,19 @@ import android.location.LocationListener;
 import android.location.LocationManager;
 import android.os.AsyncTask;
 import android.os.Bundle;
+import android.os.Environment;
+import android.view.Menu;
+import android.view.MenuInflater;
+import android.view.MenuItem;
 import android.view.View;
 import android.widget.Button;
 import android.widget.TextView;
+import android.widget.Toast;
 
 import com.google.android.maps.MapActivity;
 import com.google.android.maps.MapView;
 
-public class MainActivity extends MapActivity implements LocationListener {
+public class MyMapActivity extends MapActivity implements LocationListener {
 
 	// UI
 	private final static int COLOR_IDLE = 0xffffffff;					// white
@@ -28,6 +40,7 @@ public class MainActivity extends MapActivity implements LocationListener {
 
 	private MapView mMapView;
 	private PathOverlay mPathOverlay;
+	private MyLocationOverlay mMyLocationOverlay;
 	private TextView mDistanceView;
 	private TextView mTimerView;
 	private TextView mPaceView;
@@ -40,18 +53,18 @@ public class MainActivity extends MapActivity implements LocationListener {
 	private ProgressDialog mWaitingDialog;
 
 	// Logic
-	public final static int MILLIS = 1000;
+	public final static int SECOND_IN_MILLIS = 1000;
 	public final static int MIN_DISTANCE = 5; 						   // in meters; 5 ist in MyTracks empfohlen das von Google-Leuten gemacht wird
-	public final static int MIN_TIME = 1*MILLIS;
+	public final static int MIN_TIME = 1*SECOND_IN_MILLIS;
 	public final static int IDLE = 0;
 	public final static int PAUSED = 1;
 	public final static int RUNNING = 2;
 	
 	private LocationManager mLocationMgr;
-	private Location mCurrentLocation;
+	private List<Position> mPositions;
+	public Location mCurrentLocation;
 	private Location mPrevLocation;
 	private TimerTask mTimerTask;
-	private PaceTask mPaceTask;
 	private float mPathLength;
 	private long mTime;
 	private float mPace;
@@ -77,13 +90,17 @@ public class MainActivity extends MapActivity implements LocationListener {
 		mMapView = (MapView) findViewById(R.id.mapview);
 		mMapView.setBuiltInZoomControls(true);
 		mMapView.getController().setZoom(20);
-		
-		mPathOverlay = new PathOverlay(this, savedInstanceState);
-		mMapView.getOverlays().add(mPathOverlay);
 
-		Location l = getPreliminaryCurrentPosition();
-		if (l != null) {
-			mMapView.getController().animateTo(Util.locationToGeoPoint(l));
+		mPositions = new ArrayList<Position>();
+		mPathOverlay = new PathOverlay(mPositions, savedInstanceState);
+		mMyLocationOverlay = new MyLocationOverlay(this, savedInstanceState);
+		mMapView.getOverlays().add(mPathOverlay);
+		mMapView.getOverlays().add(mMyLocationOverlay);
+
+		mCurrentLocation = getPreliminaryCurrentPosition();
+		if (mCurrentLocation != null) {
+			mPrevLocation = mCurrentLocation;
+			mMapView.getController().animateTo(Util.locationToGeoPoint(mCurrentLocation));
 		}
 	}
 
@@ -100,15 +117,16 @@ public class MainActivity extends MapActivity implements LocationListener {
 	@Override
 	protected void onResume() {
 		super.onResume();
-		if (!mLocationMgr.isProviderEnabled(LocationManager.GPS_PROVIDER)) {
-			showDialog(DIALOG_ENABLE_GPS);
-		} else {
-			if (mSessionState == IDLE && !Util.isUpToDate(mCurrentLocation)) {
-				mCurrentLocation = null;
-				mWaitingDialog = ProgressDialog.show(this, "", "Finding current location...", true);
-				mLocationMgr.requestLocationUpdates(LocationManager.GPS_PROVIDER, 0, 0, this);
-			}
-		}
+		//if (!mLocationMgr.isProviderEnabled(LocationManager.GPS_PROVIDER)) {
+		//	showDialog(DIALOG_ENABLE_GPS);
+		//} else {
+		//	if (mSessionState == IDLE && !Util.isUpToDate(mCurrentLocation)) {
+		//		mCurrentLocation = null;
+		//		mWaitingDialog = ProgressDialog.show(this, "", "Finding current location...", true);
+				mLocationMgr.requestLocationUpdates(LocationManager.NETWORK_PROVIDER, MIN_TIME, 0, this);
+				mLocationMgr.requestLocationUpdates(LocationManager.GPS_PROVIDER, MIN_TIME, 0, this);
+		//	}
+		//}
 	}
 	
 	@Override
@@ -119,7 +137,7 @@ public class MainActivity extends MapActivity implements LocationListener {
 //		} else {
 //			// auch wenn running, die minTime auf 60 sek setzen; minDistance bleibt aber
 //			// damit kann ich hoffentlich etwas Strom sparen
-//			mLocationMgr.requestLocationUpdates(LocationManager.GPS_PROVIDER, 60*MILLIS, MIN_DISTANCE, this);
+//			mLocationMgr.requestLocationUpdates(LocationManager.GPS_PROVIDER, 60*SECOND_IN_MILLIS, MIN_DISTANCE, this);
 		}
 	}
 	
@@ -140,7 +158,7 @@ public class MainActivity extends MapActivity implements LocationListener {
 					.setNegativeButton("Exit", 
 							new DialogInterface.OnClickListener() {
 								public void onClick(DialogInterface dialog, int id) {
-									MainActivity.this.finish();
+									MyMapActivity.this.finish();
 								}
 							});
 			return builder.create();
@@ -148,21 +166,59 @@ public class MainActivity extends MapActivity implements LocationListener {
 		return null;
 	}
 	
+	@Override
+	public boolean onCreateOptionsMenu(Menu menu) {
+	    MenuInflater inflater = getMenuInflater();
+	    inflater.inflate(R.menu.menu, menu);
+	    return true;
+	}
+	
+	@Override
+	public boolean onOptionsItemSelected(MenuItem item) {
+		switch(item.getItemId()) {
+		case R.id.miSave:
+			savePositions();
+			return true;
+		}
+		return super.onOptionsItemSelected(item);
+	}
 
+	private void savePositions() {
+		// TODO sicherstellen dass ich auf external storage schreiben kann,
+		// siehe http://developer.android.com/guide/topics/data/data-storage.html#filesExternal
+		
+		try {
+			File root = Environment.getExternalStorageDirectory();
+			File dest = new File(new File(root, Environment.DIRECTORY_DOWNLOADS), "trackx.csv");
+			if (dest.exists()) {
+				if (!dest.delete()) {
+					Toast.makeText(this, "delete failed", Toast.LENGTH_LONG).show();
+				}
+			}
+			BufferedWriter output = new BufferedWriter(new FileWriter(dest));
+			output.write("latitude;longitude;accuracy;distance\n");
+			for (Position p : mPositions) {
+				output.write(p.toString()+"\n");
+			}
+			output.close();
+			Toast.makeText(this, "Saved in "+dest.getAbsolutePath(), Toast.LENGTH_LONG).show();
+		} catch (IOException e) {
+			Toast.makeText(this, "IOException :-(", Toast.LENGTH_LONG).show();
+		}
+	}
+	
 	public void onStartClicked(View view) {
 		mStartButton.setVisibility(View.GONE);
 		mPauseButton.setVisibility(View.VISIBLE);
 		mStopButton.setVisibility(View.VISIBLE);
+		mPrevLocation = mCurrentLocation;					// 0 distance at first
+		mPositions.add(new Position(mCurrentLocation));		// set first point of path
 		setPathLength(0);
-		mPathOverlay.clear();
-		mPathOverlay.setCurrentLocation(mCurrentLocation);
-		mPathOverlay.appendLocation(mCurrentLocation);		// set first point of path
-		mMapView.invalidate();
+		mPositions.clear();
+		mMapView.invalidate();								// re-render path
 		mSessionState = RUNNING;
 		mTimerTask = new TimerTask();
-		mTimerTask.execute(0L);	// TODO bei start/stop/start später andere Startzeit
-		mPaceTask = new PaceTask();
-		mPaceTask.execute((Long)null);
+		mTimerTask.execute(0L);	// TODO bei start/stop/start spÃ¤ter andere Startzeit???
 		mDistanceView.setTextColor(COLOR_RUNNING);
 		mTimerView.setTextColor(COLOR_RUNNING);
 		mLocationMgr.requestLocationUpdates(LocationManager.GPS_PROVIDER, MIN_TIME, MIN_DISTANCE, this);
@@ -187,8 +243,6 @@ public class MainActivity extends MapActivity implements LocationListener {
 		mSessionState = IDLE;
 		mTimerTask.cancel(true);
 		mTimerTask = null;
-		mPaceTask.cancel(true);
-		mPaceTask = null;
 		mDistanceView.setTextColor(COLOR_IDLE);
 		mTimerView.setTextColor(COLOR_IDLE);
 		mLocationMgr.removeUpdates(this);
@@ -198,7 +252,7 @@ public class MainActivity extends MapActivity implements LocationListener {
 		mDiscardButton.setVisibility(View.GONE);
 		mSaveButton.setVisibility(View.GONE);
 		mStartButton.setVisibility(View.VISIBLE);
-		mPathOverlay.clear();
+		mPositions.clear();
 		mMapView.invalidate();
 		setPathLength(0);
 		setTime(0);
@@ -249,10 +303,6 @@ public class MainActivity extends MapActivity implements LocationListener {
 	}
 	
 	private void setPace(float metersPerSecond) {
-		if (mCurrentLocation != null) {
-			metersPerSecond = mCurrentLocation.getSpeed();	// TEST - simply take value from Location
-		}
-		mPace = metersPerSecond;
 		mPaceView.setText(Util.formatSpeed(metersPerSecond));
 		mPaceView.invalidate();
 	}
@@ -274,62 +324,89 @@ public class MainActivity extends MapActivity implements LocationListener {
 	
 	@Override
 	public void onLocationChanged(Location location) {
-
-		if (isAcceptableLocation(location)) {
-			if (mCurrentLocation == null) {
-				// if current location is null, we probably came here from onResume() where immediate updates were requested.
-				// we will reduce this request now a little bit, as we now have an up to date fix.
-				mLocationMgr.requestLocationUpdates(LocationManager.GPS_PROVIDER, MIN_TIME, MIN_DISTANCE, this);
-				mStartButton.setEnabled(true);	// we can enable the start button even if we were already running, as it is not visible then anyway
-				if (mWaitingDialog != null && mWaitingDialog.isShowing()) {
-					mWaitingDialog.dismiss();
-				}
-			}
-			float dist = mPrevLocation != null ? location.distanceTo(mPrevLocation) : 0;
-			mPrevLocation = mCurrentLocation;
-			mCurrentLocation = location;				// used for displaying where we are and where we're heading to.
-			mMapView.getController().animateTo(Util.locationToGeoPoint(location));
-			mPathOverlay.setCurrentLocation(location);
-			if (mSessionState == RUNNING) {
-				mPathOverlay.appendLocation(location);
+		
+		// wenn Genauigkeit deutlich schlechter als vorheriger Wert und voriger noch ziemlich neu, dann ignorieren.
+		
+		
+		if (mSessionState == RUNNING) {					// while running check distance too
+			float dist = location.distanceTo(mPrevLocation);
+			if (dist >= MIN_DISTANCE && dist >= location.getAccuracy()) {
+				mMapView.getController().animateTo(Util.locationToGeoPoint(location));
+				Position p = new Position(location);
+				p.distance = dist;
+				mPositions.add(p);
+				Toast.makeText(MyMapActivity.this, p.toString(), Toast.LENGTH_LONG).show();
 				setPathLength(mPathLength+dist);
+				setPace(location.getSpeed());
+				mPrevLocation = mCurrentLocation;
+				mCurrentLocation = location;
+				mMapView.invalidate();
+			}
+		} else {
+			if (isAcceptableLocation(location)) {
+				// simply tracking current location
+				mCurrentLocation = location;
+				mMapView.getController().animateTo(Util.locationToGeoPoint(location));
+				mMapView.invalidate();
 			}
 		}
 	}
 
+	private boolean isAcceptableLocation(Location location) {
+
+		// based on http://developer.android.com/guide/topics/location/obtaining-user-location.html
+		long deltaTime = location.getTime() - mCurrentLocation.getTime();
+		if (deltaTime > 30*SECOND_IN_MILLIS) {	// location is significantly newer than current location --> accept new one.
+			return true;
+		}
+		if (!location.hasAccuracy()) {
+			return false;
+		}
+	    // Check whether the new location fix is more or less accurate
+	    int accuracyDelta = (int) (location.getAccuracy() - mCurrentLocation.getAccuracy());
+	    boolean isLessAccurate = accuracyDelta > 0;
+	    boolean isMoreAccurate = accuracyDelta < 0;
+	    boolean isSignificantlyLessAccurate = accuracyDelta > 200;
+
+	    // Check if the old and new location are from the same provider
+	    boolean isFromSameProvider = isSameProvider(location.getProvider(), mCurrentLocation.getProvider());
+
+	    // Determine location quality using a combination of timeliness and accuracy
+	    if (isMoreAccurate) {
+	        return true;
+	    } else if (!isLessAccurate) {
+	        return true;
+	    } else if (!isSignificantlyLessAccurate && isFromSameProvider) {
+	        return true;
+	    }
+	    return false;		
+	}
+	
+	/** Checks whether two providers are the same */
+	private boolean isSameProvider(String provider1, String provider2) {
+	    if (provider1 == null) {
+	      return provider2 == null;
+	    }
+	    return provider1.equals(provider2);
+	}	
+	
 	@Override
 	public void onProviderDisabled(String provider) {
-		if (provider.equals(LocationManager.GPS_PROVIDER)) {
-			mCurrentLocation = null;	// this will trigger startWaitingForUpToDateGPSLocation() in onResume()
-		}
 	}
 
 	@Override
 	public void onProviderEnabled(String provider) {
-		// TODO Auto-generated method stub
 	}
 
 	@Override
 	public void onStatusChanged(String provider, int status, Bundle extras) {
-		// TODO Auto-generated method stub
-	}
-	
-	private boolean isAcceptableLocation(Location location) {
-		if ((mCurrentLocation == null || mPrevLocation == null) && location.getAccuracy() <= 20) {
-			return true;
-		}
-		float dist = mPrevLocation == null ? 0 : location.distanceTo(mPrevLocation);
-		if (location.hasAccuracy() && location.getAccuracy() < dist) {	// genau genug?
-			return true;
-		}
-		return false;
 	}
 	
 	// -------------------------------------------------------------------------------- TimerTask
 
 	/**
-	 * Stoppuhr, läuft parallel und postet akt. Zeit schön formatiert.
-	 * TODO Berechnet gleichzeitig auch die aktuelle Geschwindigkeit und postet sie ebenso schön formatiert
+	 * Stoppuhr, lÃ¤uft parallel und postet akt. Zeit schÃ¶n formatiert.
+	 * TODO Berechnet gleichzeitig auch die aktuelle Geschwindigkeit und postet sie ebenso schï¿½n formatiert
 	 * 
 	 * @author ridcully
 	 */
@@ -363,49 +440,6 @@ public class MainActivity extends MapActivity implements LocationListener {
 
 		public long getTimeMillis() {
 			return mMillis;
-		}
-	}
-
-	// -------------------------------------------------------------------------------- PaceTask
-	
-	private final static int CURRENT_SPEED_INTERVAL_MILLIS = 3*MILLIS;		// wie oft speed upgedatet wird  
-	private final static int SAMPLE_SIZE = 3;
-
-	/**
-	 * Läuft parallel und berechnet die aktuelle Geschwindigkeit und postet sie.
-	 * Wir merken und immer die letzten Werte und errechnen daraus den Durchschnitt, um zu starke Schwankungen abzufangen
-	 * 
-	 * @author ridcully
-	 */
-	class PaceTask extends AsyncTask<Long, Float, String> {
-
-		@Override
-		protected String doInBackground(Long... params) {
-			float samples[] = new float[SAMPLE_SIZE];
-			int sampleIdx = 0;
-			float oldLength = mPathLength;
-			while (mSessionState != IDLE) {
-				try {
-					Thread.sleep(CURRENT_SPEED_INTERVAL_MILLIS);
-				} catch (InterruptedException e) {
-				}
-				float newLength = mPathLength;	// possibly changed while we were sleeping
-				float metersPerSecond = newLength-oldLength/(CURRENT_SPEED_INTERVAL_MILLIS/1000f);
-				sampleIdx = (sampleIdx+1) % SAMPLE_SIZE;
-				samples[sampleIdx] = metersPerSecond;
-				float avg = 0;
-				for (float s : samples) {
-					avg += s;
-				}
-				publishProgress(avg/SAMPLE_SIZE);
-				oldLength = newLength;
-			}
-			return null;
-		}
-		
-		@Override
-		protected void onProgressUpdate(Float... values) {
-			setPace(values[0]);
 		}
 	}	
 }
