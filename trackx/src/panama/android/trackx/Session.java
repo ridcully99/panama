@@ -15,18 +15,17 @@
  */
 package panama.android.trackx;
 
-import android.app.Activity;
-import android.os.Bundle;
+import java.util.List;
 
 /**
  * @author ridcully
  *
  */
-public class SessionActivity extends Activity {
+public class Session {
 
-	@Override
-	protected void onCreate(Bundle savedInstanceState) {
-		super.onCreate(savedInstanceState);
-		setContentView(R.layout.maintabbed);
-	}
+	public String name;
+	public String notes;
+	public List<Position> positions;
+	public long time;
+	public float distance;
 }

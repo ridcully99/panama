@@ -1,9 +1,5 @@
 package panama.android.trackx;
 
-import java.io.BufferedWriter;
-import java.io.File;
-import java.io.FileWriter;
-import java.io.IOException;
 import java.util.ArrayList;
 import java.util.List;
 
@@ -18,7 +14,8 @@ import android.location.LocationListener;
 import android.location.LocationManager;
 import android.os.AsyncTask;
 import android.os.Bundle;
-import android.os.Environment;
+import android.os.PowerManager;
+import android.util.Log;
 import android.view.Menu;
 import android.view.MenuInflater;
 import android.view.MenuItem;
@@ -26,12 +23,15 @@ import android.view.View;
 import android.widget.Button;
 import android.widget.TextView;
 import android.widget.Toast;
+import android.widget.ViewFlipper;
 
 import com.google.android.maps.MapActivity;
 import com.google.android.maps.MapView;
 
 public class MyMapActivity extends MapActivity implements LocationListener {
 
+	private final static String MY_TAG = "trackx";
+	
 	// UI
 	private final static int COLOR_IDLE = 0xffffffff;					// white
 	private final static int COLOR_RUNNING = 0xff00ff00;				// green	
@@ -51,6 +51,7 @@ public class MyMapActivity extends MapActivity implements LocationListener {
 	private Button mDiscardButton;
 	private Button mSaveButton;
 	private ProgressDialog mWaitingDialog;
+	private PowerManager.WakeLock mWakeLock;
 
 	// Logic
 	public final static int SECOND_IN_MILLIS = 1000;
@@ -76,9 +77,12 @@ public class MyMapActivity extends MapActivity implements LocationListener {
 		setContentView(R.layout.main);
 		mLocationMgr = (LocationManager) getSystemService(Context.LOCATION_SERVICE);
 
+		PowerManager pm = (PowerManager) getSystemService(Context.POWER_SERVICE);
+		mWakeLock = pm.newWakeLock(PowerManager.SCREEN_DIM_WAKE_LOCK, MY_TAG);
+
 		mDistanceView = (TextView)findViewById(R.id.distance);
 		mTimerView = (TextView)findViewById(R.id.time);
-		mPaceView = (TextView)findViewById(R.id.tacho);
+		mPaceView = (TextView)findViewById(R.id.pace);
 		mStartButton = (Button)findViewById(R.id.start);
 		mPauseButton = (Button)findViewById(R.id.pause);
 		mResumeButton = (Button)findViewById(R.id.resume);
@@ -174,44 +178,20 @@ public class MyMapActivity extends MapActivity implements LocationListener {
 	@Override
 	public boolean onOptionsItemSelected(MenuItem item) {
 		switch(item.getItemId()) {
-		case R.id.miSave:
-			savePositions();
+		case R.id.miToggle:
+			ViewFlipper flipper = (ViewFlipper)findViewById(R.id.flipper);
+			flipper.showNext();			
 			return true;
 		}
 		return super.onOptionsItemSelected(item);
-	}
-
-	private void savePositions() {
-		// TODO sicherstellen dass ich auf external storage schreiben kann,
-		// siehe http://developer.android.com/guide/topics/data/data-storage.html#filesExternal
-		
-		try {
-			File root = Environment.getExternalStorageDirectory();
-			File dest = new File(new File(root, Environment.DIRECTORY_DOWNLOADS), "trackx.csv");
-			if (dest.exists()) {
-				if (!dest.delete()) {
-					Toast.makeText(this, "delete failed", Toast.LENGTH_LONG).show();
-				}
-			}
-			BufferedWriter output = new BufferedWriter(new FileWriter(dest));
-			output.write("latitude;longitude;accuracy;distance\n");
-			for (Position p : mPositions) {
-				output.write(p.toString()+"\n");
-			}
-			output.close();
-			Toast.makeText(this, "Saved in "+dest.getAbsolutePath(), Toast.LENGTH_LONG).show();
-		} catch (IOException e) {
-			Toast.makeText(this, "IOException :-(", Toast.LENGTH_LONG).show();
-		}
 	}
 	
 	public void onStartClicked(View view) {
 		mStartButton.setVisibility(View.GONE);
 		mPauseButton.setVisibility(View.VISIBLE);
 		mStopButton.setVisibility(View.VISIBLE);
-		mPositions.clear();
+		reset();
 		mPositions.add(new Position(mCurrentLocation));		// set first point of path
-		setPathLength(0);
 		mSessionState = RUNNING;
 		mMapView.invalidate();								// re-render path
 		mTimerTask = new TimerTask();
@@ -219,16 +199,22 @@ public class MyMapActivity extends MapActivity implements LocationListener {
 		mDistanceView.setTextColor(COLOR_RUNNING);
 		mTimerView.setTextColor(COLOR_RUNNING);
 		mLocationMgr.requestLocationUpdates(LocationManager.GPS_PROVIDER, MIN_TIME, MIN_DISTANCE, this);
+		
+		mWakeLock.acquire();								// standby verhindern
 	}
 
 	public void onPauseClicked(View view) {
 		mPauseButton.setVisibility(View.GONE);
 		mResumeButton.setVisibility(View.VISIBLE);
+		
+		mWakeLock.release();		
 	}
 	
 	public void onResumeClicked(View view) {
 		mPauseButton.setVisibility(View.VISIBLE);
 		mResumeButton.setVisibility(View.GONE);
+
+		mWakeLock.acquire();		
 	}
 	
 	public void onStopClicked(View view) {
@@ -243,23 +229,33 @@ public class MyMapActivity extends MapActivity implements LocationListener {
 		mDistanceView.setTextColor(COLOR_IDLE);
 		mTimerView.setTextColor(COLOR_IDLE);
 		mLocationMgr.removeUpdates(this);
+		
+		mWakeLock.release();		
 	}
 
 	public void onDiscardClicked(View view) {
 		mDiscardButton.setVisibility(View.GONE);
 		mSaveButton.setVisibility(View.GONE);
 		mStartButton.setVisibility(View.VISIBLE);
-		mPositions.clear();
+		reset();
 		mMapView.invalidate();
-		setPathLength(0);
-		setTime(0);
-		setPace(0);
 	}
 	
 	public void onSaveClicked(View view) {
-		mDiscardButton.setVisibility(View.GONE);
-		mSaveButton.setVisibility(View.GONE);
-		mStartButton.setVisibility(View.VISIBLE);
+		try {
+			SessionPersistence.save(Util.uniqueFilename(), "notizen", mTime, mPathLength, mPositions, true);
+			mSaveButton.setEnabled(false);
+		} catch (Exception e) {
+			Log.e("trackx", "saving failed", e);
+			Toast.makeText(this, "saving failed: "+e.getMessage(), Toast.LENGTH_LONG).show();
+		}
+	}
+	
+	private void reset() {
+		mPositions.clear();
+		setPathLength(0);
+		setTime(0);
+		setPace(0);
 	}
 	
 	@Override
@@ -291,11 +287,11 @@ public class MyMapActivity extends MapActivity implements LocationListener {
 	/** call from UI thread */
 	private void setPathLength(float meters) {
 		mPathLength = meters;
-		if (meters < 1000) {
-			mDistanceView.setText(String.format("%dm", (int)meters));
-		} else {
-			mDistanceView.setText(String.format("%.3fkm", meters/1000f));
-		}
+		//if (meters < 1000) {
+		//	mDistanceView.setText(String.format("%dm", (int)meters));
+		//} else {
+			mDistanceView.setText(String.format("%.3f", meters/1000f));
+		//}
 		mDistanceView.invalidate();		
 	}
 	

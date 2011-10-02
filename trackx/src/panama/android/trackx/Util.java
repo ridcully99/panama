@@ -15,7 +15,11 @@
  */
 package panama.android.trackx;
 
+import java.util.Date;
+import java.util.logging.SimpleFormatter;
+
 import android.location.Location;
+import android.text.format.DateFormat;
 import android.util.FloatMath;
 
 import com.google.android.maps.GeoPoint;
@@ -76,6 +80,10 @@ public class Util {
 	
 	public static String formatSpeed(float metersPerSecond) {
 		float kmh = (metersPerSecond * 60 * 60)/1000f;
-		return String.format("%.2fkm/h", kmh);
+		return String.format("%.1f", kmh);
+	}
+
+	public static String uniqueFilename() {
+		return "trackx-session-"+DateFormat.format("yyyy-MM-dd-kk-mm-ss", new Date());
 	}
 }

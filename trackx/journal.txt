@@ -25,39 +25,33 @@
 - paceTask geandert, geht aber nicht richtig
 
 29.9.2011
-- Pfadl�ngenberechung ganz ins MainActivity getan - gab schon Doppelungen mit dem Merken der prevPosition...  
+- Pfadlängenberechung ganz ins MainActivity getan - gab schon Doppelungen mit dem Merken der prevPosition...  
 - Geschwindigkeitsberechnung (paceTask) überarbeitet - merken der letzten Werte und Durchschnitt errechnen und anzeigen
 - mSessionState statt mIsRunning um auch Pause-Status handhaben zu können
 - Tabbed Layout begonnen
-  --> TODO die Punkte für den aktuellen Lauf auch aus dem PathOverlay raustun und selber sammeln und Pathoverlay dann jeweils übergeben (is eh nur Referenz auf die Liste) fürs Anzeigen.
-           Nötig damit das Overlay auch für gespeicherte Tracks verwendet werden kann.
 
 30.9.2011
 > immer alle n Sekunden tracken, Distanz selbst auswerten --> sonst krieg ich während IDLE keine aktuellen Positionen
 + GPS nicht voraussetzen, dafür immer mit Kreis die Genauigkeit anzeigen
-> Layout wieder ändern: Für Session Werte/Map auf 2 Views flippable haben (Buttons bleiben fix), andere Sachen über Menü und eigene Activities 
+> Layout wieder ändern: Für Session Werte/Map auf 2 Views flippable haben (ViewFlipper Widget, Buttons bleiben fix), andere Sachen über Menü und eigene Activities 
 + CurrentLocation aus PathOverlay rausnehmen und eigenes Overlay dafür machen (dann kann ich auch das Blinken usw. besser handhaben)
 
 1.10.2011
 + Position und Distanzberechnung gefixt und (hoffentlich) stabil gemacht
++ Save und Load als JSON File implementiert (2.10. --> zu langsam beim Speichern, besser DB nehmen)
 
-TODO: Während Running das Display nicht abschalten bzw. sperren
+2.10.2011
++ WakeLock um Standby während des Laufens zu verhindern
++ Styles begonnen für Buttons etc.
+
 
 TODO: Pause, Resume, Save implementieren
 
-TODO: Am besten Locations mit allem drum und dran speichern (Speed, Höhenmeter, Richtung, Zeitstempel usw.)
 
 
 TODO: Speichern mit Kommentar, Typ (Laufen, Radln, Wandern, ...), Route (Auswahl aus bereits eingegebenen, oder neuen Namen eingeben)
 
 TODO: Altitude tracken und Anzeigen von Rauf- und Runter H�hen?
-
-TODO: Ev. "Minihistory" für Session, mit Zeit für jede Aktion, zum Durchscrollen_
-		14:35:00 Start
-		14:41:25 1000m erreicht, Kilometerzeit 6:25 [wenn automat. Markierung eingeschaltet]
-		14:55:21 Pause
-		14:57:51 Resume
-		15:22:00 Stop 
 
 TODO: Slider für Schnelldurchlauf durch gespeicherte Pfade.
 
