@@ -17,6 +17,8 @@ package panama.android.trackx;
 
 import java.util.List;
 
+import android.content.ContentValues;
+
 /**
  * @author ridcully
  *
@@ -25,7 +27,31 @@ public class Session {
 
 	public String name;
 	public String notes;
+	public long timestamp;
 	public List<Position> positions;
 	public long time;
 	public float distance;
+	
+	public Session() {
+	}
+	
+	public Session(String name, String notes, long timestamp, long time, float distance, List<Position> positions) {
+		this.name = name;
+		this.notes = notes;
+		this.timestamp = timestamp;
+		this.time = time;
+		this.distance = distance;
+		this.positions = positions;
+	}
+
+	/** for persistence */
+	public ContentValues getContentValues() {
+		ContentValues cv = new ContentValues();
+		cv.put(SessionPersistence.NAME, name);
+		cv.put(SessionPersistence.NOTES, notes);
+		cv.put(SessionPersistence.TIMESTAMP, timestamp);
+		cv.put(SessionPersistence.TIME, time);
+		cv.put(SessionPersistence.DISTANCE, distance);
+		return cv;
+	}
 }

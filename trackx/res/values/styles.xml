@@ -5,10 +5,21 @@
 		<item name="android:textSize">32dp</item>
 		<item name="android:textStyle">normal</item>
     </style>
-	<!-- for large main buttons -->
+
+	<!-- for large numbers -->
     <style name="LargeNumber">
-		<item name="android:textSize">64dp</item>
+		<item name="android:textSize">54dp</item>
+		<item name="android:textScaleX">0.9</item>
 		<item name="android:textStyle">bold</item>
+		<item name="android:layout_marginBottom">-14dp</item>
+		<item name="android:textColor">#eeeeee</item>
     </style>
+
+	<!-- for labels below numbers -->
+    <style name="NumberLabel">
+		<item name="android:textSize">11dp</item>
+		<item name="android:textColor">#aaaaaa</item>
+    </style>
+
 
 </resources>

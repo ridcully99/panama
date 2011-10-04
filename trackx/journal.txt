@@ -43,11 +43,33 @@
 2.10.2011
 + WakeLock um Standby während des Laufens zu verhindern
 + Styles begonnen für Buttons etc.
++ Layout Rework -- geht gut
+
+3.10.2001
++ Datenbank
++ Save
++ Load (mit rudimentärer Auswahlliste)
+
+4.10.2011
++ FIXED BUG: irgendwo wird mPositions neu gesetzt statt nur die Inhalte zu tauschen dadurch kriegt das PathOverlay die neuen Werte nicht mit.
 
 
-TODO: Pause, Resume, Save implementieren
+Layout-Rework: Zahlen entweder in Scroll-Layout zum rauf/runterscrollen (mit Snap),
+oder mit VISIBLE/GONE die Zusatzzahlen ein-/ausblenden per Knopfdruck auf erste Zahl oder Icon
+Von unten raufziehen mit Lasche wie bei Kamera-App!
 
+TODO: wenn gespeicherte Session angzeigt wird (auch gleich nach Save), die aktuelle Position nicht mehr anzeigen; auch Tracken dann unnötig.
 
+TODO: Pause, Resume implementieren
+
+TODO: Für gespeicherte Sessions statt den Buttons unten einen Schieberegler zum Durchscrollen der Route
+      (Sobald das Speichern einer Session fertig ist, auch diesen Schieberegler anzeigen, statt wie bisher das Save zu disablen)
+      Dafür dann 2 PathOverlays machen (ev. einmal erben oder sowas):
+      - einer der ganze Strecke in gedämpfter Farbe zeigt, und
+      - einer der Strecke von Start bis akt. Markerposition stark färbig zeigt.
+      Zeichnen: zuerst den ganzen gedämpften, darüber den teilweisen (gleiche Positions, einfach abbrechen an entsprechender Stelle) 
+
+TODO: Menüpunkt "New Session" -> reset() + Startbutton anzeigen
 
 TODO: Speichern mit Kommentar, Typ (Laufen, Radln, Wandern, ...), Route (Auswahl aus bereits eingegebenen, oder neuen Namen eingeben)
 

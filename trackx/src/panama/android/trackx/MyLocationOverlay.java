@@ -32,12 +32,12 @@ import com.google.android.maps.Overlay;
  */
 public class MyLocationOverlay extends Overlay {
 
-	private MyMapActivity mMainActivity;
+	private MainActivity mMainActivity;
 	private Paint mArrowPaint;
 	private Path mPath;
 	private Point mHelperPoint = new Point();
 	
-	public MyLocationOverlay(MyMapActivity activity, Bundle savedInstanceState) {
+	public MyLocationOverlay(MainActivity activity, Bundle savedInstanceState) {
 		mMainActivity = activity;
 
 		mPath = new Path();

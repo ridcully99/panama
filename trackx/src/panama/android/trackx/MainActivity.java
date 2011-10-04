@@ -19,24 +19,24 @@ import android.util.Log;
 import android.view.Menu;
 import android.view.MenuInflater;
 import android.view.MenuItem;
+import android.view.MotionEvent;
 import android.view.View;
+import android.view.View.OnTouchListener;
 import android.widget.Button;
 import android.widget.TextView;
 import android.widget.Toast;
-import android.widget.ViewFlipper;
 
 import com.google.android.maps.MapActivity;
 import com.google.android.maps.MapView;
 
-public class MyMapActivity extends MapActivity implements LocationListener {
+public class MainActivity extends MapActivity implements LocationListener {
 
-	private final static String MY_TAG = "trackx";
+	public final static String MY_TAG = "trackx";
 	
 	// UI
-	private final static int COLOR_IDLE = 0xffffffff;					// white
-	private final static int COLOR_RUNNING = 0xff00ff00;				// green	
-	private final static int REQUEST_ENABLING_GPS = 1;
-	private final static int DIALOG_ENABLE_GPS = 1;
+	public final static int REQUEST_ENABLING_GPS = 1;
+	public final static int REQUEST_LOAD_SESSION  = 2;
+	public final static int DIALOG_ENABLE_GPS = 1;
 
 	private MapView mMapView;
 	private PathOverlay mPathOverlay;
@@ -62,13 +62,14 @@ public class MyMapActivity extends MapActivity implements LocationListener {
 	public final static int RUNNING = 2;
 	
 	private LocationManager mLocationMgr;
-	private List<Position> mPositions;
+	private final List<Position> mPositions = new ArrayList<Position>();	// final, weil PathOverlay die verwendet. Statt Zuweisen bei Bedarf clear() + addAll()
 	public Location mCurrentLocation;
 	private TimerTask mTimerTask;
 	private float mPathLength;
 	private long mTime;
 	private float mPace;
-	public int mSessionState = IDLE;	// IDLE, PAUSED, RUNNING
+	private int mSessionState = IDLE;	// IDLE, PAUSED, RUNNING
+	private SessionPersistence mPersistence;
 	
 	/** Called when the activity is first created. */
 	@Override
@@ -94,7 +95,6 @@ public class MyMapActivity extends MapActivity implements LocationListener {
 		mMapView.setBuiltInZoomControls(true);
 		mMapView.getController().setZoom(20);
 
-		mPositions = new ArrayList<Position>();
 		mPathOverlay = new PathOverlay(mPositions, savedInstanceState);
 		mMyLocationOverlay = new MyLocationOverlay(this, savedInstanceState);
 		mMapView.getOverlays().add(mPathOverlay);
@@ -104,6 +104,18 @@ public class MyMapActivity extends MapActivity implements LocationListener {
 		if (mCurrentLocation != null) {
 			mMapView.getController().animateTo(Util.locationToGeoPoint(mCurrentLocation));
 		}
+		
+		View dataAreaLayout = findViewById(R.id.dataArea);	// a Layout is a View
+		dataAreaLayout.setOnTouchListener(new OnTouchListener() {
+			@Override
+			public boolean onTouch(View v, MotionEvent event) {
+				// TODO groß/klein togglen (schön wäre mit Animation); 
+				// TODO eventuell durch ändern des Style bei klein auch die Schrift kleiner machen 
+				return false;
+			}
+		});
+		
+		mPersistence = new SessionPersistence(this);
 	}
 
 	/** 
@@ -160,7 +172,7 @@ public class MyMapActivity extends MapActivity implements LocationListener {
 					.setNegativeButton("Exit", 
 							new DialogInterface.OnClickListener() {
 								public void onClick(DialogInterface dialog, int id) {
-									MyMapActivity.this.finish();
+									MainActivity.this.finish();
 								}
 							});
 			return builder.create();
@@ -178,14 +190,17 @@ public class MyMapActivity extends MapActivity implements LocationListener {
 	@Override
 	public boolean onOptionsItemSelected(MenuItem item) {
 		switch(item.getItemId()) {
-		case R.id.miToggle:
-			ViewFlipper flipper = (ViewFlipper)findViewById(R.id.flipper);
-			flipper.showNext();			
+		case R.id.miNew:
+			reset();
+			mMapView.invalidate();								// re-render path
 			return true;
+		case R.id.miLoad:
+			Intent intent = new Intent(this, SessionListActivity.class);
+			startActivityForResult(intent, REQUEST_LOAD_SESSION);
 		}
 		return super.onOptionsItemSelected(item);
 	}
-	
+
 	public void onStartClicked(View view) {
 		mStartButton.setVisibility(View.GONE);
 		mPauseButton.setVisibility(View.VISIBLE);
@@ -196,8 +211,6 @@ public class MyMapActivity extends MapActivity implements LocationListener {
 		mMapView.invalidate();								// re-render path
 		mTimerTask = new TimerTask();
 		mTimerTask.execute(0L);	// TODO bei start/stop/start später andere Startzeit???
-		mDistanceView.setTextColor(COLOR_RUNNING);
-		mTimerView.setTextColor(COLOR_RUNNING);
 		mLocationMgr.requestLocationUpdates(LocationManager.GPS_PROVIDER, MIN_TIME, MIN_DISTANCE, this);
 		
 		mWakeLock.acquire();								// standby verhindern
@@ -207,7 +220,9 @@ public class MyMapActivity extends MapActivity implements LocationListener {
 		mPauseButton.setVisibility(View.GONE);
 		mResumeButton.setVisibility(View.VISIBLE);
 		
-		mWakeLock.release();		
+		if (mWakeLock.isHeld()) {
+			mWakeLock.release();
+		}
 	}
 	
 	public void onResumeClicked(View view) {
@@ -226,11 +241,11 @@ public class MyMapActivity extends MapActivity implements LocationListener {
 		mSessionState = IDLE;
 		mTimerTask.cancel(true);
 		mTimerTask = null;
-		mDistanceView.setTextColor(COLOR_IDLE);
-		mTimerView.setTextColor(COLOR_IDLE);
 		mLocationMgr.removeUpdates(this);
 		
-		mWakeLock.release();		
+		if (mWakeLock.isHeld()) {
+			mWakeLock.release();
+		}
 	}
 
 	public void onDiscardClicked(View view) {
@@ -243,8 +258,8 @@ public class MyMapActivity extends MapActivity implements LocationListener {
 	
 	public void onSaveClicked(View view) {
 		try {
-			SessionPersistence.save(Util.uniqueFilename(), "notizen", mTime, mPathLength, mPositions, true);
-			mSaveButton.setEnabled(false);
+			Session session = new Session(Util.uniqueFilename(), "notizen", System.currentTimeMillis(), mTime, mPathLength, mPositions);
+			mPersistence.save(session);
 		} catch (Exception e) {
 			Log.e("trackx", "saving failed", e);
 			Toast.makeText(this, "saving failed: "+e.getMessage(), Toast.LENGTH_LONG).show();
@@ -260,10 +275,23 @@ public class MyMapActivity extends MapActivity implements LocationListener {
 	
 	@Override
 	protected void onActivityResult(int requestCode, int resultCode, Intent data) {
-		if (requestCode == REQUEST_ENABLING_GPS) {
+		switch(requestCode) {
+		case REQUEST_ENABLING_GPS:
 			// see if user enabled GPS
 			if (!mLocationMgr.isProviderEnabled(LocationManager.GPS_PROVIDER)) {
 				showDialog(DIALOG_ENABLE_GPS);	// if not, once again ask to enable it.
+			}
+			
+		case REQUEST_LOAD_SESSION:
+			if (resultCode == RESULT_OK) {
+				long id = data.getLongExtra("id", -1);
+				reset();
+				Session session = mPersistence.load(id);
+				setPathLength(session.distance);
+				setTime(session.time);
+				mPositions.clear();
+				mPositions.addAll(session.positions);	// mPositions 
+				mMapView.invalidate();
 			}
 		}
 	}
@@ -308,6 +336,11 @@ public class MyMapActivity extends MapActivity implements LocationListener {
 	
 	// -------------------------------------------------------------------------------------- MapActivity Implementation
 
+	@Override
+	protected boolean isLocationDisplayed() {
+		return true;
+	}
+	
 	@Override
 	protected boolean isRouteDisplayed() {
 		return false;

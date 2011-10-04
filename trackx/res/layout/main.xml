@@ -4,21 +4,11 @@
     android:layout_width="fill_parent"
     android:layout_height="fill_parent"
     >
-    <ViewFlipper android:id="@+id/flipper"
+    <FrameLayout
     	android:layout_width="fill_parent"
 		android:layout_height="0dp"
 		android:layout_weight="1"
 		>
-		<LinearLayout 
-		    android:orientation="vertical"
-	        android:layout_width="fill_parent"
-			android:layout_height="fill_parent"
-			>
-		    <TextView android:layout_height="wrap_content" android:layout_width="wrap_content" android:id="@+id/time" android:text="00:00" android:layout_gravity="right" style="@style/LargeNumber"></TextView>
-		    <TextView android:layout_height="wrap_content" android:layout_width="wrap_content" android:id="@+id/distance" android:text="0" android:layout_gravity="right" style="@style/LargeNumber"></TextView>
-		    <TextView android:layout_height="wrap_content" android:layout_width="wrap_content" android:id="@+id/pace" android:text="0.0" android:layout_gravity="right" style="@style/LargeNumber"></TextView>
-		</LinearLayout>
-
 	    <!-- apiKey ist für debug.keystore; später für meinen echten keystore entsprechend generieren. siehe http://code.google.com/intl/de-DE/android/add-ons/google-apis/mapkey.html -->
 	    <com.google.android.maps.MapView
 	        android:id="@+id/mapview"
@@ -27,7 +17,83 @@
 	        android:clickable="true"
 	        android:apiKey="0b1q8jJRIEIM__hPmDWDTiVFhc58Z9QxamMPRGA" 
 	        />
-    </ViewFlipper>
+
+		<LinearLayout
+			android:id="@+id/dataArea"
+		    android:orientation="vertical"
+	        android:layout_width="fill_parent"
+			android:layout_height="wrap_content"
+			android:background="#88000000"
+			>
+			<!-- first line -->
+			<LinearLayout 
+				android:orientation="horizontal"
+	        	android:layout_width="fill_parent"
+				android:layout_height="wrap_content" android:layout_marginLeft="4dp" android:layout_marginRight="4dp">
+				
+				<!-- time part -->
+				<LinearLayout 
+		    		android:orientation="vertical"
+	        		android:layout_width="0dp"
+					android:layout_height="wrap_content"
+					android:layout_weight="0.5"
+				>
+				    <TextView android:layout_height="wrap_content" android:layout_width="wrap_content" android:id="@+id/time" android:text="00:00" android:layout_gravity="right" style="@style/LargeNumber"></TextView>
+				    <TextView android:layout_height="wrap_content" android:layout_width="wrap_content" android:layout_gravity="right" android:id="@+id/timeLabel" style="@style/NumberLabel" android:text="TIME · H:MM:SS"></TextView>
+				</LinearLayout>			
+
+				<!-- distance part -->
+				<LinearLayout 
+		    		android:orientation="vertical"
+	        		android:layout_width="0dp"
+					android:layout_height="wrap_content"
+					android:layout_weight="0.5"
+				>
+				    <TextView android:layout_height="wrap_content" android:layout_width="wrap_content" android:id="@+id/distance" android:text="0" android:layout_gravity="right" style="@style/LargeNumber"></TextView>
+				    <TextView android:layout_height="wrap_content" android:layout_width="wrap_content" android:layout_gravity="right" android:id="@+id/distanceLabel" style="@style/NumberLabel" android:text="DISTANCE · KM"></TextView>
+				</LinearLayout>	
+
+			</LinearLayout> <!-- first line -->
+
+			<!-- second line -->
+			<LinearLayout 
+				android:orientation="horizontal"
+	        	android:layout_width="fill_parent"
+				android:layout_height="wrap_content" android:layout_marginLeft="4dp" android:layout_marginRight="4dp">
+				
+				<!-- current speed part -->
+				<LinearLayout 
+		    		android:orientation="vertical"
+	        		android:layout_width="0dp"
+					android:layout_height="wrap_content"
+					android:layout_weight="0.5"
+				>
+				    <TextView android:layout_height="wrap_content" android:layout_width="wrap_content" android:id="@+id/pace" android:text="0.0" android:layout_gravity="right" style="@style/LargeNumber"></TextView>
+				    <TextView android:layout_height="wrap_content" android:layout_width="wrap_content" android:layout_gravity="right" android:id="@+id/paceLabel" style="@style/NumberLabel" android:text="PACE · KM/H"></TextView>
+				</LinearLayout>			
+
+				<!-- avg. speed part -->
+				<LinearLayout 
+		    		android:orientation="vertical"
+	        		android:layout_width="0dp"
+					android:layout_height="wrap_content"
+					android:layout_weight="0.5"
+				>
+				    <TextView android:layout_height="wrap_content" android:layout_width="wrap_content" android:id="@+id/averagePace" android:text="0" android:layout_gravity="right" style="@style/LargeNumber"></TextView>
+				    <TextView android:layout_height="wrap_content" android:layout_width="wrap_content" android:layout_gravity="right" android:id="@+id/averagePaceLabel" style="@style/NumberLabel" android:text="AVG.PACE · KM/H"></TextView>
+				</LinearLayout>	
+
+			</LinearLayout> <!-- second line -->
+			
+			<!-- add some space at the bottom -->
+			<View 
+				android:layout_width="fill_parent"
+				android:layout_height="14dp"
+			/>
+
+		</LinearLayout>
+	
+	</FrameLayout>    
 
     <LinearLayout android:layout_width="match_parent" android:layout_height="wrap_content" android:id="@+id/linearLayout1">
         <Button android:layout_weight="1" android:fadeScrollbars="false" android:text="Start" android:onClick="onStartClicked" android:layout_height="wrap_content" android:layout_width="0dp" android:id="@+id/start" style="@style/LargeButton"></Button>

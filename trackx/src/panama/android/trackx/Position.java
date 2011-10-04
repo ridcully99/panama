@@ -15,6 +15,7 @@
  */
 package panama.android.trackx;
 
+import android.content.ContentValues;
 import android.location.Location;
 
 import com.google.android.maps.GeoPoint;
@@ -37,5 +38,18 @@ public class Position {
 	
 	public String toString() {
 		return location.getLatitude()+";"+location.getLongitude()+";"+location.getAccuracy()+";"+distance;
+	}
+
+	/** write our data to be saved to provided cv */
+	public void applyTo(ContentValues cv) {
+		cv.put(SessionPersistence.TIME, location.getTime());
+		cv.put(SessionPersistence.LATITUDE, location.getLatitude());
+		cv.put(SessionPersistence.LONGITUDE, location.getLongitude());
+		cv.put(SessionPersistence.ALTITUDE, location.getAltitude());
+		cv.put(SessionPersistence.ACCURACY, location.getAccuracy());
+		cv.put(SessionPersistence.SPEED, location.getSpeed());
+		cv.put(SessionPersistence.BEARING, location.getBearing());
+		cv.put(SessionPersistence.PROVIDER, location.getProvider());
+		cv.put(SessionPersistence.DISTANCE, distance);
 	}
 }
