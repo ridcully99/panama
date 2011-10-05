@@ -95,7 +95,7 @@
 	
 	</FrameLayout>    
 
-    <LinearLayout android:layout_width="match_parent" android:layout_height="wrap_content" android:id="@+id/linearLayout1">
+    <LinearLayout android:layout_width="fill_parent" android:layout_height="wrap_content" android:id="@+id/linearLayout1">
         <Button android:layout_weight="1" android:fadeScrollbars="false" android:text="Start" android:onClick="onStartClicked" android:layout_height="wrap_content" android:layout_width="0dp" android:id="@+id/start" style="@style/LargeButton"></Button>
         <Button android:layout_height="wrap_content" android:layout_weight="1" android:layout_width="0dp" android:id="@+id/pause" android:text="Pause" android:visibility="gone" android:onClick="onPauseClicked" style="@style/LargeButton"></Button>
         <Button android:layout_height="wrap_content" android:layout_weight="1" android:layout_width="0dp" android:id="@+id/resume" android:text="Resume" android:visibility="gone" android:onClick="onResumeClicked" style="@style/LargeButton"></Button>

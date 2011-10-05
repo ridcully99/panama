@@ -21,7 +21,6 @@ import android.graphics.Paint.Style;
 import android.graphics.Path;
 import android.graphics.Point;
 import android.location.Location;
-import android.os.Bundle;
 
 import com.google.android.maps.MapView;
 import com.google.android.maps.Overlay;
@@ -32,14 +31,12 @@ import com.google.android.maps.Overlay;
  */
 public class MyLocationOverlay extends Overlay {
 
-	private MainActivity mMainActivity;
+	private Location mCurrentLocation;
 	private Paint mArrowPaint;
 	private Path mPath;
 	private Point mHelperPoint = new Point();
 	
-	public MyLocationOverlay(MainActivity activity, Bundle savedInstanceState) {
-		mMainActivity = activity;
-
+	public MyLocationOverlay() {
 		mPath = new Path();
 		mArrowPaint = new Paint();
 		mArrowPaint.setAntiAlias(true);
@@ -49,21 +46,24 @@ public class MyLocationOverlay extends Overlay {
 		mArrowPaint.setStrokeCap(Paint.Cap.BUTT);
 	}
 	
+	public void setLocation(Location location) {
+		mCurrentLocation = location;
+	}
+	
 	@Override
 	public void draw(Canvas canvas, MapView mapView, boolean shadow) {
 		if (shadow) {
 			return;	// we don't have a shadow.
 		}
-		Location currentLocation = mMainActivity.mCurrentLocation;
-		if (currentLocation != null) {
-			mapView.getProjection().toPixels(Util.locationToGeoPoint(currentLocation), mHelperPoint);
+		if (mCurrentLocation != null) {
+			mapView.getProjection().toPixels(Util.locationToGeoPoint(mCurrentLocation), mHelperPoint);
 			canvas.save();
 			canvas.translate(mHelperPoint.x, mHelperPoint.y);
-			canvas.rotate(currentLocation.getBearing());
+			canvas.rotate(mCurrentLocation.getBearing());
 			canvas.scale(0.5f, -0.5f);	// scale to mirror on x-axis and adopt size -- easier than changing all coords below ;-)
 
 			// draw accuray circle
-			float radius = Util.metersToRadius(currentLocation.getAccuracy(), mapView, currentLocation.getLatitude());
+			float radius = Util.metersToRadius(mCurrentLocation.getAccuracy(), mapView, mCurrentLocation.getLatitude());
 			canvas.drawCircle(0, 0, radius, mArrowPaint);
 
 			// draw filled arrow with border

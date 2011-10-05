@@ -37,8 +37,7 @@ public class PathOverlay extends Overlay {
 	private Paint mPathPaint;
 	private Point mHelperPoint = new Point();
 	
-	public PathOverlay(List<Position> positions, Bundle savedInstanceState) {
-		mPositions = positions;
+	public PathOverlay() {
 		mPath = new Path();
 		mPathPaint = new Paint();
 		mPathPaint.setAntiAlias(true);
@@ -51,12 +50,16 @@ public class PathOverlay extends Overlay {
 		// TODO rebuild mPoints from savedInstanceState (if not null)
 	}
 	
+	public void setPositions(List<Position> positions) {
+		mPositions = positions;
+	}
+	
 	@Override
 	public void draw(Canvas canvas, MapView mapView, boolean shadow) {
 		if (shadow) {
 			return;	// we don't have a shadow.
 		}
-		if (mPositions.size() > 0) {
+		if (mPositions != null && mPositions.size() > 0) {
 			// path jedesmal neu aufbauen weil sich zoom und scroll ver�ndert haben k�nnten
 			// TODO? hier ist ggf. Optimierungspotential -- so lang sich zoom und scroll nicht �ndern m�sste der Pfad nicht neu gebaut werden, sondern es k�nnte die letzte Position einfach angeh�ngt werden
 			mPath.reset();
