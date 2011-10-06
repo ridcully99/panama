@@ -10,6 +10,7 @@ import android.content.DialogInterface;
 import android.content.Intent;
 import android.content.ServiceConnection;
 import android.location.Location;
+import android.location.LocationManager;
 import android.os.Bundle;
 import android.os.IBinder;
 import android.os.PowerManager;
@@ -54,6 +55,8 @@ public class MainActivity extends MapActivity implements TrackerService.Listener
 	private SessionPersistence mPersistence = new SessionPersistence(this);
 	private TrackerService mService;
 	private boolean mBound;	// whether bound to service
+	
+	private LocationManager mLocationMgr = (LocationManager) getSystemService(Context.LOCATION_SERVICE);
 	
 	/** Called when the activity is first created. */
 	@Override
@@ -106,9 +109,9 @@ public class MainActivity extends MapActivity implements TrackerService.Listener
 	protected void onResume() {
 		super.onResume();
 		
-		//if (!mLocationMgr.isProviderEnabled(LocationManager.GPS_PROVIDER)) {
-		//	showDialog(DIALOG_ENABLE_GPS);
-		//} else {
+		if (!mLocationMgr.isProviderEnabled(LocationManager.GPS_PROVIDER)) {
+			showDialog(DIALOG_ENABLE_GPS);
+		} //else {
 		//	if (sessionState == IDLE && !Util.isUpToDate(currentLocation)) {
 		//		currentLocation = null;
 		//		mWaitingDialog = ProgressDialog.show(this, "", "Finding current location...", true);
@@ -161,9 +164,9 @@ public class MainActivity extends MapActivity implements TrackerService.Listener
 	
 	@Override
 	public boolean onCreateOptionsMenu(Menu menu) {
-	    MenuInflater inflater = getMenuInflater();
-	    inflater.inflate(R.menu.menu, menu);
-	    return true;
+		MenuInflater inflater = getMenuInflater();
+		inflater.inflate(R.menu.menu, menu);
+		return true;
 	}
 	
 	@Override
@@ -302,23 +305,23 @@ public class MainActivity extends MapActivity implements TrackerService.Listener
 
 	// ------------------------------------------------------------------------------------------------- service connection
 	
-    /** Defines callbacks for service binding, passed to bindService() */
-    private ServiceConnection mConnection = new ServiceConnection() { /* nice trick with anonymous class */
+	/** Defines callbacks for service binding, passed to bindService() */
+	private ServiceConnection mConnection = new ServiceConnection() { /* nice trick with anonymous class */
 
-        @Override
-        public void onServiceConnected(ComponentName className, IBinder service) {
-            // We've bound to LocalService, cast the IBinder and get LocalService instance
-            LocalBinder binder = (LocalBinder) service;
-            mService = binder.getService();
-            mBound = true;
-            mService.addListener(MainActivity.this);
-    		mService.startTracking();
-        }
+		@Override
+		public void onServiceConnected(ComponentName className, IBinder service) {
+			// We've bound to LocalService, cast the IBinder and get LocalService instance
+			LocalBinder binder = (LocalBinder) service;
+			mService = binder.getService();
+			mBound = true;
+			mService.addListener(MainActivity.this);
+			mService.startTracking();
+		}
 
-        @Override
-        public void onServiceDisconnected(ComponentName className) {
-            mBound = false;
-        }
-    };	
+		@Override
+		public void onServiceDisconnected(ComponentName className) {
+			mBound = false;
+		}
+	};	
 
 }

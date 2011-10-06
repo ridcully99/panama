@@ -57,7 +57,25 @@
 5.10.2011
 + Auf Service umgestellt fürs Tracking/Recording
 
-TODO: Foreground Service machen
+6.10.2011
+
+TODO: 
+Start: sicherstellen dass GPS aktiviert. 
+Start erst ermöglichen wenn die aktuelle Position "gut genug" ist (aktuell auf x Sekunden und akkurat auf y Meter)
+Bei Start das Service starten und mich hin-"binden".
+Service so umbauen dass ich ihm eine Referenz auf meine Session (in MainActivity) gebe 
+und das Service diese updatet, Werte reinschreibt usw. und mich dann immer informiert dass sich was geändert hat.
+Dann update ich das PathOverlay und die Zahlen.
+Bei Stop vom Service trennen und dieses beenden (alle Sessiondaten hab ich eh bei mir).
+
+Tracken der Position für Feststellung ob gut genug für Start und Darstellung von MyPosition in der Activity machen.
+
+TODO: Nur GPS
+
+TODO: Service nur fürs Recording; dann als Foreground Service machen, mit Notification
+sessionState und Tracking der current location in der Activity.
+
+
 
 Layout-Rework: Zahlen entweder in Scroll-Layout zum rauf/runterscrollen (mit Snap),
 oder mit VISIBLE/GONE die Zusatzzahlen ein-/ausblenden per Knopfdruck auf erste Zahl oder Icon
@@ -72,21 +90,13 @@ TODO: Buttons weiter reinrücken damit nicht ungfahr gedrückt werden
 TODO: Kompatibel zu Android 2.1 machen
 
 TODO: Für gespeicherte Sessions statt den Buttons unten einen Schieberegler zum Durchscrollen der Route
-      (Sobald das Speichern einer Session fertig ist, auch diesen Schieberegler anzeigen, statt wie bisher das Save zu disablen)
-      Dafür dann 2 PathOverlays machen (ev. einmal erben oder sowas):
-      - einer der ganze Strecke in gedämpfter Farbe zeigt, und
-      - einer der Strecke von Start bis akt. Markerposition stark färbig zeigt.
-      Zeichnen: zuerst den ganzen gedämpften, darüber den teilweisen (gleiche Positions, einfach abbrechen an entsprechender Stelle) 
-
-TODO: Menüpunkt "New Session" -> reset() + Startbutton anzeigen
+	(Sobald das Speichern einer Session fertig ist, auch diesen Schieberegler anzeigen, statt wie bisher das Save zu disablen)
+	Dafür dann 2 PathOverlays machen (ev. einmal erben oder sowas):
+	- einer der ganze Strecke in gedämpfter Farbe zeigt, und
+	- einer der Strecke von Start bis akt. Markerposition stark färbig zeigt.
+	Zeichnen: zuerst den ganzen gedämpften, darüber den teilweisen (gleiche Positions, einfach abbrechen an entsprechender Stelle) 
 
 TODO: Speichern mit Kommentar, Typ (Laufen, Radln, Wandern, ...), Route (Auswahl aus bereits eingegebenen, oder neuen Namen eingeben)
-
-TODO: Altitude tracken und Anzeigen von Rauf- und Runter H�hen?
-
-TODO: Slider für Schnelldurchlauf durch gespeicherte Pfade.
-
-TODO: Notification wenn aufgezeichnet wird  
 
 TODO: wenn geht (oder als Option) die Karte drehen sodass Pfeil immer "nach oben" zeigt, i.e. in Laufrichtung.
 
