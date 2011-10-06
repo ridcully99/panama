@@ -16,7 +16,6 @@
 package panama.android.trackx;
 
 import java.util.Date;
-import java.util.logging.SimpleFormatter;
 
 import android.location.Location;
 import android.text.format.DateFormat;
@@ -31,7 +30,10 @@ import com.google.android.maps.MapView;
  */
 public class Util {
 
-	public final static long UP_TO_DATE_MILLIS = 60 * 1000;	// 60 Sekunden gelten als Up To Date
+	public final static int SECOND_IN_MILLIS = 1000;
+	public final static long UP_TO_DATE_MILLIS = 60 * SECOND_IN_MILLIS;	// 60 Sekunden gelten als Up To Date
+	
+
 	
 	/**
 	 * Check if location is up to date
@@ -83,7 +85,49 @@ public class Util {
 		return String.format("%.1f", kmh);
 	}
 
-	public static String uniqueFilename() {
+	public static String createUniqueName() {
 		return "trackx-session-"+DateFormat.format("yyyy-MM-dd-kk-mm-ss", new Date());
 	}
+	
+	/** 
+	 * check if candidate is a better location than reference, based on age and accuracy.
+	 * 
+	 * based on http://developer.android.com/guide/topics/location/obtaining-user-location.html
+	 */
+	
+	public static boolean isBetterLocation(Location reference, Location candidate) {
+		long deltaTime = candidate.getTime() - reference.getTime();
+		if (deltaTime > 30*SECOND_IN_MILLIS) {	// location is significantly newer than current location --> accept new one.
+			return true;
+		}
+		if (!candidate.hasAccuracy()) {
+			return false;
+		}
+		// Check whether the new location fix is more or less accurate
+		int accuracyDelta = (int) (candidate.getAccuracy() - reference.getAccuracy());
+		boolean isLessAccurate = accuracyDelta > 0;
+		boolean isMoreAccurate = accuracyDelta < 0;
+		boolean isSignificantlyLessAccurate = accuracyDelta > 200;
+
+		// Check if the old and new location are from the same provider
+		boolean isFromSameProvider = isSameProvider(candidate.getProvider(), reference.getProvider());
+
+		// Determine location quality using a combination of timeliness and accuracy
+		if (isMoreAccurate) {
+			return true;
+		} else if (!isLessAccurate) {
+			return true;
+		} else if (!isSignificantlyLessAccurate && isFromSameProvider) {
+			return true;
+		}
+		return false;		
+	}
+	
+	/** Checks whether two providers are the same */
+	private static boolean isSameProvider(String provider1, String provider2) {
+		if (provider1 == null) {
+		return provider2 == null;
+		}
+		return provider1.equals(provider2);
+	}	
 }

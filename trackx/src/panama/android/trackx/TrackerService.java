@@ -39,9 +39,8 @@ import android.os.IBinder;
  */
 public class TrackerService extends Service {
 
-	public final static int SECOND_IN_MILLIS = 1000;
 	public final static int MIN_DISTANCE = 5; 						   // in meters; 5 ist in MyTracks empfohlen das von Google-Leuten gemacht wird
-	public final static int MIN_TIME = 1*SECOND_IN_MILLIS;
+	public final static int MIN_TIME = 1*Util.SECOND_IN_MILLIS;
 	
 	public final static int IDLE = 0;
 	public final static int PAUSED = 1;
@@ -150,7 +149,7 @@ public class TrackerService extends Service {
 		@Override
 		public void onLocationChanged(Location location) {
 	
-			if (!isAcceptableLocation(location)) {
+			if (!Util.isBetterLocation(currentLocation, location)) {
 				return;
 			}
 			
@@ -171,44 +170,6 @@ public class TrackerService extends Service {
 				l.onLocationChanged(location);
 			}
 		}
-	
-		private boolean isAcceptableLocation(Location location) {
-	
-			// based on http://developer.android.com/guide/topics/location/obtaining-user-location.html
-			long deltaTime = location.getTime() - currentLocation.getTime();
-			if (deltaTime > 30*SECOND_IN_MILLIS) {	// location is significantly newer than current location --> accept new one.
-				return true;
-			}
-			if (!location.hasAccuracy()) {
-				return false;
-			}
-		    // Check whether the new location fix is more or less accurate
-		    int accuracyDelta = (int) (location.getAccuracy() - currentLocation.getAccuracy());
-		    boolean isLessAccurate = accuracyDelta > 0;
-		    boolean isMoreAccurate = accuracyDelta < 0;
-		    boolean isSignificantlyLessAccurate = accuracyDelta > 200;
-	
-		    // Check if the old and new location are from the same provider
-		    boolean isFromSameProvider = isSameProvider(location.getProvider(), currentLocation.getProvider());
-	
-		    // Determine location quality using a combination of timeliness and accuracy
-		    if (isMoreAccurate) {
-		        return true;
-		    } else if (!isLessAccurate) {
-		        return true;
-		    } else if (!isSignificantlyLessAccurate && isFromSameProvider) {
-		        return true;
-		    }
-		    return false;		
-		}
-		
-		/** Checks whether two providers are the same */
-		private boolean isSameProvider(String provider1, String provider2) {
-		    if (provider1 == null) {
-		      return provider2 == null;
-		    }
-		    return provider1.equals(provider2);
-		}	
 		
 		@Override
 		public void onProviderDisabled(String provider) {
@@ -258,7 +219,8 @@ public class TrackerService extends Service {
 		protected void onProgressUpdate(Long... values) {
 			// notify listeners
 			for (Listener l : mListeners) {
-				l.onTimerChanged(values[0]);
+				timeMillis = values[0];
+				l.onTimerChanged(timeMillis);
 			}
 		}
 
@@ -298,7 +260,7 @@ public class TrackerService extends Service {
 
 	/** stop tracking (when IDLE und Activity geht auf Pause) */
 	public void stopTracking() {
-		 mLocationMgr.removeUpdates(mLocationListener);
+		mLocationMgr.removeUpdates(mLocationListener);
 	}
 
 	public void startTracking() {

@@ -224,7 +224,7 @@ public class MainActivity extends MapActivity implements TrackerService.Listener
 	
 	public void onSaveClicked(View view) {
 		try {
-			Session session = new Session(Util.uniqueFilename(), "notizen", System.currentTimeMillis(), mService.timeMillis, mService.pathLength, mService.positions);
+			Session session = new Session(Util.createUniqueName(), "notizen", System.currentTimeMillis(), mService.timeMillis, mService.pathLength, mService.positions);
 			mPersistence.save(session);
 		} catch (Exception e) {
 			Log.e("trackx", "saving failed", e);
