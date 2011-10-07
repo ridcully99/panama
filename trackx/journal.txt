@@ -57,24 +57,17 @@
 5.10.2011
 + Auf Service umgestellt fürs Tracking/Recording
 
-6.10.2011
+6.10.2011...
 
-TODO: 
-Start: sicherstellen dass GPS aktiviert. 
-Start erst ermöglichen wenn die aktuelle Position "gut genug" ist (aktuell auf x Sekunden und akkurat auf y Meter)
-Bei Start das Service starten und mich hin-"binden".
-Service so umbauen dass ich ihm eine Referenz auf meine Session (in MainActivity) gebe 
-und das Service diese updatet, Werte reinschreibt usw. und mich dann immer informiert dass sich was geändert hat.
-Dann update ich das PathOverlay und die Zahlen.
-Bei Stop vom Service trennen und dieses beenden (alle Sessiondaten hab ich eh bei mir).
+7.10.2011
++ ganz viel herumgebaut, schaut jetzt vom Ablauf schon ganz gut aus, Layout ist noch immer unklar...
++ Foreground Service + Notification
 
-Tracken der Position für Feststellung ob gut genug für Start und Darstellung von MyPosition in der Activity machen.
-
-TODO: Nur GPS
-
-TODO: Service nur fürs Recording; dann als Foreground Service machen, mit Notification
-sessionState und Tracking der current location in der Activity.
-
+TODO: Notification startet Activity immer neu (auch wenn schon existiert...) hatte TE auch, das Problem
+      Eigentlich aber vorerst ein guter Test, weil eigentlich sollte sich die Activity dann ja gleich wieder alles
+      holen vom Service und gleich weitermachen -- tuts aber z.Zt. überhaupt nicht.
+      (da müsste ich bei onCreate ode wo schau'n ob mService.isRunning und dann gleich die Buttons umschalten und
+      onLocationChanged(mService.currentLocation) aufrufen zum Bildaufbau.
 
 
 Layout-Rework: Zahlen entweder in Scroll-Layout zum rauf/runterscrollen (mit Snap),

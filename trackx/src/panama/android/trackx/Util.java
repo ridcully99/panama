@@ -18,6 +18,7 @@ package panama.android.trackx;
 import java.util.Date;
 
 import android.location.Location;
+import android.location.LocationManager;
 import android.text.format.DateFormat;
 import android.util.FloatMath;
 
@@ -31,19 +32,9 @@ import com.google.android.maps.MapView;
 public class Util {
 
 	public final static int SECOND_IN_MILLIS = 1000;
-	public final static long UP_TO_DATE_MILLIS = 60 * SECOND_IN_MILLIS;	// 60 Sekunden gelten als Up To Date
+	public final static int MAX_STARTOK_FIX_ACCURACY = 100;
+	public final static long MAX_STARTOK_FIX_AGE = 30 * SECOND_IN_MILLIS;
 	
-
-	
-	/**
-	 * Check if location is up to date
-	 * @param location may be null
-	 * @return
-	 */
-	public static boolean isUpToDate(Location location) {
-		return location != null && (System.currentTimeMillis() - location.getTime()) <= UP_TO_DATE_MILLIS;
-	}
-
 	/**
 	 * Location -> GeoPoint
 	 * @param location not null
@@ -89,13 +80,24 @@ public class Util {
 		return "trackx-session-"+DateFormat.format("yyyy-MM-dd-kk-mm-ss", new Date());
 	}
 	
+	/** check if location is OK for starting session */
+	public static boolean isOKforStart(Location location) {
+		return  location != null &&
+				LocationManager.GPS_PROVIDER.equals(location.getProvider()) &&
+				location.hasAccuracy() &&
+				location.getAccuracy() <= MAX_STARTOK_FIX_ACCURACY &&
+				(System.currentTimeMillis() - location.getTime()) <= MAX_STARTOK_FIX_AGE;
+	}
+	
 	/** 
 	 * check if candidate is a better location than reference, based on age and accuracy.
 	 * 
 	 * based on http://developer.android.com/guide/topics/location/obtaining-user-location.html
 	 */
-	
 	public static boolean isBetterLocation(Location reference, Location candidate) {
+		if (reference == null) {
+			return true;
+		}
 		long deltaTime = candidate.getTime() - reference.getTime();
 		if (deltaTime > 30*SECOND_IN_MILLIS) {	// location is significantly newer than current location --> accept new one.
 			return true;

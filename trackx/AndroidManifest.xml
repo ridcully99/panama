@@ -34,4 +34,5 @@
 	<uses-permission android:name="android.permission.WRITE_EXTERNAL_STORAGE" /><!-- for saving data -->
 	<uses-permission android:name="android.permission.WAKE_LOCK" />				<!-- for preventing stand by while running -->
 	
+	<uses-permission android:name="android.permission.ACCESS_MOCK_LOCATION"/>	<!-- during development -->
 </manifest>

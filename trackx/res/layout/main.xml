@@ -39,7 +39,7 @@
 					android:layout_weight="0.5"
 				>
 				    <TextView android:layout_height="wrap_content" android:layout_width="wrap_content" android:id="@+id/time" android:text="00:00" android:layout_gravity="right" style="@style/LargeNumber"></TextView>
-				    <TextView android:layout_height="wrap_content" android:layout_width="wrap_content" android:layout_gravity="right" android:id="@+id/timeLabel" style="@style/NumberLabel" android:text="TIME · H:MM:SS"></TextView>
+				    <TextView android:layout_height="wrap_content" android:layout_width="wrap_content" android:layout_gravity="right" android:id="@+id/timeLabel" style="@style/NumberLabel" android:text="TIME"></TextView>
 				</LinearLayout>			
 
 				<!-- distance part -->
@@ -49,14 +49,15 @@
 					android:layout_height="wrap_content"
 					android:layout_weight="0.5"
 				>
-				    <TextView android:layout_height="wrap_content" android:layout_width="wrap_content" android:id="@+id/distance" android:text="0" android:layout_gravity="right" style="@style/LargeNumber"></TextView>
-				    <TextView android:layout_height="wrap_content" android:layout_width="wrap_content" android:layout_gravity="right" android:id="@+id/distanceLabel" style="@style/NumberLabel" android:text="DISTANCE · KM"></TextView>
+				    <TextView android:layout_height="wrap_content" android:layout_width="wrap_content" android:id="@+id/distance" android:text="0.00" android:layout_gravity="right" style="@style/LargeNumber"></TextView>
+				    <TextView android:layout_height="wrap_content" android:layout_width="wrap_content" android:layout_gravity="right" android:id="@+id/distanceLabel" style="@style/NumberLabel" android:text="DISTANCE - KM"></TextView>
 				</LinearLayout>	
 
 			</LinearLayout> <!-- first line -->
 
 			<!-- second line -->
 			<LinearLayout 
+				android:id="@+id/numberLine2"
 				android:orientation="horizontal"
 	        	android:layout_width="fill_parent"
 				android:layout_height="wrap_content" android:layout_marginLeft="4dp" android:layout_marginRight="4dp">
@@ -68,8 +69,8 @@
 					android:layout_height="wrap_content"
 					android:layout_weight="0.5"
 				>
-				    <TextView android:layout_height="wrap_content" android:layout_width="wrap_content" android:id="@+id/pace" android:text="0.0" android:layout_gravity="right" style="@style/LargeNumber"></TextView>
-				    <TextView android:layout_height="wrap_content" android:layout_width="wrap_content" android:layout_gravity="right" android:id="@+id/paceLabel" style="@style/NumberLabel" android:text="PACE · KM/H"></TextView>
+				    <TextView android:layout_height="wrap_content" android:layout_width="wrap_content" android:id="@+id/pace" android:layout_gravity="right" style="@style/MediumNumber" android:text="0.0"></TextView>
+				    <TextView android:layout_height="wrap_content" android:layout_width="wrap_content" android:layout_gravity="right" android:id="@+id/paceLabel" style="@style/NumberLabel" android:text="PACE - KM/H"></TextView>
 				</LinearLayout>			
 
 				<!-- avg. speed part -->
@@ -79,8 +80,8 @@
 					android:layout_height="wrap_content"
 					android:layout_weight="0.5"
 				>
-				    <TextView android:layout_height="wrap_content" android:layout_width="wrap_content" android:id="@+id/averagePace" android:text="0" android:layout_gravity="right" style="@style/LargeNumber"></TextView>
-				    <TextView android:layout_height="wrap_content" android:layout_width="wrap_content" android:layout_gravity="right" android:id="@+id/averagePaceLabel" style="@style/NumberLabel" android:text="AVG.PACE · KM/H"></TextView>
+				    <TextView android:layout_height="wrap_content" android:layout_width="wrap_content" android:id="@+id/averagePace" android:text="0.0" android:layout_gravity="right" style="@style/MediumNumber"></TextView>
+				    <TextView android:layout_height="wrap_content" android:layout_width="wrap_content" android:layout_gravity="right" android:id="@+id/averagePaceLabel" style="@style/NumberLabel" android:text="AVERAGE PACE - KM/H"></TextView>
 				</LinearLayout>	
 
 			</LinearLayout> <!-- second line -->
@@ -96,7 +97,8 @@
 	</FrameLayout>    
 
     <LinearLayout android:layout_width="fill_parent" android:layout_height="wrap_content" android:id="@+id/linearLayout1">
-        <Button android:layout_weight="1" android:fadeScrollbars="false" android:text="Start" android:onClick="onStartClicked" android:layout_height="wrap_content" android:layout_width="0dp" android:id="@+id/start" style="@style/LargeButton"></Button>
+        <Button android:text="New Session" android:onClick="onNewSessionClicked" android:layout_height="wrap_content" android:id="@+id/newSession" style="@style/LargeButton" android:layout_width="fill_parent"></Button>
+        <Button android:layout_weight="1" android:text="Start" android:onClick="onStartClicked" android:layout_height="wrap_content" android:layout_width="0dp" android:id="@+id/start" android:visibility="gone" style="@style/LargeButton"></Button>
         <Button android:layout_height="wrap_content" android:layout_weight="1" android:layout_width="0dp" android:id="@+id/pause" android:text="Pause" android:visibility="gone" android:onClick="onPauseClicked" style="@style/LargeButton"></Button>
         <Button android:layout_height="wrap_content" android:layout_weight="1" android:layout_width="0dp" android:id="@+id/resume" android:text="Resume" android:visibility="gone" android:onClick="onResumeClicked" style="@style/LargeButton"></Button>
         <Button android:layout_height="wrap_content" android:id="@+id/stop" android:text="Stop" android:layout_weight="1" android:layout_width="0dp" android:onClick="onStopClicked" android:visibility="gone" style="@style/LargeButton"></Button>

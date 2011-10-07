@@ -15,6 +15,7 @@
  */
 package panama.android.trackx;
 
+import java.util.ArrayList;
 import java.util.List;
 
 import android.content.ContentValues;
@@ -33,6 +34,7 @@ public class Session {
 	public float distance;
 	
 	public Session() {
+		reset();
 	}
 	
 	public Session(String name, String notes, long timestamp, long time, float distance, List<Position> positions) {
@@ -44,6 +46,16 @@ public class Session {
 		this.positions = positions;
 	}
 
+	public void reset() {
+		time = 0;
+		distance = 0;
+		if (positions != null) {
+			positions.clear();
+		} else {
+			positions = new ArrayList<Position>();
+		}
+	}
+	
 	/** for persistence */
 	public ContentValues getContentValues() {
 		ContentValues cv = new ContentValues();

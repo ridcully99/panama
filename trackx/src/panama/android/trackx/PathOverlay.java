@@ -17,11 +17,12 @@ package panama.android.trackx;
 
 import java.util.List;
 
+import android.graphics.BlurMaskFilter;
 import android.graphics.Canvas;
+import android.graphics.MaskFilter;
 import android.graphics.Paint;
 import android.graphics.Path;
 import android.graphics.Point;
-import android.os.Bundle;
 
 import com.google.android.maps.MapView;
 import com.google.android.maps.Overlay;
@@ -45,7 +46,8 @@ public class PathOverlay extends Overlay {
 		mPathPaint.setStyle(Paint.Style.STROKE);
 		mPathPaint.setStrokeJoin(Paint.Join.ROUND);
 		mPathPaint.setStrokeCap(Paint.Cap.ROUND);
-		mPathPaint.setStrokeWidth(5);
+		mPathPaint.setStrokeWidth(7);
+		mPathPaint.setMaskFilter(new BlurMaskFilter(2f, BlurMaskFilter.Blur.NORMAL));
 
 		// TODO rebuild mPoints from savedInstanceState (if not null)
 	}
