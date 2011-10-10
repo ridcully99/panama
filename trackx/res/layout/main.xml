@@ -4,12 +4,20 @@
     android:layout_width="fill_parent"
     android:layout_height="fill_parent"
     >
-    <FrameLayout
-    	android:layout_width="fill_parent"
+    <LinearLayout android:id="@+id/linearLayout2" android:layout_height="wrap_content" android:layout_width="fill_parent" android:background="@drawable/titlebackground" android:paddingLeft="8dp" android:paddingRight="2dp">
+        <TextView android:layout_width="wrap_content" android:layout_height="wrap_content" android:id="@+id/title" android:text="@string/app_name" android:layout_weight="1" android:textSize="24dp" android:textColor="#cc8800" android:textStyle="bold"></TextView>
+        <Button android:layout_width="wrap_content" android:layout_height="wrap_content" android:id="@+id/viewSwitcher" android:onClick="onSwitchViewClicked" android:text="Map -&gt;"></Button>
+    </LinearLayout>
+    
+    <ViewAnimator 
+    	android:layout_width="fill_parent" 
 		android:layout_height="0dp"
 		android:layout_weight="1"
-		>
-	    <!-- apiKey ist für debug.keystore; später für meinen echten keystore entsprechend generieren. siehe http://code.google.com/intl/de-DE/android/add-ons/google-apis/mapkey.html -->
+    	android:id="@+id/container">
+
+		<include layout="@layout/numberpage" />
+	
+		<!-- apiKey ist für debug.keystore; später für meinen echten keystore entsprechend generieren. siehe http://code.google.com/intl/de-DE/android/add-ons/google-apis/mapkey.html -->
 	    <com.google.android.maps.MapView
 	        android:id="@+id/mapview"
 	        android:layout_width="fill_parent"
@@ -17,92 +25,17 @@
 	        android:clickable="true"
 	        android:apiKey="0b1q8jJRIEIM__hPmDWDTiVFhc58Z9QxamMPRGA" 
 	        />
-
-		<LinearLayout
-			android:id="@+id/dataArea"
-		    android:orientation="vertical"
-	        android:layout_width="fill_parent"
-			android:layout_height="wrap_content"
-			android:background="#88000000"
-			>
-			<!-- first line -->
-			<LinearLayout 
-				android:orientation="horizontal"
-	        	android:layout_width="fill_parent"
-				android:layout_height="wrap_content" android:layout_marginLeft="4dp" android:layout_marginRight="4dp">
-				
-				<!-- time part -->
-				<LinearLayout 
-		    		android:orientation="vertical"
-	        		android:layout_width="0dp"
-					android:layout_height="wrap_content"
-					android:layout_weight="0.5"
-				>
-				    <TextView android:layout_height="wrap_content" android:layout_width="wrap_content" android:id="@+id/time" android:text="00:00" android:layout_gravity="right" style="@style/LargeNumber"></TextView>
-				    <TextView android:layout_height="wrap_content" android:layout_width="wrap_content" android:layout_gravity="right" android:id="@+id/timeLabel" style="@style/NumberLabel" android:text="TIME"></TextView>
-				</LinearLayout>			
-
-				<!-- distance part -->
-				<LinearLayout 
-		    		android:orientation="vertical"
-	        		android:layout_width="0dp"
-					android:layout_height="wrap_content"
-					android:layout_weight="0.5"
-				>
-				    <TextView android:layout_height="wrap_content" android:layout_width="wrap_content" android:id="@+id/distance" android:text="0.00" android:layout_gravity="right" style="@style/LargeNumber"></TextView>
-				    <TextView android:layout_height="wrap_content" android:layout_width="wrap_content" android:layout_gravity="right" android:id="@+id/distanceLabel" style="@style/NumberLabel" android:text="DISTANCE - KM"></TextView>
-				</LinearLayout>	
-
-			</LinearLayout> <!-- first line -->
-
-			<!-- second line -->
-			<LinearLayout 
-				android:id="@+id/numberLine2"
-				android:orientation="horizontal"
-	        	android:layout_width="fill_parent"
-				android:layout_height="wrap_content" android:layout_marginLeft="4dp" android:layout_marginRight="4dp">
-				
-				<!-- current speed part -->
-				<LinearLayout 
-		    		android:orientation="vertical"
-	        		android:layout_width="0dp"
-					android:layout_height="wrap_content"
-					android:layout_weight="0.5"
-				>
-				    <TextView android:layout_height="wrap_content" android:layout_width="wrap_content" android:id="@+id/pace" android:layout_gravity="right" style="@style/MediumNumber" android:text="0.0"></TextView>
-				    <TextView android:layout_height="wrap_content" android:layout_width="wrap_content" android:layout_gravity="right" android:id="@+id/paceLabel" style="@style/NumberLabel" android:text="PACE - KM/H"></TextView>
-				</LinearLayout>			
-
-				<!-- avg. speed part -->
-				<LinearLayout 
-		    		android:orientation="vertical"
-	        		android:layout_width="0dp"
-					android:layout_height="wrap_content"
-					android:layout_weight="0.5"
-				>
-				    <TextView android:layout_height="wrap_content" android:layout_width="wrap_content" android:id="@+id/averagePace" android:text="0.0" android:layout_gravity="right" style="@style/MediumNumber"></TextView>
-				    <TextView android:layout_height="wrap_content" android:layout_width="wrap_content" android:layout_gravity="right" android:id="@+id/averagePaceLabel" style="@style/NumberLabel" android:text="AVERAGE PACE - KM/H"></TextView>
-				</LinearLayout>	
-
-			</LinearLayout> <!-- second line -->
-			
-			<!-- add some space at the bottom -->
-			<View 
-				android:layout_width="fill_parent"
-				android:layout_height="14dp"
-			/>
-
-		</LinearLayout>
 	
-	</FrameLayout>    
+	</ViewAnimator>
+ 
 
-    <LinearLayout android:layout_width="fill_parent" android:layout_height="wrap_content" android:id="@+id/linearLayout1">
-        <Button android:text="New Session" android:onClick="onNewSessionClicked" android:layout_height="wrap_content" android:id="@+id/newSession" style="@style/LargeButton" android:layout_width="fill_parent"></Button>
-        <Button android:layout_weight="1" android:text="Start" android:onClick="onStartClicked" android:layout_height="wrap_content" android:layout_width="0dp" android:id="@+id/start" android:visibility="gone" style="@style/LargeButton"></Button>
+    <LinearLayout android:layout_width="fill_parent" android:layout_height="wrap_content" android:id="@+id/linearLayout1" android:background="@drawable/titlebackground" android:paddingLeft="8dp" android:paddingRight="8dp" android:paddingTop="8dp" android:paddingBottom="8dp">
+        <Button android:layout_height="wrap_content" android:layout_weight="1" android:layout_width="0dp" android:id="@+id/newSession" android:text="New Session" android:onClick="onNewSessionClicked" style="@style/LargeButton"></Button>
+        <Button android:layout_height="wrap_content" android:layout_weight="1" android:layout_width="0dp" android:id="@+id/start" android:text="Start" android:onClick="onStartClicked" android:visibility="gone" style="@style/LargeButton"></Button>
         <Button android:layout_height="wrap_content" android:layout_weight="1" android:layout_width="0dp" android:id="@+id/pause" android:text="Pause" android:visibility="gone" android:onClick="onPauseClicked" style="@style/LargeButton"></Button>
         <Button android:layout_height="wrap_content" android:layout_weight="1" android:layout_width="0dp" android:id="@+id/resume" android:text="Resume" android:visibility="gone" android:onClick="onResumeClicked" style="@style/LargeButton"></Button>
-        <Button android:layout_height="wrap_content" android:id="@+id/stop" android:text="Stop" android:layout_weight="1" android:layout_width="0dp" android:onClick="onStopClicked" android:visibility="gone" style="@style/LargeButton"></Button>
-        <Button android:layout_height="wrap_content" android:layout_weight="1" android:layout_width="0dp" android:text="Discard" android:id="@+id/discard" android:visibility="gone" android:onClick="onDiscardClicked" style="@style/LargeButton"></Button>
+        <Button android:layout_height="wrap_content" android:layout_weight="1" android:layout_width="0dp" android:id="@+id/stop" android:text="Stop" android:onClick="onStopClicked" android:visibility="gone" style="@style/LargeButton"></Button>
+        <Button android:layout_height="wrap_content" android:layout_weight="1" android:layout_width="0dp" android:id="@+id/discard" android:text="Discard" android:visibility="gone" android:onClick="onDiscardClicked" style="@style/LargeButton"></Button>
         <Button android:layout_height="wrap_content" android:layout_weight="1" android:layout_width="0dp" android:id="@+id/save" android:text="Save" android:visibility="gone" android:onClick="onSaveClicked" style="@style/LargeButton"></Button>
     </LinearLayout>
 

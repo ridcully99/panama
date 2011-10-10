@@ -1,34 +1,48 @@
 <?xml version="1.0" encoding="utf-8"?>
 <resources>
-	<!-- for large main buttons -->
+
     <style name="LargeButton">
 		<item name="android:textSize">24dp</item>
 		<item name="android:textStyle">normal</item>
+		<item name="android:layout_marginLeft">4dp</item>
+		<item name="android:layout_marginRight">4dp</item>
     </style>
 
-	<!-- for large numbers -->
     <style name="LargeNumber">
-		<item name="android:textSize">36dp</item>
-		<item name="android:textScaleX">1</item>
+		<item name="android:textSize">42dp</item>
+		<item name="android:textStyle">bold</item>
+		<item name="android:textColor">#ffffff</item>
+    </style>
+
+    <style name="LargeLabel">
+		<item name="android:textSize">32dp</item>
 		<item name="android:textStyle">normal</item>
-		<item name="android:layout_marginBottom">-9dp</item>
-		<item name="android:textColor">#eeeeee</item>
+		<item name="android:textColor">#888888</item>
+    </style>
+
+    <style name="LargeUnitLabel">
+		<item name="android:textSize">32dp</item>
+		<item name="android:textStyle">bold</item>
+		<item name="android:textColor">#ffffff</item>
     </style>
     
-	<!-- for medium numbers -->
     <style name="MediumNumber">
-		<item name="android:textSize">24dp</item>
-		<item name="android:textScaleX">1</item>
-		<item name="android:textStyle">normal</item>
-		<item name="android:layout_marginBottom">-6dp</item>
-		<item name="android:textColor">#eeeeee</item>
+		<item name="android:textSize">28dp</item>
+		<item name="android:textStyle">bold</item>
+		<item name="android:textColor">#ffffff</item>
     </style>    
 
-	<!-- for labels below numbers -->
-    <style name="NumberLabel">
-		<item name="android:textSize">11dp</item>
-		<item name="android:textColor">#cccccc</item>
+
+    <style name="MediumLabel">
+		<item name="android:textSize">20dp</item>
+		<item name="android:textStyle">normal</item>
+		<item name="android:textColor">#888888</item>
     </style>
 
+    <style name="MediumUnitLabel">
+		<item name="android:textSize">20dp</item>
+		<item name="android:textStyle">bold</item>
+		<item name="android:textColor">#ffffff</item>
+    </style>
 
 </resources>

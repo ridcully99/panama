@@ -48,7 +48,7 @@ public class Util {
 	/**
 	 * Meters to pixel-distance radius for specified latitude.
 	 * From http://www.anddev.org/viewtopic.php?p=16075 (via http://stackoverflow.com/questions/2077054/how-to-compute-a-radius-around-a-point-in-an-android-mapview)
-	 * WARNING: Division für latitude == +/-90 (am Nord- und Südpol)
+	 * WARNING: Division by Zero für latitude == +/-90 (am Nord- und Südpol)
 	 * @param meters
 	 * @param map
 	 * @param latitude
@@ -65,17 +65,21 @@ public class Util {
 		long hours = mins / 60;
 		mins -= hours * 60;
 		if (hours > 0) {
-			return String.format("%d:%02d:%02d", hours, mins, secs);
+			return String.format("%dh%02d'%02d''", hours, mins, secs);
 		} else {
-			return String.format("%02d:%02d", mins, secs);
+			return String.format("%02d'%02d''", mins, secs);
 		}
 	}
 	
 	public static String formatSpeed(float metersPerSecond) {
 		float kmh = (metersPerSecond * 60 * 60)/1000f;
-		return String.format("%.1f", kmh);
+		return String.format("%.1f km/h", kmh);
 	}
 
+	public static String formatDistance(float meters) {
+		return String.format("%.2f km", meters/1000f);
+	}	
+	
 	public static String createUniqueName() {
 		return "trackx-session-"+DateFormat.format("yyyy-MM-dd-kk-mm-ss", new Date());
 	}
@@ -131,5 +135,5 @@ public class Util {
 		return provider2 == null;
 		}
 		return provider1.equals(provider2);
-	}	
+	}
 }

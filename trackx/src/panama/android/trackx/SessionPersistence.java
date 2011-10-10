@@ -92,7 +92,7 @@ public class SessionPersistence {
 		SQLiteDatabase db = mDBHelper.getWritableDatabase();
 		Cursor c = db.query(TBL_SESSION, new String[] {TIME, DISTANCE}, "_id = "+sessionId, null, null, null, null);
 		if (c.getCount() == 0) {
-			Log.e(MainActivity.MY_TAG, "session "+sessionId+" not found.");
+			Log.e(MainActivity.TAG, "session "+sessionId+" not found.");
 			c.close();
 			mDBHelper.close();
 			return null;

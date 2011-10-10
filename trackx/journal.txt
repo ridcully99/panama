@@ -63,6 +63,14 @@
 + ganz viel herumgebaut, schaut jetzt vom Ablauf schon ganz gut aus, Layout ist noch immer unklar...
 + Foreground Service + Notification
 
+8.10.2011
++ custom font (ev. noch anderen suchen)
++ current pace überarbeitet
++ avg.pace begonnen
++ vibrieren...
+
+TODO: current pace rot oder grün, wenn über oder unter'm durchschnitt
+
 TODO: Notification startet Activity immer neu (auch wenn schon existiert...) hatte TE auch, das Problem
       Eigentlich aber vorerst ein guter Test, weil eigentlich sollte sich die Activity dann ja gleich wieder alles
       holen vom Service und gleich weitermachen -- tuts aber z.Zt. überhaupt nicht.

@@ -19,8 +19,6 @@ import java.util.ArrayList;
 import java.util.HashSet;
 import java.util.List;
 import java.util.Set;
-import java.util.Timer;
-import java.util.TimerTask;
 
 import android.app.Notification;
 import android.app.PendingIntent;
@@ -30,10 +28,11 @@ import android.content.Intent;
 import android.location.Location;
 import android.location.LocationListener;
 import android.location.LocationManager;
+import android.os.AsyncTask;
 import android.os.Binder;
 import android.os.Bundle;
 import android.os.IBinder;
-import android.widget.Toast;
+import android.util.Log;
 
 /**
  * Track (and record) positions.
@@ -43,6 +42,8 @@ import android.widget.Toast;
  */
 public class TrackerService extends Service {
 
+	private final static String TAG = "trackx-service";
+	
 	public final static int MIN_DISTANCE = 5; 						   // in meters; 5 ist in MyTracks empfohlen das von Google-Leuten gemacht wird
 	public final static int MIN_TIME = 1*Util.SECOND_IN_MILLIS;
 	
@@ -50,11 +51,11 @@ public class TrackerService extends Service {
 	public final static int TRACKING = 1;
 	public final static int RECORDING = 2;
 
-	public final static int RECORDING_NOTIFICATION = 1;
+	public final static int FOREGROUND_WHILE_RECORDING = 1;
 	
 	public Location currentLocation;
 	private LocationManager mLocationMgr;
-	private Timer mTimer;
+	private TimerTask mTimer;
 	private IBinder mLocalBinder = new LocalBinder();
 	private Set<Listener> mListeners = new HashSet<Listener>();
 	
@@ -62,22 +63,23 @@ public class TrackerService extends Service {
 	public float pathLength;
 	public long elapsedTimeMillis;
 	public float currentPace;
+	public float averagePace;
 	public boolean isTracking = false;
 	public boolean isRecording = false;
-	private long startTimeMillis;
 	
 	// create Notification for using while recording
-	private Notification notification;
+	private Notification mNotification;
 	
 	@Override
 	public void onCreate() {
 		mLocationMgr = (LocationManager) getSystemService(Context.LOCATION_SERVICE);
 
 		// create Notification for using while recording
-		notification = new Notification(R.drawable.icon, "text1", System.currentTimeMillis());
+		mNotification = new Notification(R.drawable.icon, getText(R.string.notification_recording_started), System.currentTimeMillis());
 		Intent notificationIntent = new Intent(this, MainActivity.class);
+		notificationIntent.setFlags(Intent.FLAG_ACTIVITY_CLEAR_TOP | Intent.FLAG_ACTIVITY_SINGLE_TOP);
 		PendingIntent pendingIntent = PendingIntent.getActivity(this, 0, notificationIntent, 0);
-		notification.contentIntent = pendingIntent;
+		mNotification.contentIntent = pendingIntent;
 	}
 	
 	/** do IPC communication with Activities here */
@@ -87,54 +89,52 @@ public class TrackerService extends Service {
 	}
 
 	public void addListener(Listener listener) {
-		Toast.makeText(this, "SRV:addListener", Toast.LENGTH_SHORT).show();
 		mListeners.add(listener);
 	}
 
 	public void startRecording() {
-		Toast.makeText(this, "SRV:startRecording", Toast.LENGTH_SHORT).show();
+		Log.i(TAG, "startRecording begin");
+		isRecording = true;
 		reset();
 		positions.add(new Position(currentLocation));
-		mTimer = new Timer();
-		mTimer.scheduleAtFixedRate(new TimerTask() {
-			@Override
-			public void run() {
-				elapsedTimeMillis = System.currentTimeMillis() - startTimeMillis;
-				Toast.makeText(TrackerService.this, "SRV:sendTimerNotifications", Toast.LENGTH_SHORT).show();
-			}
-		}, 0, Util.SECOND_IN_MILLIS);
-		notification.setLatestEventInfo(this, "notification-title", "notification-message", notification.contentIntent);
-		startForeground(RECORDING_NOTIFICATION, notification);
-		isRecording = true;
+		mNotification.setLatestEventInfo(this, getText(R.string.notification_recording), getText(R.string.notification_text), mNotification.contentIntent);
+		startForeground(FOREGROUND_WHILE_RECORDING, mNotification);
+		mTimer = new TimerTask();
+		mTimer.execute(0L);
+		Log.d(TAG, "startRecording done, isRecording="+isRecording);
 	}
 	
 	public void stopRecording() {
-		Toast.makeText(this, "SRV:stopRecording", Toast.LENGTH_SHORT).show();
-		mTimer.cancel();
-		mTimer = null;
-		mLocationMgr.removeUpdates(mLocationListener);
-		stopForeground(true);
+		Log.d(TAG, "stopRecording begin");
 		isRecording = false;
+		mTimer.cancel(true);
+		mTimer = null;
+		stopForeground(true);
+		Log.d(TAG, "stopRecording done, isRecording="+isRecording);
 	}
 	
 	public void startTracking() {
+		Log.d(TAG, "startTracking begin");
 		currentLocation = getPreliminaryPosition();
 		mLocationMgr.requestLocationUpdates(LocationManager.GPS_PROVIDER, MIN_TIME, 0, mLocationListener);
 		isTracking = true;
+		Log.d(TAG, "startTracking done");
 	}
 	
 	public void stopTracking() {
+		Log.d(TAG, "stopTracking begin");
 		mLocationMgr.removeUpdates(mLocationListener);
 		currentLocation = null;	// by setting to null, the marker will be no longer displayed on the map with the next refresh
 		isTracking = false;
+		Log.d(TAG, "stopTracking done");
 	}
 	
 	public void reset() {
 		positions.clear();
 		pathLength = 0;
-		startTimeMillis = System.currentTimeMillis();
 		elapsedTimeMillis = 0;
 		currentPace = 0;
+		averagePace = 0;
 		for (Listener l : mListeners) {
 			l.onLocationChanged(currentLocation);
 			l.onTimerChanged(elapsedTimeMillis);
@@ -195,6 +195,8 @@ public class TrackerService extends Service {
 		public void onLocationChanged(Location location);
 		
 		public void onTimerChanged(long elapsedTimeMillis);
+		
+		public void onPaceChanged(float currentPace, float averagePace);
 	}	
 	
 	// -------------------------------------------------------------------------------- LocationListener
@@ -205,23 +207,26 @@ public class TrackerService extends Service {
 		public void onLocationChanged(Location location) {
 
 			// FOR EMULATOR TESTING ONLY!!!
-			Toast.makeText(TrackerService.this, "SRV:EMULATORTESTING MODE IS ACTIVE!!!", Toast.LENGTH_SHORT).show();
 			if (location.hasAccuracy() == false) {
-				location.setAccuracy(3);
+				location.setAccuracy(5);
 				location.setTime(System.currentTimeMillis());
 			}
 			
-			Toast.makeText(TrackerService.this, "SRV:newLocation", Toast.LENGTH_SHORT).show();
+			Log.d(TAG, "onLocationChanged. tracking/recording="+TrackerService.this.isTracking+","+TrackerService.this.isRecording);
 			
 			if (!Util.isBetterLocation(currentLocation, location)) {
-				Toast.makeText(TrackerService.this, "SRV:notBetter", Toast.LENGTH_SHORT).show();
 				return;
 			}
 			
-			if (isRecording) {
+			if (TrackerService.this.isRecording) {
+				// always notify about pace (to get speed 0 too, even if we do not actually record the position due to too less distance...)
+				currentPace = location.getSpeed();
+				averagePace = elapsedTimeMillis > 0 ? pathLength/(elapsedTimeMillis/Util.SECOND_IN_MILLIS) : 0;
+				for (Listener l : mListeners) {
+					l.onPaceChanged(currentPace, averagePace);
+				}
 				float dist = location.distanceTo(currentLocation);
-				if (dist < MIN_DISTANCE || dist < currentLocation.getAccuracy()+location.getAccuracy()) {
-					Toast.makeText(TrackerService.this, "SRV:distTooSmall", Toast.LENGTH_SHORT).show();
+				if (dist < MIN_DISTANCE || dist < /*currentLocation.getAccuracy()+*/location.getAccuracy()) {
 					return;	// no adding to path _AND_ no update of current pos. (otherwise current pos would move away from path)
 				}
 
@@ -229,11 +234,9 @@ public class TrackerService extends Service {
 				p.distance = dist;
 				positions.add(p);
 				pathLength += dist;
-				currentPace = location.getSpeed();
 			}
 			currentLocation = location;
 			// notify listeners
-			Toast.makeText(TrackerService.this, "SRV:sendLocationNotification", Toast.LENGTH_SHORT).show();
 			for (Listener l : mListeners) {
 				l.onLocationChanged(location);
 			}
@@ -251,4 +254,42 @@ public class TrackerService extends Service {
 		public void onStatusChanged(String provider, int status, Bundle extras) {
 		}
 	};
+	
+	// -------------------------------------------------------------------------------- TimerTask
+
+	/**
+	 * Stoppuhr, läuft parallel und postet akt. Zeit schön formatiert.
+	 * TODO Berechnet gleichzeitig auch die aktuelle Geschwindigkeit und postet sie ebenso sch�n formatiert
+	 * 
+	 * @author ridcully
+	 */
+	class TimerTask extends AsyncTask<Long, Long, String> {
+		/**
+		 * params[0] == initial value in millis (0 at first start, but can be > 0 after stop/start ...)
+		 */
+		@Override
+		protected String doInBackground(Long... params) {
+			Log.d(TAG, "TimerTask.doInBackground begin");
+			long startMillis = System.currentTimeMillis();
+			while (TrackerService.this.isRecording) {
+				long millis = System.currentTimeMillis() - startMillis;
+				publishProgress(millis);
+				try {
+					Thread.sleep(500);	// nur 1/2 Sekunde, damit ich sicher keine Sekunde verpasse
+				} catch (InterruptedException e) {
+				}
+			}
+			Log.d(TAG, "TimerTask.doInBackground done");
+			return null;
+		}
+		
+		@Override
+		protected void onProgressUpdate(Long... values) {
+			// notify listeners
+			for (Listener l : mListeners) {
+				elapsedTimeMillis = values[0];
+				l.onTimerChanged(elapsedTimeMillis);
+			}
+		}
+	}	
 }

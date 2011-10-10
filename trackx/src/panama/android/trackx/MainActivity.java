@@ -15,23 +15,23 @@ import android.location.LocationManager;
 import android.os.Bundle;
 import android.os.IBinder;
 import android.os.PowerManager;
+import android.os.Vibrator;
 import android.util.Log;
 import android.view.Menu;
 import android.view.MenuInflater;
 import android.view.MenuItem;
-import android.view.MotionEvent;
 import android.view.View;
-import android.view.View.OnTouchListener;
 import android.widget.Button;
 import android.widget.TextView;
 import android.widget.Toast;
+import android.widget.ViewAnimator;
 
 import com.google.android.maps.MapActivity;
 import com.google.android.maps.MapView;
 
 public class MainActivity extends MapActivity implements TrackerService.Listener {
 
-	public final static String MY_TAG = "trackx";
+	public final static String TAG = "trackx";
 	
 	// UI
 	public final static int REQUEST_ENABLING_GPS = 1;
@@ -44,6 +44,7 @@ public class MainActivity extends MapActivity implements TrackerService.Listener
 	private TextView mDistanceView;
 	private TextView mTimerView;
 	private TextView mPaceView;
+	private TextView mAveragePaceView;
 	private Button mNewSessionButton;
 	private Button mStartButton;
 	private Button mPauseButton;
@@ -52,9 +53,11 @@ public class MainActivity extends MapActivity implements TrackerService.Listener
 	private Button mDiscardButton;
 	private Button mSaveButton;
 	private ProgressDialog mWaitingDialog;
-	private PowerManager.WakeLock mWakeLock;
 
+	private PowerManager.WakeLock mWakeLock;
 	private LocationManager mLocationMgr;
+	private Vibrator mVibrator;
+
 	private SessionPersistence mPersistence = new SessionPersistence(this);
 	private TrackerService mService;
 	private boolean mBound;	// whether bound to service
@@ -64,14 +67,23 @@ public class MainActivity extends MapActivity implements TrackerService.Listener
 	public void onCreate(Bundle savedInstanceState) {
 		super.onCreate(savedInstanceState);
 		mLocationMgr = (LocationManager) getSystemService(Context.LOCATION_SERVICE);
+		mVibrator = (Vibrator)getSystemService(Context.VIBRATOR_SERVICE);
 		setContentView(R.layout.main);
 
 		PowerManager pm = (PowerManager) getSystemService(Context.POWER_SERVICE);
-		mWakeLock = pm.newWakeLock(PowerManager.SCREEN_DIM_WAKE_LOCK, MY_TAG);
+		mWakeLock = pm.newWakeLock(PowerManager.SCREEN_DIM_WAKE_LOCK, TAG);
 
 		mDistanceView = (TextView)findViewById(R.id.distance);
 		mTimerView = (TextView)findViewById(R.id.time);
 		mPaceView = (TextView)findViewById(R.id.pace);
+		mAveragePaceView = (TextView)findViewById(R.id.averagePace);
+		
+//		Typeface numberFont = Typeface.createFromAsset(this.getAssets(), "fonts/LEXIB___.ttf");
+//		mDistanceView.setTypeface(numberFont);
+//		mTimerView.setTypeface(numberFont);
+//		mPaceView.setTypeface(numberFont);
+//		mAveragePaceView.setTypeface(numberFont);
+		
 		mNewSessionButton = (Button)findViewById(R.id.newSession);
 		mNewSessionButton.setEnabled(false);	// disabled bis wir mit Service verbunden sind.
 		mStartButton = (Button)findViewById(R.id.start);
@@ -83,49 +95,16 @@ public class MainActivity extends MapActivity implements TrackerService.Listener
 
 		mMapView = (MapView) findViewById(R.id.mapview);
 		mMapView.setBuiltInZoomControls(true);
-		mMapView.getController().setZoom(20);
-
-		View dataAreaLayout = findViewById(R.id.dataArea);	// a Layout is a View
-		dataAreaLayout.setOnTouchListener(new OnTouchListener() {
-			@Override
-			public boolean onTouch(View v, MotionEvent event) {
-				if (event.getAction() == MotionEvent.ACTION_UP) {
-					View row = MainActivity.this.findViewById(R.id.numberLine2);
-					row.setVisibility(row.getVisibility() == View.GONE ? View.VISIBLE: View.GONE);
-				}
-				return true;
-			}
-		});
-		
-		// Bind to TrackerService (asynchronous)
-		Intent intent = new Intent(this, TrackerService.class);
-		bindService(intent, mConnection, Context.BIND_AUTO_CREATE);	// this is done asynchronously
-	}
-
-	@Override
-	protected void onStart() {
-		super.onStart();
+		mMapView.getController().setZoom(19);
 		mPathOverlay = new PathOverlay();
 		mMyLocationOverlay = new MyLocationOverlay();
 		mMapView.getOverlays().add(mPathOverlay);
 		mMapView.getOverlays().add(mMyLocationOverlay);
-	}
-	
-//	@Override
-//	protected void onPause() {
-//		super.onPause();
-//		if (mBound && !mService.isRecording) {	/* strom sparen wenn geht */
-//			mService.stopTracking();
-//		}
-//	}
 
-//	@Override
-//	protected void onResume() {
-//		super.onResume();
-//		if (mBound && !mService ...???) {
-//			mService.startTracking();
-//		}
-//	}
+		// Bind to TrackerService (asynchronous)
+		Intent intent = new Intent(this, TrackerService.class);
+		bindService(intent, mConnection, Context.BIND_AUTO_CREATE);	// this is done asynchronously
+	}
 	
 	@Override
 	protected void onDestroy() {
@@ -179,6 +158,24 @@ public class MainActivity extends MapActivity implements TrackerService.Listener
 		return super.onOptionsItemSelected(item);
 	}
 
+	public void onSwitchViewClicked(View view) {
+		// TODO später animiert machen
+		ViewAnimator container = (ViewAnimator)findViewById(R.id.container);
+		int displayed = container.getDisplayedChild();
+		container.setDisplayedChild(1-displayed);
+		if (displayed == 0) { // previously displayed
+			((Button)view).setText("<- Clock");
+		} else {
+			((Button)view).setText("Map ->");
+		}
+	}
+	
+	public void onShowMapClicked(View view) {
+		// TODO später animiert machen
+		ViewAnimator container = (ViewAnimator)findViewById(R.id.container);
+		container.setDisplayedChild(1);
+	}
+	
 	public void onNewSessionClicked(View view) {
 		if (!mLocationMgr.isProviderEnabled(LocationManager.GPS_PROVIDER)) {
 			showDialog(DIALOG_ENABLE_GPS);
@@ -201,11 +198,13 @@ public class MainActivity extends MapActivity implements TrackerService.Listener
 	}
 
 	public void onStartClicked(View view) {
+		Log.d(TAG, "onStartClicked begin");
 		mStartButton.setVisibility(View.GONE);
 		mPauseButton.setVisibility(View.VISIBLE);
 		mStopButton.setVisibility(View.VISIBLE);
 		mService.startRecording();
 		mWakeLock.acquire();										// standby verhindern
+		Log.d(TAG, "onStartClicked done");
 	}
 
 	public void onPauseClicked(View view) {
@@ -225,6 +224,7 @@ public class MainActivity extends MapActivity implements TrackerService.Listener
 	}
 	
 	public void onStopClicked(View view) {
+		Log.d(TAG, "onStopClicked begin");
 		mPauseButton.setVisibility(View.GONE);
 		mResumeButton.setVisibility(View.GONE);
 		mStopButton.setVisibility(View.GONE);
@@ -232,10 +232,12 @@ public class MainActivity extends MapActivity implements TrackerService.Listener
 		mSaveButton.setVisibility(View.VISIBLE);
 		mService.stopRecording();
 		mService.stopTracking();	// versuchsweise mal
+		setCurrentPace(0);
 
 		if (mWakeLock.isHeld()) {
 			mWakeLock.release();
 		}
+		Log.d(TAG, "onStopClicked done");
 	}
 
 	public void onDiscardClicked(View view) {
@@ -282,15 +284,20 @@ public class MainActivity extends MapActivity implements TrackerService.Listener
 
 	/** call from UI thread */
 	private void setPathLength(float meters) {
-		mDistanceView.setText(String.format("%.2f", meters/1000f));
+		mDistanceView.setText(Util.formatDistance(meters));
 		mDistanceView.invalidate();		
 	}
 	
-	private void setPace(float metersPerSecond) {
+	private void setCurrentPace(float metersPerSecond) {
 		mPaceView.setText(Util.formatSpeed(metersPerSecond));
 		mPaceView.invalidate();
 	}
 
+	private void setAveragePace(float metersPerSecond) {
+		mAveragePaceView.setText(Util.formatSpeed(metersPerSecond));
+		mAveragePaceView.invalidate();
+	}
+	
 	private void setTime(long timeMillis) {
 		mTimerView.setText(Util.formatTime(timeMillis));
 		mTimerView.invalidate();
@@ -312,13 +319,13 @@ public class MainActivity extends MapActivity implements TrackerService.Listener
 	
 	@Override
 	public void onLocationChanged(Location location) {
-		Toast.makeText(this, "got location notification", Toast.LENGTH_SHORT).show();
-		
+		Log.d(TAG, "onLocationChanged begin");
 		if (mWaitingDialog != null && mWaitingDialog.isShowing() && Util.isOKforStart(location)) {
 			mWaitingDialog.dismiss();
 			mNewSessionButton.setVisibility(View.GONE);
 			mStartButton.setVisibility(View.VISIBLE);
-			// TODO vibrate - damit User weiss dass er jetzt starten kann.
+			//mVibrator.vibrate(50); //vibrieren damit User weiss dass er jetzt starten kann (ohne immer hinsehen zu müssen)
+			//mVibrator.cancel();
 		}		
 		
 		mMyLocationOverlay.setLocation(mService.currentLocation);
@@ -328,13 +335,16 @@ public class MainActivity extends MapActivity implements TrackerService.Listener
 		}
 		mMapView.invalidate();		
 		setPathLength(mService.pathLength);
-		setPace(mService.currentPace);
-		setTime(mService.elapsedTimeMillis);
+	}
+	
+	@Override
+	public void onPaceChanged(float currentPace, float averagePace) {
+		setCurrentPace(currentPace);
+		setAveragePace(averagePace);
 	}
 	
 	@Override
 	public void onTimerChanged(long timeMillis) {
-		Toast.makeText(this, "got timer notification", Toast.LENGTH_SHORT).show();
 		setTime(mService.elapsedTimeMillis);
 	}
 	
@@ -345,13 +355,11 @@ public class MainActivity extends MapActivity implements TrackerService.Listener
 
 		@Override
 		public void onServiceConnected(ComponentName className, IBinder service) {
-			Toast.makeText(MainActivity.this, "connected to service", Toast.LENGTH_SHORT).show();
-
 			// We've bound to LocalService, cast the IBinder and get LocalService instance
 			LocalBinder binder = (LocalBinder) service;
 			mService = binder.getService();
 			mBound = true;
-			mService.addListener(MainActivity.this);	// add ourselves as listeners; recording has already started on startService()!
+			mService.addListener(MainActivity.this);	// add ourselves as listeners
 			// reset NICHT machen -- kann sein dass schon recording läuft
 			// mService.reset();
 			mNewSessionButton.setEnabled(true);
