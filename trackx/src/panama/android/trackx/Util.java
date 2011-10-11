@@ -73,11 +73,11 @@ public class Util {
 	
 	public static String formatSpeed(float metersPerSecond) {
 		float kmh = (metersPerSecond * 60 * 60)/1000f;
-		return String.format("%.1f km/h", kmh);
+		return String.format("%.1f", kmh);
 	}
 
 	public static String formatDistance(float meters) {
-		return String.format("%.2f km", meters/1000f);
+		return String.format("%.2f", meters/1000f);
 	}	
 	
 	public static String createUniqueName() {
