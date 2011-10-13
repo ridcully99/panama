@@ -1,5 +1,7 @@
 package panama.android.trackx;
 
+import java.util.List;
+
 import panama.android.trackx.TrackerService.LocalBinder;
 import android.app.AlertDialog;
 import android.app.Dialog;
@@ -10,6 +12,7 @@ import android.content.DialogInterface;
 import android.content.DialogInterface.OnCancelListener;
 import android.content.Intent;
 import android.content.ServiceConnection;
+import android.graphics.RectF;
 import android.location.Location;
 import android.location.LocationManager;
 import android.os.Bundle;
@@ -26,6 +29,7 @@ import android.widget.TextView;
 import android.widget.Toast;
 import android.widget.ViewAnimator;
 
+import com.google.android.maps.GeoPoint;
 import com.google.android.maps.MapActivity;
 import com.google.android.maps.MapView;
 
@@ -277,12 +281,41 @@ public class MainActivity extends MapActivity implements TrackerService.Listener
 				long id = data.getLongExtra("id", -1);
 				Session session = mPersistence.load(id);
 				mService.setSession(session);
+				adjustMap(session.positions);
 			}
 			return;
 		}
 	}
 
-	/** call from UI thread */
+	/** 
+	 * zoom/move map so that start and end point are visible.
+	 * based on http://stackoverflow.com/questions/7513247/how-to-zoom-a-mapview-so-it-always-includes-two-geopoints
+	 */
+	private void adjustMap(List<Position> positions) {
+		if (positions == null || positions.isEmpty()) {
+			return;
+		}
+		GeoPoint[] bounds = mPathOverlay.getBoundingBox();
+		GeoPoint a = bounds[0];
+		GeoPoint b = bounds[1];
+		GeoPoint center = new GeoPoint(a.getLatitudeE6()+(b.getLatitudeE6()-a.getLatitudeE6())/2, 
+									   a.getLongitudeE6()+(b.getLongitudeE6()-a.getLongitudeE6())/2);
+		
+		double latitudeSpan = Math.round(Math.abs(a.getLatitudeE6() - b.getLatitudeE6()));
+		double longitudeSpan = Math.round(Math.abs(a.getLongitudeE6() - b.getLongitudeE6())); 
+
+		//double currentLatitudeSpan = (double)mMapView.getLatitudeSpan();
+		//double currentLongitudeSpan = (double)mMapView.getLongitudeSpan();
+
+		//double ratio = currentLongitudeSpan/currentLatitudeSpan;
+		//if(longitudeSpan < (double)(latitudeSpan+2E7) * ratio){
+		//    longitudeSpan = ((double)(latitudeSpan+2E7) * ratio);
+		//}
+		mMapView.getController().setCenter(center);
+		mMapView.getController().zoomToSpan((int)(latitudeSpan*1.5), (int)(longitudeSpan*1.5));                
+		mMapView.invalidate();
+	}
+
 	private void setPathLength(float meters) {
 		mDistanceView.setText(Util.formatDistance(meters));
 		mDistanceView.invalidate();		

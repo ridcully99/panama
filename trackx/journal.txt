@@ -58,6 +58,7 @@
 + Auf Service umgestellt fürs Tracking/Recording
 
 6.10.2011...
++ auf 2.1 umgestellt (Version 7)
 
 7.10.2011
 + ganz viel herumgebaut, schaut jetzt vom Ablauf schon ganz gut aus, Layout ist noch immer unklar...
@@ -69,26 +70,32 @@
 + avg.pace begonnen
 + vibrieren...
 
-TODO: current pace rot oder grün, wenn über oder unter'm durchschnitt
+10.10.2011
++ Layout mit RelativeLayout verschönert
 
-TODO: Notification startet Activity immer neu (auch wenn schon existiert...) hatte TE auch, das Problem
-      Eigentlich aber vorerst ein guter Test, weil eigentlich sollte sich die Activity dann ja gleich wieder alles
-      holen vom Service und gleich weitermachen -- tuts aber z.Zt. überhaupt nicht.
-      (da müsste ich bei onCreate ode wo schau'n ob mService.isRunning und dann gleich die Buttons umschalten und
+11.10.2011
++ Activities mit launchMode="singleTask", sonst hatte ich wieder den Effekt das u.U. Activities mehrfach gestartet werden 
++ Sessionliste formatiert darstellen
+
+13.10.2011
++ Laden funktioniert wieder.
++ nach dem Laden die Map so einrichten (zentrieren/zoomen) dass die gesamte Strecke sichtbar ist.
+
+TODO: während Suche nach better fix irgendwie was anzeigen bzgl. genauigkeit (auch in nummernansicht)
+      und Start prinzipiell erlauben sobald ich eine zeitlich aktuelle Position habe ... je länger man dann wartet, desto genauer wird sie halt.
+      --> statt Progress-Dialog vielleicht dann auch was anderes machen
+      
+TODO: bei geladenen Sessions (oder generell?) irgendwo klein Datum+Zeit anzeigen
+
+TODO: Kalorienberechnung
+
+TODO: current pace rot oder grün, wenn über oder unter'm durchschnitt oder Pfeilchen rauf, Pfeilchen runter (optisch vielleicht ruhiger)
+
+TODO: Für den Fall das Activity tot ist müsste ich bei onCreate ode wo schau'n ob mService.isRunning und dann gleich die Buttons umschalten und
       onLocationChanged(mService.currentLocation) aufrufen zum Bildaufbau.
-
-
-Layout-Rework: Zahlen entweder in Scroll-Layout zum rauf/runterscrollen (mit Snap),
-oder mit VISIBLE/GONE die Zusatzzahlen ein-/ausblenden per Knopfdruck auf erste Zahl oder Icon
-Von unten raufziehen mit Lasche wie bei Kamera-App!
-
-TODO: wenn gespeicherte Session angzeigt wird (auch gleich nach Save), die aktuelle Position nicht mehr anzeigen; auch Tracken dann unnötig.
+      Wie Testen? Testweise finishActivity via Menüoption triggerbar machen.
 
 TODO: Pause, Resume implementieren
-
-TODO: Buttons weiter reinrücken damit nicht ungfahr gedrückt werden
-
-TODO: Kompatibel zu Android 2.1 machen
 
 TODO: Für gespeicherte Sessions statt den Buttons unten einen Schieberegler zum Durchscrollen der Route
 	(Sobald das Speichern einer Session fertig ist, auch diesen Schieberegler anzeigen, statt wie bisher das Save zu disablen)
@@ -97,13 +104,17 @@ TODO: Für gespeicherte Sessions statt den Buttons unten einen Schieberegler zum
 	- einer der Strecke von Start bis akt. Markerposition stark färbig zeigt.
 	Zeichnen: zuerst den ganzen gedämpften, darüber den teilweisen (gleiche Positions, einfach abbrechen an entsprechender Stelle) 
 
+TODO: Marker für Start und Ziel, Kilometer/Meilen (optional) ... mit Infos auf Tap bzgl. Zeit/Distanz ...
+
 TODO: Speichern mit Kommentar, Typ (Laufen, Radln, Wandern, ...), Route (Auswahl aus bereits eingegebenen, oder neuen Namen eingeben)
 
 TODO: wenn geht (oder als Option) die Karte drehen sodass Pfeil immer "nach oben" zeigt, i.e. in Laufrichtung.
 
 TODO: Export in Standardformaten (GPX?) via Share oder so?
 
+TODO: Texte aus strings.xml / I18n / L10n
+
 TODO: Optionen: 
-		- Umschalten zw. km und Meilen (auch f�r km/h, mph verwenden) -- Berechnungen immer metrisch, erst für Anzeige ggf. umrechnen!
-		- Größe, Gewicht, Geschlecht f�r Kalorienberechnung?
+		- Umschalten zw. km und Meilen (auch für UnitLabels (km/h, mph) verwenden) -- Berechnungen immer metrisch, erst für Anzeige ggf. umrechnen!
+		- Größe, Gewicht, Geschlecht für Kalorienberechnung
 		- Automatische Marker alle Kilometer/Meilen

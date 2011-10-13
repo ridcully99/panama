@@ -145,7 +145,9 @@ public class TrackerService extends Service {
 	public void setSession(Session session) {
 		pathLength = session.distance;
 		elapsedTimeMillis = session.time;
+		averagePace = elapsedTimeMillis > 0 ? pathLength/(elapsedTimeMillis/Util.SECOND_IN_MILLIS) : 0;
 		positions = session.positions;
+		currentLocation = null;
 		// notify listeners
 		for (Listener l : mListeners) {
 			l.onLocationChanged(currentLocation);

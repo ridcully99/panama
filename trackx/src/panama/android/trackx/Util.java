@@ -15,6 +15,7 @@
  */
 package panama.android.trackx;
 
+import java.text.SimpleDateFormat;
 import java.util.Date;
 
 import android.location.Location;
@@ -34,6 +35,8 @@ public class Util {
 	public final static int SECOND_IN_MILLIS = 1000;
 	public final static int MAX_STARTOK_FIX_ACCURACY = 100;
 	public final static long MAX_STARTOK_FIX_AGE = 30 * SECOND_IN_MILLIS;
+	
+	public final static SimpleDateFormat dateFormat = new SimpleDateFormat("dd.MMM.yyyy HH:mm");
 	
 	/**
 	 * Location -> GeoPoint
@@ -79,6 +82,10 @@ public class Util {
 	public static String formatDistance(float meters) {
 		return String.format("%.2f", meters/1000f);
 	}	
+	
+	public static CharSequence formatDate(long timestampMillis) {
+		return dateFormat.format(timestampMillis);
+	}
 	
 	public static String createUniqueName() {
 		return "trackx-session-"+DateFormat.format("yyyy-MM-dd-kk-mm-ss", new Date());

@@ -130,7 +130,7 @@ public class SessionPersistence {
 	/** gets list of all sessions, ordered by timestamp descending */
 	public Cursor getSessionList() {
 		SQLiteDatabase db = mDBHelper.getWritableDatabase();
-		Cursor c = db.query(TBL_SESSION, new String[] {"_id", NAME, TIME, DISTANCE}, null, null, null, null, "timestamp desc");
+		Cursor c = db.query(TBL_SESSION, new String[] {"_id", TIMESTAMP, TIME, DISTANCE}, null, null, null, null, "timestamp desc");
 		return c;
 	}	
 	

@@ -11,7 +11,7 @@
 	<TextView android:layout_height="wrap_content" android:layout_width="wrap_content" android:id="@+id/distanceLabel" android:text="Distance" android:layout_alignBaseline="@+id/distance" android:layout_alignBottom="@+id/distance" android:layout_alignParentLeft="true" style="@style/LargeLabel"></TextView>
 	<TextView android:layout_height="wrap_content" android:layout_width="wrap_content" android:layout_alignBaseline="@+id/distanceLabel" android:layout_alignParentRight="true" android:text="km" android:id="@+id/distanceUnit" style="@style/LargeUnitLabel"></TextView>
 
-	<View android:id="@+id/hline1" android:layout_width="fill_parent" android:layout_alignParentLeft="true" android:background="#888888" android:layout_height="2dp" android:layout_below="@+id/distance" android:layout_marginBottom="10dp"/>
+	<View android:id="@+id/hline1" android:layout_width="fill_parent" android:layout_alignParentLeft="true" android:layout_height="2dp" android:layout_below="@+id/distance" android:layout_marginBottom="10dp" android:background="#444444"/>
 
 	<TextView style="@style/MediumNumber" android:layout_height="wrap_content" android:id="@+id/pace" android:layout_width="wrap_content" android:layout_below="@+id/hline1" android:layout_toLeftOf="@+id/currentPaceUnit" android:layout_marginTop="10dp" android:text="0.0" android:layout_marginRight="4dp"></TextView>
 	<TextView android:layout_height="wrap_content" android:layout_width="wrap_content" android:id="@+id/paceLabel" android:layout_alignBaseline="@+id/pace" android:layout_alignBottom="@+id/pace" android:layout_alignParentLeft="true" style="@style/MediumLabel" android:text="Current Pace"></TextView>

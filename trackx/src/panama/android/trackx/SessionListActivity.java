@@ -20,9 +20,9 @@ import android.content.Intent;
 import android.database.Cursor;
 import android.os.Bundle;
 import android.view.View;
-import android.widget.ListAdapter;
 import android.widget.ListView;
 import android.widget.SimpleCursorAdapter;
+import android.widget.TextView;
 
 /**
  * from http://developer.android.com/reference/android/app/ListActivity.html
@@ -32,6 +32,7 @@ import android.widget.SimpleCursorAdapter;
 public class SessionListActivity extends ListActivity {
 
 	private Cursor mCursor;
+	private SessionPersistence mPersistence;
 	
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -39,21 +40,43 @@ public class SessionListActivity extends ListActivity {
         
         // Put a managed wrapper around the retrieved cursor so we don't have to worry about
         // requerying or closing it as the activity changes state.
-        SessionPersistence persistence = new SessionPersistence(this);
-        mCursor = persistence.getSessionList();
+        mPersistence = new SessionPersistence(this);
+        mCursor = mPersistence.getSessionList();
         startManagingCursor(mCursor);
 
         // Now create a new list adapter bound to the cursor.
         // SimpleListAdapter is designed for binding to a Cursor.
-        ListAdapter adapter = new SimpleCursorAdapter(
+        SimpleCursorAdapter adapter = new SimpleCursorAdapter(
                 this, // Context.
-                android.R.layout.two_line_list_item,  								// Specify the row template to use (here, two columns bound to the two retrieved cursor rows).
-                mCursor,                                              				// Pass in the cursor to bind to.
-                new String[] {SessionPersistence.NAME, SessionPersistence.TIME},    // Array of cursor columns to bind to.
-                new int[] {android.R.id.text1, android.R.id.text2});  				// Parallel array of which template objects to bind to those columns.
-
-        // Bind to our new adapter.
-        setListAdapter(adapter);
+                R.layout.sessionlist_item, 
+                mCursor,                                              												  // Pass in the cursor to bind to.
+                new String[] {SessionPersistence.TIMESTAMP, SessionPersistence.TIME, SessionPersistence.DISTANCE},    // Array of cursor columns to bind to.
+                new int[] {R.id.sessionListDate, R.id.sessionListData});  // formating is done via viewBinder
+        adapter.setViewBinder(new SimpleCursorAdapter.ViewBinder() {
+			@Override
+			public boolean setViewValue(View view, Cursor cursor, int columnIndex) {
+				if (view.getId() == R.id.sessionListDate) {
+					long timestampMillis = cursor.getLong(1);
+					((TextView)view).setText(Util.formatDate(timestampMillis));
+					return true;
+				}
+				if (view.getId() == R.id.sessionListData) {
+					long timeMillis = cursor.getLong(2);
+					long distance = cursor.getLong(3);
+					((TextView)view).setText(Util.formatTime(timeMillis)+", "+Util.formatDistance(distance)+" km");
+					return true;
+				}
+				return false;
+			}
+		});
+        setListAdapter(adapter);	        // Bind to our new adapter.
+    }
+    
+    @Override
+    protected void onDestroy() {
+    	super.onDestroy();
+    	stopManagingCursor(mCursor);
+    	mPersistence.close();
     }
     
     @Override

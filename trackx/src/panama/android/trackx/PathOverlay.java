@@ -19,11 +19,11 @@ import java.util.List;
 
 import android.graphics.BlurMaskFilter;
 import android.graphics.Canvas;
-import android.graphics.MaskFilter;
 import android.graphics.Paint;
 import android.graphics.Path;
 import android.graphics.Point;
 
+import com.google.android.maps.GeoPoint;
 import com.google.android.maps.MapView;
 import com.google.android.maps.Overlay;
 
@@ -53,6 +53,26 @@ public class PathOverlay extends Overlay {
 	
 	public void setPositions(List<Position> positions) {
 		mPositions = positions;
+	}
+	
+	/**
+	 * @return two GeoPoint representing top-left and bottom-right of bounding box of path.
+	 */
+	public GeoPoint[] getBoundingBox() {
+		if (mPositions == null || mPositions.isEmpty()) {
+			return null;
+		}
+		int latMin = Integer.MAX_VALUE, latMax = Integer.MIN_VALUE, lonMin = Integer.MAX_VALUE, lonMax = Integer.MIN_VALUE;
+		for (Position p : mPositions) {
+			GeoPoint gp = p.geoPoint;
+			int lat = gp.getLatitudeE6();
+			int lon = gp.getLongitudeE6();
+			latMin = Math.min(latMin, lat);
+			latMax = Math.max(latMax, lat);
+			lonMin = Math.min(lonMin, lon);
+			lonMax = Math.max(lonMax, lon);
+		}
+		return new GeoPoint[] { new GeoPoint(latMin, lonMin), new GeoPoint(latMax, lonMax) };
 	}
 	
 	@Override
