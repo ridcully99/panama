@@ -22,6 +22,7 @@ import android.location.Location;
 import android.location.LocationManager;
 import android.text.format.DateFormat;
 import android.util.FloatMath;
+import android.util.Log;
 
 import com.google.android.maps.GeoPoint;
 import com.google.android.maps.MapView;
@@ -36,7 +37,7 @@ public class Util {
 	public final static int MAX_STARTOK_FIX_ACCURACY = 100;
 	public final static long MAX_STARTOK_FIX_AGE = 30 * SECOND_IN_MILLIS;
 	
-	public final static SimpleDateFormat dateFormat = new SimpleDateFormat("dd.MMM.yyyy HH:mm");
+	public final static SimpleDateFormat dateFormat = new SimpleDateFormat("EEE, dd.MMM.yyyy HH:mm");	// TODO externalize and make I18n
 	
 	/**
 	 * Location -> GeoPoint
@@ -93,11 +94,14 @@ public class Util {
 	
 	/** check if location is OK for starting session */
 	public static boolean isOKforStart(Location location) {
-		return  location != null &&
+		boolean ok = location != null &&
 				LocationManager.GPS_PROVIDER.equals(location.getProvider()) &&
-				location.hasAccuracy() &&
-				location.getAccuracy() <= MAX_STARTOK_FIX_ACCURACY &&
+				((location.hasAccuracy() && location.getAccuracy() <= MAX_STARTOK_FIX_ACCURACY) || (!location.hasAccuracy())) &&
 				(System.currentTimeMillis() - location.getTime()) <= MAX_STARTOK_FIX_AGE;
+		if (!ok) {
+			Log.d(MainActivity.TAG, String.format("location not OK for start: provider=%s, accuracy=%f meters, age=%d secs", location.getProvider(), location.getAccuracy(), (int)(System.currentTimeMillis() - location.getTime())/1000));
+		}
+		return ok;
 	}
 	
 	/** 
@@ -116,6 +120,7 @@ public class Util {
 		if (!candidate.hasAccuracy()) {
 			return false;
 		}
+		boolean isNewer = deltaTime >= 3 * SECOND_IN_MILLIS;	// 3+ seconds newer
 		// Check whether the new location fix is more or less accurate
 		int accuracyDelta = (int) (candidate.getAccuracy() - reference.getAccuracy());
 		boolean isLessAccurate = accuracyDelta > 0;
@@ -128,12 +133,12 @@ public class Util {
 		// Determine location quality using a combination of timeliness and accuracy
 		if (isMoreAccurate) {
 			return true;
-		} else if (!isLessAccurate) {
+		} else if (isNewer && !isLessAccurate) {
 			return true;
 		} else if (!isSignificantlyLessAccurate && isFromSameProvider) {
 			return true;
 		}
-		return false;		
+		return false;	
 	}
 	
 	/** Checks whether two providers are the same */

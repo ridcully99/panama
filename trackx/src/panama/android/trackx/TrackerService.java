@@ -145,7 +145,7 @@ public class TrackerService extends Service {
 	public void setSession(Session session) {
 		pathLength = session.distance;
 		elapsedTimeMillis = session.time;
-		averagePace = elapsedTimeMillis > 0 ? pathLength/(elapsedTimeMillis/Util.SECOND_IN_MILLIS) : 0;
+		averagePace = (elapsedTimeMillis/Util.SECOND_IN_MILLIS) > 0 ? pathLength/(elapsedTimeMillis/Util.SECOND_IN_MILLIS) : 0;
 		positions = session.positions;
 		currentLocation = null;
 		// notify listeners
@@ -210,7 +210,8 @@ public class TrackerService extends Service {
 
 			// FOR EMULATOR TESTING ONLY!!!
 			if (location.hasAccuracy() == false) {
-				location.setAccuracy(5);
+				Log.d(TAG, "setting accuracy to 15 for location having no accuracy!");
+				location.setAccuracy(15);
 				location.setTime(System.currentTimeMillis());
 			}
 			
@@ -223,7 +224,7 @@ public class TrackerService extends Service {
 			if (TrackerService.this.isRecording) {
 				// always notify about pace (to get speed 0 too, even if we do not actually record the position due to too less distance...)
 				currentPace = location.getSpeed();
-				averagePace = elapsedTimeMillis > 0 ? pathLength/(elapsedTimeMillis/Util.SECOND_IN_MILLIS) : 0;
+				averagePace = (elapsedTimeMillis/Util.SECOND_IN_MILLIS) > 0 ? pathLength/(elapsedTimeMillis/Util.SECOND_IN_MILLIS) : 0;
 				for (Listener l : mListeners) {
 					l.onPaceChanged(currentPace, averagePace);
 				}

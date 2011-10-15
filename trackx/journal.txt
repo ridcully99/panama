@@ -81,13 +81,26 @@
 + Laden funktioniert wieder.
 + nach dem Laden die Map so einrichten (zentrieren/zoomen) dass die gesamte Strecke sichtbar ist.
 
+14.10.2011
++ Animation für Map ein/ausblenden
+
+15.10.2011
++ Animationsflaw bei erstem einblenden gefixt (setZOrderAdjustment)
++ Texte/Formatierung optimiert (Wochentag bei Liste gespeicherter Sessions)
++ NaN bei Average Pace gefixt
+
+
 TODO: während Suche nach better fix irgendwie was anzeigen bzgl. genauigkeit (auch in nummernansicht)
       und Start prinzipiell erlauben sobald ich eine zeitlich aktuelle Position habe ... je länger man dann wartet, desto genauer wird sie halt.
       --> statt Progress-Dialog vielleicht dann auch was anderes machen
       
+TODO: mal echten Map API Key generieren und einbauen      
+      
 TODO: bei geladenen Sessions (oder generell?) irgendwo klein Datum+Zeit anzeigen
 
 TODO: Kalorienberechnung
+
+TODO: Vibration aktivieren
 
 TODO: current pace rot oder grün, wenn über oder unter'm durchschnitt oder Pfeilchen rauf, Pfeilchen runter (optisch vielleicht ruhiger)
 

@@ -2,7 +2,8 @@
 <resources>
     <string name="hello">Hello World, MainActivity!</string>
     <string name="app_name">Trackx</string>
-    <string name="notification_recording_started">Recording started</string>
-    <string name="notification_recording">Recording...</string><string name="notification_text">Time / Distance</string>
+    <string name="notification_recording_started">Trackx started recording</string>
+    <string name="notification_recording">Trackx</string>
+    <string name="notification_text">Recording...</string>
     
 </resources>

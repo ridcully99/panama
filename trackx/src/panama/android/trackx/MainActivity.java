@@ -12,7 +12,6 @@ import android.content.DialogInterface;
 import android.content.DialogInterface.OnCancelListener;
 import android.content.Intent;
 import android.content.ServiceConnection;
-import android.graphics.RectF;
 import android.location.Location;
 import android.location.LocationManager;
 import android.os.Bundle;
@@ -23,11 +22,15 @@ import android.util.Log;
 import android.view.Menu;
 import android.view.MenuInflater;
 import android.view.MenuItem;
+import android.view.MotionEvent;
 import android.view.View;
+import android.view.View.OnTouchListener;
+import android.view.animation.Animation;
+import android.view.animation.AnimationUtils;
 import android.widget.Button;
+import android.widget.ImageButton;
 import android.widget.TextView;
 import android.widget.Toast;
-import android.widget.ViewAnimator;
 
 import com.google.android.maps.GeoPoint;
 import com.google.android.maps.MapActivity;
@@ -56,6 +59,7 @@ public class MainActivity extends MapActivity implements TrackerService.Listener
 	private Button mStopButton;
 	private Button mDiscardButton;
 	private Button mSaveButton;
+	private ImageButton mToggleMapButton;
 	private ProgressDialog mWaitingDialog;
 
 	private PowerManager.WakeLock mWakeLock;
@@ -104,7 +108,9 @@ public class MainActivity extends MapActivity implements TrackerService.Listener
 		mMyLocationOverlay = new MyLocationOverlay();
 		mMapView.getOverlays().add(mPathOverlay);
 		mMapView.getOverlays().add(mMyLocationOverlay);
-
+		mToggleMapButton = (ImageButton)findViewById(R.id.toggleMap);
+		mToggleMapButton.setOnTouchListener(mToggleMapButtonListener);	// eigener Listener um pressed Status fix setzen zu können, sodass er auch bleibt.
+		
 		// Bind to TrackerService (asynchronous)
 		Intent intent = new Intent(this, TrackerService.class);
 		bindService(intent, mConnection, Context.BIND_AUTO_CREATE);	// this is done asynchronously
@@ -162,24 +168,6 @@ public class MainActivity extends MapActivity implements TrackerService.Listener
 		return super.onOptionsItemSelected(item);
 	}
 
-	public void onSwitchViewClicked(View view) {
-		// TODO später animiert machen
-		ViewAnimator container = (ViewAnimator)findViewById(R.id.container);
-		int displayed = container.getDisplayedChild();
-		container.setDisplayedChild(1-displayed);
-		if (displayed == 0) { // previously displayed
-			((Button)view).setText("<- Clock");
-		} else {
-			((Button)view).setText("Map ->");
-		}
-	}
-	
-	public void onShowMapClicked(View view) {
-		// TODO später animiert machen
-		ViewAnimator container = (ViewAnimator)findViewById(R.id.container);
-		container.setDisplayedChild(1);
-	}
-	
 	public void onNewSessionClicked(View view) {
 		if (!mLocationMgr.isProviderEnabled(LocationManager.GPS_PROVIDER)) {
 			showDialog(DIALOG_ENABLE_GPS);
@@ -192,7 +180,7 @@ public class MainActivity extends MapActivity implements TrackerService.Listener
 	private void waitForSatisfactoryStartingLocation() {
 		mService.startTracking();
 		mService.reset();
-		mWaitingDialog = ProgressDialog.show(this, "", "waiting for better fix...", true, true, new OnCancelListener() {
+		mWaitingDialog = ProgressDialog.show(this, "", "Let's see were we are right now...", true, true, new OnCancelListener() {
 			@Override
 			public void onCancel(DialogInterface dialog) {
 				mService.stopTracking();
@@ -361,10 +349,15 @@ public class MainActivity extends MapActivity implements TrackerService.Listener
 			//mVibrator.cancel();
 		}		
 		
+		// EXPERIMENTAL
+		if (mStartButton.getVisibility() == View.VISIBLE) {
+			mStartButton.setText("Start " + ((int)location.getAccuracy())+"m");
+		}
+		
 		mMyLocationOverlay.setLocation(mService.currentLocation);
 		mPathOverlay.setPositions(mService.positions);
 		if (location != null) {
-			mMapView.getController().animateTo(Util.locationToGeoPoint(location));
+			mMapView.getController().setCenter(Util.locationToGeoPoint(location));
 		}
 		mMapView.invalidate();		
 		setPathLength(mService.pathLength);
@@ -402,5 +395,29 @@ public class MainActivity extends MapActivity implements TrackerService.Listener
 		public void onServiceDisconnected(ComponentName className) {
 			mBound = false;
 		}
-	};	
+	};
+
+	/** eigener OnTouchListener um Button.pressed Status fix setzen und entfernen zu können (wie bei FingerColors) */
+	private OnTouchListener mToggleMapButtonListener = new OnTouchListener() {
+		@Override
+		public boolean onTouch(View v, MotionEvent event) {
+			if (event.getAction() == MotionEvent.ACTION_DOWN) {
+				if (mMapView.getVisibility() == View.GONE) {
+					mMapView.bringToFront();
+					Animation in = AnimationUtils.loadAnimation(MainActivity.this, R.anim.shift_in_from_bottom);
+					in.setZAdjustment(Animation.ZORDER_TOP);
+					mMapView.setVisibility(View.VISIBLE);
+					mMapView.startAnimation(in);
+					v.setPressed(true);
+				} else {
+					mMapView.getZoomButtonsController().setVisible(false);	// remove zoom buttons immediately
+					Animation out = AnimationUtils.loadAnimation(MainActivity.this, R.anim.shift_out_to_bottom);
+					mMapView.startAnimation(out);
+					mMapView.setVisibility(View.GONE);
+					v.setPressed(false);
+				}
+			}
+			return true;
+		}
+	};
 }
