@@ -5,19 +5,27 @@
 	android:layout_width="fill_parent" 
 	android:padding="8dp">
 	<TextView android:layout_height="wrap_content" android:layout_width="wrap_content" style="@style/LargeNumber" android:id="@+id/time" android:layout_alignParentTop="true" android:layout_alignParentRight="true" android:text="00'00''"></TextView>
-	<TextView android:layout_height="wrap_content" android:layout_width="wrap_content" android:id="@+id/timeLabel" android:text="Time" android:layout_alignBaseline="@+id/time" android:layout_alignBottom="@+id/time" android:layout_alignParentLeft="true" style="@style/LargeLabel"></TextView>
+	<TextView android:layout_height="wrap_content" android:layout_width="wrap_content" android:id="@+id/timeLabel" android:text="Time" android:layout_alignBaseline="@+id/time" android:layout_alignParentLeft="true" style="@style/LargeLabel"></TextView>
 
-	<TextView style="@style/LargeNumber" android:layout_height="wrap_content" android:id="@+id/distance" android:layout_width="wrap_content" android:layout_below="@+id/time" android:layout_toLeftOf="@+id/distanceUnit" android:layout_marginBottom="20dp" android:text="0.00" android:layout_marginRight="4dp"></TextView>
-	<TextView android:layout_height="wrap_content" android:layout_width="wrap_content" android:id="@+id/distanceLabel" android:text="Distance" android:layout_alignBaseline="@+id/distance" android:layout_alignBottom="@+id/distance" android:layout_alignParentLeft="true" style="@style/LargeLabel"></TextView>
+	<TextView style="@style/LargeNumber" android:layout_height="wrap_content" android:id="@+id/distance" android:layout_width="wrap_content" android:layout_below="@+id/time" android:layout_toLeftOf="@+id/distanceUnit" android:text="0.00" android:layout_marginRight="4dp"></TextView>
+	<TextView android:layout_height="wrap_content" android:layout_width="wrap_content" android:id="@+id/distanceLabel" android:text="Distance" android:layout_alignBaseline="@+id/distance" android:layout_alignParentLeft="true" style="@style/LargeLabel"></TextView>
 	<TextView android:layout_height="wrap_content" android:layout_width="wrap_content" android:layout_alignBaseline="@+id/distanceLabel" android:layout_alignParentRight="true" android:text="km" android:id="@+id/distanceUnit" style="@style/LargeUnitLabel"></TextView>
 
-	<View android:id="@+id/hline1" android:layout_width="fill_parent" android:layout_alignParentLeft="true" android:layout_height="2dp" android:layout_below="@+id/distance" android:layout_marginBottom="10dp" android:background="#444444"/>
+	<View android:id="@+id/hline1" android:layout_width="fill_parent" android:layout_alignParentLeft="true" android:layout_height="2dp" android:layout_below="@+id/distance" android:layout_marginBottom="10dp" android:background="#444444" android:layout_marginTop="10dp"/>
 
-	<TextView style="@style/MediumNumber" android:layout_height="wrap_content" android:id="@+id/pace" android:layout_width="wrap_content" android:layout_below="@+id/hline1" android:layout_toLeftOf="@+id/currentPaceUnit" android:layout_marginTop="10dp" android:text="0.0" android:layout_marginRight="4dp"></TextView>
-	<TextView android:layout_height="wrap_content" android:layout_width="wrap_content" android:id="@+id/paceLabel" android:layout_alignBaseline="@+id/pace" android:layout_alignBottom="@+id/pace" android:layout_alignParentLeft="true" style="@style/MediumLabel" android:text="Current Pace"></TextView>
+	<TextView style="@style/MediumNumber" android:layout_height="wrap_content" android:id="@+id/pace" android:layout_width="wrap_content" android:layout_below="@+id/hline1" android:layout_toLeftOf="@+id/currentPaceUnit" android:text="0.0" android:layout_marginRight="4dp"></TextView>
+	<TextView android:layout_height="wrap_content" android:layout_width="wrap_content" android:id="@+id/paceLabel" android:layout_alignBaseline="@+id/pace" android:layout_alignParentLeft="true" style="@style/MediumLabel" android:text="Current Pace"></TextView>
 	<TextView android:layout_height="wrap_content" android:layout_width="wrap_content" android:layout_alignBaseline="@+id/paceLabel" android:layout_alignParentRight="true" android:text="km/h" android:id="@+id/currentPaceUnit" style="@style/MediumUnitLabel"></TextView>
 
 	<TextView style="@style/MediumNumber" android:layout_height="wrap_content" android:id="@+id/averagePace" android:layout_width="wrap_content" android:layout_below="@+id/pace" android:layout_toLeftOf="@+id/averagePaceUnit" android:text="0.0" android:layout_marginRight="4dp"></TextView>
-	<TextView android:layout_height="wrap_content" android:layout_width="wrap_content" android:id="@+id/averagePaceLabel" android:layout_alignBaseline="@+id/averagePace" android:layout_alignBottom="@+id/averagePace" android:layout_alignParentLeft="true" style="@style/MediumLabel" android:text="Average Pace"></TextView>
+	<TextView android:layout_height="wrap_content" android:layout_width="wrap_content" android:id="@+id/averagePaceLabel" android:layout_alignBaseline="@+id/averagePace" android:layout_alignParentLeft="true" style="@style/MediumLabel" android:text="Average Pace"></TextView>
 	<TextView android:layout_height="wrap_content" android:layout_width="wrap_content" android:layout_alignBaseline="@+id/averagePaceLabel" android:layout_alignParentRight="true" android:text="km/h" android:id="@+id/averagePaceUnit" style="@style/MediumUnitLabel"></TextView>
+
+	<View android:id="@+id/hline2" android:layout_width="fill_parent" android:layout_alignParentLeft="true" android:layout_height="2dp" android:layout_below="@+id/averagePace" android:layout_marginBottom="10dp" android:background="#444444" android:layout_marginTop="10dp"/>
+
+	<TextView style="@style/MediumNumber" android:layout_height="wrap_content" android:id="@+id/calories" android:layout_width="wrap_content" android:layout_below="@+id/hline2" android:layout_toLeftOf="@+id/caloriesUnit" android:text="0" android:layout_marginRight="4dp"></TextView>
+	<TextView android:layout_height="wrap_content" android:layout_width="wrap_content" android:id="@+id/caloriesLabel" android:layout_alignBaseline="@+id/calories" android:layout_alignParentLeft="true" style="@style/MediumLabel" android:text="Calories"></TextView>
+	<TextView android:layout_height="wrap_content" android:layout_width="wrap_content" android:layout_alignBaseline="@+id/caloriesLabel" android:layout_alignParentRight="true" android:text="kcal" android:id="@+id/caloriesUnit" style="@style/MediumUnitLabel"></TextView>
+
+
 </RelativeLayout>

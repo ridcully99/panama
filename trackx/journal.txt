@@ -89,6 +89,13 @@
 + Texte/Formatierung optimiert (Wochentag bei Liste gespeicherter Sessions)
 + NaN bei Average Pace gefixt
 
+16.10.2011
++ Kalorienberechnung 
+  (nach ACSM, einfach beschrieben auf http://www.livestrong.com/article/34973-calculate-treadmill-calories/)
+  die Beschreibung dort ist aber nicht ganz richtig. Step 5 ist falsch; meiner Meinung (und gemäß ACSM Dokument) nach
+  sollte der Oxygenwert / 1000 gerechnet werden (weil da die Fomel für Liter statt ml ist) und mit 4.9 multipliziert werden um die kcal/min zu erhalten.
+  Dann noch mit dem Gewicht und der Zeit multiplizieren.
+  Und: 3.5 ist für Männer, 3.2 für Frauen. Alterseinfluss hab ich keinen gesehen
 
 TODO: während Suche nach better fix irgendwie was anzeigen bzgl. genauigkeit (auch in nummernansicht)
       und Start prinzipiell erlauben sobald ich eine zeitlich aktuelle Position habe ... je länger man dann wartet, desto genauer wird sie halt.
@@ -97,8 +104,6 @@ TODO: während Suche nach better fix irgendwie was anzeigen bzgl. genauigkeit (a
 TODO: mal echten Map API Key generieren und einbauen      
       
 TODO: bei geladenen Sessions (oder generell?) irgendwo klein Datum+Zeit anzeigen
-
-TODO: Kalorienberechnung
 
 TODO: Vibration aktivieren
 
@@ -129,5 +134,5 @@ TODO: Texte aus strings.xml / I18n / L10n
 
 TODO: Optionen: 
 		- Umschalten zw. km und Meilen (auch für UnitLabels (km/h, mph) verwenden) -- Berechnungen immer metrisch, erst für Anzeige ggf. umrechnen!
-		- Größe, Gewicht, Geschlecht für Kalorienberechnung
-		- Automatische Marker alle Kilometer/Meilen
+		- Gewicht, Geschlecht für Kalorienberechnung
+		- Automatische Marker alle Kilometer/Meilen?

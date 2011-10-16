@@ -52,6 +52,7 @@ public class MainActivity extends MapActivity implements TrackerService.Listener
 	private TextView mTimerView;
 	private TextView mPaceView;
 	private TextView mAveragePaceView;
+	private TextView mCaloriesView;
 	private Button mNewSessionButton;
 	private Button mStartButton;
 	private Button mPauseButton;
@@ -85,6 +86,7 @@ public class MainActivity extends MapActivity implements TrackerService.Listener
 		mTimerView = (TextView)findViewById(R.id.time);
 		mPaceView = (TextView)findViewById(R.id.pace);
 		mAveragePaceView = (TextView)findViewById(R.id.averagePace);
+		mCaloriesView = (TextView)findViewById(R.id.calories);
 		
 //		Typeface numberFont = Typeface.createFromAsset(this.getAssets(), "fonts/LEXIB___.ttf");
 //		mDistanceView.setTypeface(numberFont);
@@ -241,7 +243,7 @@ public class MainActivity extends MapActivity implements TrackerService.Listener
 	
 	public void onSaveClicked(View view) {
 		try {
-			Session session = new Session(Util.createUniqueName(), "notizen", System.currentTimeMillis(), mService.elapsedTimeMillis, mService.pathLength, mService.positions);
+			Session session = new Session("title-unused", "notes-unused", System.currentTimeMillis(), mService.elapsedTimeMillis, mService.pathLength, mService.positions);
 			mPersistence.save(session);
 			Toast.makeText(this, "session saved", Toast.LENGTH_LONG).show();
 		} catch (Exception e) {
@@ -323,6 +325,11 @@ public class MainActivity extends MapActivity implements TrackerService.Listener
 		mTimerView.setText(Util.formatTime(timeMillis));
 		mTimerView.invalidate();
 	}
+	
+	private void setCalories(int kcal) {
+		mCaloriesView.setText(""+kcal);
+		mCaloriesView.invalidate();
+	}
 
 	// -------------------------------------------------------------------------------------- MapActivity Implementation
 
@@ -372,6 +379,7 @@ public class MainActivity extends MapActivity implements TrackerService.Listener
 	@Override
 	public void onTimerChanged(long timeMillis) {
 		setTime(mService.elapsedTimeMillis);
+		setCalories(Util.calculateCalories(0, 86.5f, mService.elapsedTimeMillis, mService.pathLength, 0f));
 	}
 	
 	// ------------------------------------------------------------------------------------------------- service connection

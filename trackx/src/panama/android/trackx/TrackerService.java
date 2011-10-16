@@ -208,12 +208,12 @@ public class TrackerService extends Service {
 		@Override
 		public void onLocationChanged(Location location) {
 
-			// FOR EMULATOR TESTING ONLY!!!
-			if (location.hasAccuracy() == false) {
-				Log.d(TAG, "setting accuracy to 15 for location having no accuracy!");
-				location.setAccuracy(15);
-				location.setTime(System.currentTimeMillis());
-			}
+//			// FOR EMULATOR TESTING ONLY!!!
+//			if (location.hasAccuracy() == false) {
+//				Log.d(TAG, "setting accuracy to 15 for location having no accuracy!");
+//				location.setAccuracy(15);
+//				location.setTime(System.currentTimeMillis());
+//			}
 			
 			Log.d(TAG, "onLocationChanged. tracking/recording="+TrackerService.this.isTracking+","+TrackerService.this.isRecording);
 			

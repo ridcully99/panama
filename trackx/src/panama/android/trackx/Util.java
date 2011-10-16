@@ -16,11 +16,9 @@
 package panama.android.trackx;
 
 import java.text.SimpleDateFormat;
-import java.util.Date;
 
 import android.location.Location;
 import android.location.LocationManager;
-import android.text.format.DateFormat;
 import android.util.FloatMath;
 import android.util.Log;
 
@@ -36,6 +34,13 @@ public class Util {
 	public final static int SECOND_IN_MILLIS = 1000;
 	public final static int MAX_STARTOK_FIX_ACCURACY = 100;
 	public final static long MAX_STARTOK_FIX_AGE = 30 * SECOND_IN_MILLIS;
+	
+	// calories calulation
+	public final static int GENDER_MALE = 0;
+	public final static int GENDER_FEMALE = 1;
+	public final static int GENDER_UNKNOWN = 2;
+	private final static float RESTING_COMPONENT[] = new float[] {3.5f, 3.2f, 3.35f};	// used GENDER_... as index
+	private final static float MIN_RUNNING_SPEED_IN_M_PER_MINUTE = 5.9545728f*1000f/60f;
 	
 	public final static SimpleDateFormat dateFormat = new SimpleDateFormat("EEE, dd.MMM.yyyy HH:mm");	// TODO externalize and make I18n
 	
@@ -88,8 +93,32 @@ public class Util {
 		return dateFormat.format(timestampMillis);
 	}
 	
-	public static String createUniqueName() {
-		return "trackx-session-"+DateFormat.format("yyyy-MM-dd-kk-mm-ss", new Date());
+	/**
+	 * 
+	 * @param gender GENDER_MALE, GENDER_FEMALE or GENDER_UNKNOWN
+	 * @param weight in kg
+	 * @param timeMillis
+	 * @param meters
+	 * @param grade Steigung in % ... 0.02 == 2%
+	 * @return kcal
+	 */
+	public static int calculateCalories(int gender, float weight, long timeMillis, float meters, float grade) {
+		if (timeMillis == 0 || meters == 0) {
+			return 0;
+		}
+		if (gender < 0 || gender > 2) {
+			gender = 2;
+		}
+		float speed = meters/(timeMillis/SECOND_IN_MILLIS/60); // in meter/minute
+		float oxygen;
+		if (speed < MIN_RUNNING_SPEED_IN_M_PER_MINUTE) {
+			oxygen = (0.1f * speed) + (1.8f * speed * grade) + RESTING_COMPONENT[gender];
+		} else {
+			oxygen = (0.2f * speed) + (0.9f * speed * grade) + RESTING_COMPONENT[gender];
+		}
+		float kcalPerMinute = (oxygen * 4.9f) / 1000f;
+		float kcal = kcalPerMinute * weight * ((float)timeMillis)/((float)(SECOND_IN_MILLIS*60));
+		return (int)kcal;
 	}
 	
 	/** check if location is OK for starting session */
