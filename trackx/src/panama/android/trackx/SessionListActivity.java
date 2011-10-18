@@ -57,7 +57,7 @@ public class SessionListActivity extends ListActivity {
 			public boolean setViewValue(View view, Cursor cursor, int columnIndex) {
 				if (view.getId() == R.id.sessionListDate) {
 					long timestampMillis = cursor.getLong(1);
-					((TextView)view).setText(Util.formatDate(timestampMillis));
+					((TextView)view).setText(Util.formatDateLong(timestampMillis));
 					return true;
 				}
 				if (view.getId() == R.id.sessionListData) {

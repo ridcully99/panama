@@ -48,12 +48,14 @@ public class MainActivity extends MapActivity implements TrackerService.Listener
 	private MapView mMapView;
 	private PathOverlay mPathOverlay;
 	private MyLocationOverlay mMyLocationOverlay;
+	private TextView mSessionStartView;
 	private TextView mDistanceView;
 	private TextView mTimerView;
 	private TextView mPaceView;
 	private TextView mAveragePaceView;
 	private TextView mCaloriesView;
 	private Button mNewSessionButton;
+	private Button mCancelButton;
 	private Button mStartButton;
 	private Button mPauseButton;
 	private Button mResumeButton;
@@ -65,7 +67,6 @@ public class MainActivity extends MapActivity implements TrackerService.Listener
 
 	private PowerManager.WakeLock mWakeLock;
 	private LocationManager mLocationMgr;
-	private Vibrator mVibrator;
 
 	private SessionPersistence mPersistence = new SessionPersistence(this);
 	private TrackerService mService;
@@ -76,12 +77,12 @@ public class MainActivity extends MapActivity implements TrackerService.Listener
 	public void onCreate(Bundle savedInstanceState) {
 		super.onCreate(savedInstanceState);
 		mLocationMgr = (LocationManager) getSystemService(Context.LOCATION_SERVICE);
-		mVibrator = (Vibrator)getSystemService(Context.VIBRATOR_SERVICE);
 		setContentView(R.layout.main);
 
 		PowerManager pm = (PowerManager) getSystemService(Context.POWER_SERVICE);
 		mWakeLock = pm.newWakeLock(PowerManager.SCREEN_DIM_WAKE_LOCK, TAG);
 
+		mSessionStartView = (TextView)findViewById(R.id.sessionDateTime);
 		mDistanceView = (TextView)findViewById(R.id.distance);
 		mTimerView = (TextView)findViewById(R.id.time);
 		mPaceView = (TextView)findViewById(R.id.pace);
@@ -96,6 +97,7 @@ public class MainActivity extends MapActivity implements TrackerService.Listener
 		
 		mNewSessionButton = (Button)findViewById(R.id.newSession);
 		mNewSessionButton.setEnabled(false);	// disabled bis wir mit Service verbunden sind.
+		mCancelButton = (Button)findViewById(R.id.cancel);
 		mStartButton = (Button)findViewById(R.id.start);
 		mPauseButton = (Button)findViewById(R.id.pause);
 		mResumeButton = (Button)findViewById(R.id.resume);
@@ -191,14 +193,20 @@ public class MainActivity extends MapActivity implements TrackerService.Listener
 		});
 	}
 
+	public void onCancelClicked(View view) {
+		mCancelButton.setVisibility(View.GONE);
+		mStartButton.setVisibility(View.GONE);
+		mNewSessionButton.setVisibility(View.VISIBLE);
+		mService.stopTracking();
+		mService.reset();
+	}
+	
 	public void onStartClicked(View view) {
-		Log.d(TAG, "onStartClicked begin");
 		mStartButton.setVisibility(View.GONE);
 		mPauseButton.setVisibility(View.VISIBLE);
 		mStopButton.setVisibility(View.VISIBLE);
 		mService.startRecording();
 		mWakeLock.acquire();										// standby verhindern
-		Log.d(TAG, "onStartClicked done");
 	}
 
 	public void onPauseClicked(View view) {
@@ -243,7 +251,7 @@ public class MainActivity extends MapActivity implements TrackerService.Listener
 	
 	public void onSaveClicked(View view) {
 		try {
-			Session session = new Session("title-unused", "notes-unused", System.currentTimeMillis(), mService.elapsedTimeMillis, mService.pathLength, mService.positions);
+			Session session = new Session("title-unused", "notes-unused", mService.sessionStartedAtMillis, mService.elapsedTimeMillis, mService.pathLength, mService.positions);
 			mPersistence.save(session);
 			Toast.makeText(this, "session saved", Toast.LENGTH_LONG).show();
 		} catch (Exception e) {
@@ -280,6 +288,7 @@ public class MainActivity extends MapActivity implements TrackerService.Listener
 	/** 
 	 * zoom/move map so that start and end point are visible.
 	 * based on http://stackoverflow.com/questions/7513247/how-to-zoom-a-mapview-so-it-always-includes-two-geopoints
+	 *   hab aber die komische ratio Anpassung entfernt, sonst gings nicht
 	 */
 	private void adjustMap(List<Position> positions) {
 		if (positions == null || positions.isEmpty()) {
@@ -294,13 +303,6 @@ public class MainActivity extends MapActivity implements TrackerService.Listener
 		double latitudeSpan = Math.round(Math.abs(a.getLatitudeE6() - b.getLatitudeE6()));
 		double longitudeSpan = Math.round(Math.abs(a.getLongitudeE6() - b.getLongitudeE6())); 
 
-		//double currentLatitudeSpan = (double)mMapView.getLatitudeSpan();
-		//double currentLongitudeSpan = (double)mMapView.getLongitudeSpan();
-
-		//double ratio = currentLongitudeSpan/currentLatitudeSpan;
-		//if(longitudeSpan < (double)(latitudeSpan+2E7) * ratio){
-		//    longitudeSpan = ((double)(latitudeSpan+2E7) * ratio);
-		//}
 		mMapView.getController().setCenter(center);
 		mMapView.getController().zoomToSpan((int)(latitudeSpan*1.5), (int)(longitudeSpan*1.5));                
 		mMapView.invalidate();
@@ -347,13 +349,12 @@ public class MainActivity extends MapActivity implements TrackerService.Listener
 	
 	@Override
 	public void onLocationChanged(Location location) {
-		Log.d(TAG, "onLocationChanged begin");
-		if (mWaitingDialog != null && mWaitingDialog.isShowing() && Util.isOKforStart(location)) {
+		if (mWaitingDialog != null && mWaitingDialog.isShowing() && mService.trackingFoundLocation && Util.isOKforStart(location)) {
 			mWaitingDialog.dismiss();
 			mNewSessionButton.setVisibility(View.GONE);
 			mStartButton.setVisibility(View.VISIBLE);
-			//mVibrator.vibrate(50); //vibrieren damit User weiss dass er jetzt starten kann (ohne immer hinsehen zu müssen)
-			//mVibrator.cancel();
+			Vibrator vibrator = (Vibrator)getSystemService(Context.VIBRATOR_SERVICE);
+			vibrator.vibrate(40); //vibrieren damit User weiss dass er jetzt starten kann (ohne immer hinsehen zu müssen)
 		}		
 		
 		// EXPERIMENTAL
@@ -380,6 +381,18 @@ public class MainActivity extends MapActivity implements TrackerService.Listener
 	public void onTimerChanged(long timeMillis) {
 		setTime(mService.elapsedTimeMillis);
 		setCalories(Util.calculateCalories(0, 86.5f, mService.elapsedTimeMillis, mService.pathLength, 0f));
+	}
+	
+	@Override
+	public void onRefreshAll() {
+		onLocationChanged(null);
+		onPaceChanged(mService.currentPace, mService.averagePace);
+		onTimerChanged(mService.elapsedTimeMillis);
+		if (mService.sessionStartedAtMillis > 0) {
+			mSessionStartView.setText("Session of "+Util.formatDateShort(mService.sessionStartedAtMillis));
+		} else {
+			mSessionStartView.setText("");
+		}
 	}
 	
 	// ------------------------------------------------------------------------------------------------- service connection

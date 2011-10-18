@@ -54,6 +54,7 @@ public class TrackerService extends Service {
 	public final static int FOREGROUND_WHILE_RECORDING = 1;
 	
 	public Location currentLocation;
+	public Location preliminaryLocation;
 	private LocationManager mLocationMgr;
 	private TimerTask mTimer;
 	private IBinder mLocalBinder = new LocalBinder();
@@ -61,11 +62,13 @@ public class TrackerService extends Service {
 	
 	public List<Position> positions = new ArrayList<Position>();
 	public float pathLength;
+	public long sessionStartedAtMillis;
 	public long elapsedTimeMillis;
 	public float currentPace;
 	public float averagePace;
 	public boolean isTracking = false;
 	public boolean isRecording = false;
+	public boolean trackingFoundLocation = false;	// set true at first location we get after startTracking()
 	
 	// create Notification for using while recording
 	private Notification mNotification;
@@ -93,32 +96,33 @@ public class TrackerService extends Service {
 	}
 
 	public void startRecording() {
-		Log.i(TAG, "startRecording begin");
 		isRecording = true;
-		reset();
+		resetQuietly();
+		sessionStartedAtMillis = System.currentTimeMillis();
+		for (Listener l : mListeners) {
+			l.onRefreshAll();
+		}
 		positions.add(new Position(currentLocation));
 		mNotification.setLatestEventInfo(this, getText(R.string.notification_recording), getText(R.string.notification_text), mNotification.contentIntent);
 		startForeground(FOREGROUND_WHILE_RECORDING, mNotification);
 		mTimer = new TimerTask();
 		mTimer.execute(0L);
-		Log.d(TAG, "startRecording done, isRecording="+isRecording);
 	}
 	
 	public void stopRecording() {
-		Log.d(TAG, "stopRecording begin");
 		isRecording = false;
 		mTimer.cancel(true);
 		mTimer = null;
 		stopForeground(true);
-		Log.d(TAG, "stopRecording done, isRecording="+isRecording);
 	}
 	
-	public void startTracking() {
-		Log.d(TAG, "startTracking begin");
+	/** returns preliminary location at start */
+	public Location startTracking() {
+		trackingFoundLocation = false;
 		currentLocation = getPreliminaryPosition();
 		mLocationMgr.requestLocationUpdates(LocationManager.GPS_PROVIDER, MIN_TIME, 0, mLocationListener);
 		isTracking = true;
-		Log.d(TAG, "startTracking done");
+		return currentLocation;
 	}
 	
 	public void stopTracking() {
@@ -130,28 +134,32 @@ public class TrackerService extends Service {
 	}
 	
 	public void reset() {
+		resetQuietly();
+		for (Listener l : mListeners) {
+			l.onRefreshAll();
+		}
+	}
+	
+	private void resetQuietly() {
 		positions.clear();
 		pathLength = 0;
+		sessionStartedAtMillis = 0;
 		elapsedTimeMillis = 0;
 		currentPace = 0;
 		averagePace = 0;
-		for (Listener l : mListeners) {
-			l.onLocationChanged(currentLocation);
-			l.onTimerChanged(elapsedTimeMillis);
-		}
 	}
 	
 	/** set data from session (called after load) */
 	public void setSession(Session session) {
 		pathLength = session.distance;
+		sessionStartedAtMillis = session.timestamp;
 		elapsedTimeMillis = session.time;
 		averagePace = (elapsedTimeMillis/Util.SECOND_IN_MILLIS) > 0 ? pathLength/(elapsedTimeMillis/Util.SECOND_IN_MILLIS) : 0;
 		positions = session.positions;
 		currentLocation = null;
 		// notify listeners
 		for (Listener l : mListeners) {
-			l.onLocationChanged(currentLocation);
-			l.onTimerChanged(elapsedTimeMillis);
+			l.onRefreshAll();
 		}
 	}	
 	
@@ -199,6 +207,8 @@ public class TrackerService extends Service {
 		public void onTimerChanged(long elapsedTimeMillis);
 		
 		public void onPaceChanged(float currentPace, float averagePace);
+		
+		public void onRefreshAll();
 	}	
 	
 	// -------------------------------------------------------------------------------- LocationListener
@@ -220,6 +230,8 @@ public class TrackerService extends Service {
 			if (!Util.isBetterLocation(currentLocation, location)) {
 				return;
 			}
+			
+			trackingFoundLocation = true;
 			
 			if (TrackerService.this.isRecording) {
 				// always notify about pace (to get speed 0 too, even if we do not actually record the position due to too less distance...)

@@ -32,8 +32,7 @@ import com.google.android.maps.MapView;
 public class Util {
 
 	public final static int SECOND_IN_MILLIS = 1000;
-	public final static int MAX_STARTOK_FIX_ACCURACY = 100;
-	public final static long MAX_STARTOK_FIX_AGE = 30 * SECOND_IN_MILLIS;
+	public final static int MAX_STARTOK_FIX_ACCURACY = 30;
 	
 	// calories calulation
 	public final static int GENDER_MALE = 0;
@@ -42,7 +41,8 @@ public class Util {
 	private final static float RESTING_COMPONENT[] = new float[] {3.5f, 3.2f, 3.35f};	// used GENDER_... as index
 	private final static float MIN_RUNNING_SPEED_IN_M_PER_MINUTE = 5.9545728f*1000f/60f;
 	
-	public final static SimpleDateFormat dateFormat = new SimpleDateFormat("EEE, dd.MMM.yyyy HH:mm");	// TODO externalize and make I18n
+	public final static SimpleDateFormat longerDateFormat = new SimpleDateFormat("EEE, dd.MMM.yyyy HH:mm");	// TODO externalize and make I18n
+	public final static SimpleDateFormat shorterDateFormat = new SimpleDateFormat("dd.MM.yyyy HH:mm");	// TODO externalize and make I18n
 	
 	/**
 	 * Location -> GeoPoint
@@ -89,8 +89,12 @@ public class Util {
 		return String.format("%.2f", meters/1000f);
 	}	
 	
-	public static CharSequence formatDate(long timestampMillis) {
-		return dateFormat.format(timestampMillis);
+	public static CharSequence formatDateLong(long timestampMillis) {
+		return longerDateFormat.format(timestampMillis);
+	}
+	
+	public static CharSequence formatDateShort(long timeMillis) {
+		return shorterDateFormat.format(timeMillis);
 	}
 	
 	/**
@@ -125,10 +129,9 @@ public class Util {
 	public static boolean isOKforStart(Location location) {
 		boolean ok = location != null &&
 				LocationManager.GPS_PROVIDER.equals(location.getProvider()) &&
-				((location.hasAccuracy() && location.getAccuracy() <= MAX_STARTOK_FIX_ACCURACY) || (!location.hasAccuracy())) &&
-				(System.currentTimeMillis() - location.getTime()) <= MAX_STARTOK_FIX_AGE;
+				((location.hasAccuracy() && location.getAccuracy() <= MAX_STARTOK_FIX_ACCURACY) || (!location.hasAccuracy()));
 		if (!ok) {
-			Log.d(MainActivity.TAG, String.format("location not OK for start: provider=%s, accuracy=%f meters, age=%d secs", location.getProvider(), location.getAccuracy(), (int)(System.currentTimeMillis() - location.getTime())/1000));
+			Log.d(MainActivity.TAG, String.format("location not OK for start: provider=%s, accuracy=%f meters", location.getProvider(), location.getAccuracy()));
 		}
 		return ok;
 	}

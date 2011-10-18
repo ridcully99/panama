@@ -90,7 +90,7 @@ public class SessionPersistence {
 	
 	public Session load(long sessionId) {
 		SQLiteDatabase db = mDBHelper.getWritableDatabase();
-		Cursor c = db.query(TBL_SESSION, new String[] {TIME, DISTANCE}, "_id = "+sessionId, null, null, null, null);
+		Cursor c = db.query(TBL_SESSION, new String[] {TIME, DISTANCE, TIMESTAMP}, "_id = "+sessionId, null, null, null, null);
 		if (c.getCount() == 0) {
 			Log.e(MainActivity.TAG, "session "+sessionId+" not found.");
 			c.close();
@@ -101,6 +101,7 @@ public class SessionPersistence {
 		c.moveToFirst();
 		session.time = c.getLong(0);
 		session.distance = c.getFloat(1);
+		session.timestamp = c.getLong(2);
 		c.close();
 
 		c = db.query(TBL_POSITION, new String[] {TIME, LATITUDE, LONGITUDE, ALTITUDE, ACCURACY, SPEED, BEARING, PROVIDER, DISTANCE}, "session_id = "+sessionId, null, null, null, TIME+" asc");
