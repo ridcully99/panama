@@ -39,7 +39,6 @@
 
     <LinearLayout android:layout_width="fill_parent" android:layout_height="wrap_content" android:id="@+id/linearLayout1" android:background="@drawable/headerbackground" android:paddingLeft="8dp" android:paddingRight="8dp" android:paddingTop="8dp" android:paddingBottom="8dp">
         <Button android:layout_height="wrap_content" android:layout_weight="1" android:layout_width="0dp" android:id="@+id/newSession" android:text="New Session" android:onClick="onNewSessionClicked" style="@style/LargeButton"></Button>
-        <Button android:layout_height="wrap_content" android:layout_weight="1" android:layout_width="0dp" android:id="@+id/cancel" android:text="Cancel" android:onClick="onCancelClicked" android:visibility="gone" style="@style/LargeButton"></Button>
         <Button android:layout_height="wrap_content" android:layout_weight="1" android:layout_width="0dp" android:id="@+id/start" android:text="Start" android:onClick="onStartClicked" android:visibility="gone" style="@style/LargeButton"></Button>
         <Button android:layout_height="wrap_content" android:layout_weight="1" android:layout_width="0dp" android:id="@+id/pause" android:text="Pause" android:visibility="gone" android:onClick="onPauseClicked" style="@style/LargeButton"></Button>
         <Button android:layout_height="wrap_content" android:layout_weight="1" android:layout_width="0dp" android:id="@+id/resume" android:text="Resume" android:visibility="gone" android:onClick="onResumeClicked" style="@style/LargeButton"></Button>

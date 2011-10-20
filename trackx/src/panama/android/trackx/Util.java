@@ -35,11 +35,12 @@ public class Util {
 	public final static int MAX_STARTOK_FIX_ACCURACY = 30;
 	
 	// calories calulation
-	public final static int GENDER_MALE = 0;
-	public final static int GENDER_FEMALE = 1;
-	public final static int GENDER_UNKNOWN = 2;
-	private final static float RESTING_COMPONENT[] = new float[] {3.5f, 3.2f, 3.35f};	// used GENDER_... as index
-	private final static float MIN_RUNNING_SPEED_IN_M_PER_MINUTE = 5.9545728f*1000f/60f;
+	public final static int DEFAULT_WEIGHT = 75;
+	public final static int GENDER_UNKNOWN = 0;
+	public final static int GENDER_MALE = 1;
+	public final static int GENDER_FEMALE = 2;
+	private final static float RESTING_COMPONENT[] = new float[] {3.35f, 3.5f, 3.2f};	// used GENDER_... as index
+	private final static float MIN_RUNNING_SPEED_IN_M_PER_MINUTE = 5.9545728f*1000f/60f;	// unterscheidung ob gehen oder laufen --> verschiedene Faktoren bei Kalorienberechnung
 	
 	public final static SimpleDateFormat longerDateFormat = new SimpleDateFormat("EEE, dd.MMM.yyyy HH:mm");	// TODO externalize and make I18n
 	public final static SimpleDateFormat shorterDateFormat = new SimpleDateFormat("dd.MM.yyyy HH:mm");	// TODO externalize and make I18n

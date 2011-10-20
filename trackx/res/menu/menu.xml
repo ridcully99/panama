@@ -2,5 +2,6 @@
 <menu
   xmlns:android="http://schemas.android.com/apk/res/android">
     <item android:id="@+id/miNew" android:title="New Session"></item>
-    <item android:id="@+id/miLoad" android:title="Load"></item> <!-- TODO später History -> Liste gespeicherter Sessions -->
+    <item android:id="@+id/miLoad" android:title="History"></item>
+    <item android:id="@+id/miSettings" android:title="Settings"></item>
 </menu>

@@ -9,6 +9,7 @@ import android.app.ProgressDialog;
 import android.content.ComponentName;
 import android.content.Context;
 import android.content.DialogInterface;
+import android.content.SharedPreferences;
 import android.content.DialogInterface.OnCancelListener;
 import android.content.Intent;
 import android.content.ServiceConnection;
@@ -18,6 +19,7 @@ import android.os.Bundle;
 import android.os.IBinder;
 import android.os.PowerManager;
 import android.os.Vibrator;
+import android.preference.PreferenceManager;
 import android.util.Log;
 import android.view.Menu;
 import android.view.MenuInflater;
@@ -43,6 +45,7 @@ public class MainActivity extends MapActivity implements TrackerService.Listener
 	// UI
 	public final static int REQUEST_ENABLING_GPS = 1;
 	public final static int REQUEST_LOAD_SESSION  = 2;
+	public final static int REQUEST_SETTINGS  = 3;
 	public final static int DIALOG_ENABLE_GPS = 1;
 
 	private MapView mMapView;
@@ -55,7 +58,6 @@ public class MainActivity extends MapActivity implements TrackerService.Listener
 	private TextView mAveragePaceView;
 	private TextView mCaloriesView;
 	private Button mNewSessionButton;
-	private Button mCancelButton;
 	private Button mStartButton;
 	private Button mPauseButton;
 	private Button mResumeButton;
@@ -72,6 +74,10 @@ public class MainActivity extends MapActivity implements TrackerService.Listener
 	private TrackerService mService;
 	private boolean mBound;	// whether bound to service
 	
+	private SharedPreferences mPrefs;
+	private int mGender = Util.GENDER_UNKNOWN;
+	private float mWeight = Util.DEFAULT_WEIGHT;
+	
 	/** Called when the activity is first created. */
 	@Override
 	public void onCreate(Bundle savedInstanceState) {
@@ -79,6 +85,8 @@ public class MainActivity extends MapActivity implements TrackerService.Listener
 		mLocationMgr = (LocationManager) getSystemService(Context.LOCATION_SERVICE);
 		setContentView(R.layout.main);
 
+		mPrefs = PreferenceManager.getDefaultSharedPreferences(this);
+		
 		PowerManager pm = (PowerManager) getSystemService(Context.POWER_SERVICE);
 		mWakeLock = pm.newWakeLock(PowerManager.SCREEN_DIM_WAKE_LOCK, TAG);
 
@@ -97,7 +105,6 @@ public class MainActivity extends MapActivity implements TrackerService.Listener
 		
 		mNewSessionButton = (Button)findViewById(R.id.newSession);
 		mNewSessionButton.setEnabled(false);	// disabled bis wir mit Service verbunden sind.
-		mCancelButton = (Button)findViewById(R.id.cancel);
 		mStartButton = (Button)findViewById(R.id.start);
 		mPauseButton = (Button)findViewById(R.id.pause);
 		mResumeButton = (Button)findViewById(R.id.resume);
@@ -168,10 +175,55 @@ public class MainActivity extends MapActivity implements TrackerService.Listener
 		case R.id.miLoad:
 			Intent intent = new Intent(this, SessionListActivity.class);
 			startActivityForResult(intent, REQUEST_LOAD_SESSION);
+			return true;
+		case R.id.miSettings:
+			intent = new Intent(this, SettingsActivity.class);
+			startActivityForResult(intent, REQUEST_SETTINGS); 
+			return true;
 		}
 		return super.onOptionsItemSelected(item);
 	}
 
+	@Override
+	protected void onActivityResult(int requestCode, int resultCode, Intent data) {
+		switch(requestCode) {
+		case REQUEST_ENABLING_GPS:
+			// see if user enabled GPS
+			if (!mLocationMgr.isProviderEnabled(LocationManager.GPS_PROVIDER)) {
+				showDialog(DIALOG_ENABLE_GPS);	// if not, once again ask to enable it.
+			} else {
+				waitForSatisfactoryStartingLocation();
+			}
+			return;
+		case REQUEST_LOAD_SESSION:
+			if (resultCode == RESULT_OK) {
+				long id = data.getLongExtra("id", -1);
+				Session session = mPersistence.load(id);
+				mService.setSession(session);
+				adjustMap(session.positions);
+			}
+			return;
+		case REQUEST_SETTINGS:
+			mGender = Integer.parseInt(mPrefs.getString(SettingsActivity.GENDER_KEY, ""+Util.GENDER_UNKNOWN));
+			mWeight = Float.parseFloat(mPrefs.getString(SettingsActivity.WEIGHT_KEY, ""+Util.DEFAULT_WEIGHT));
+			// TODO check if units preference has changed and adapt labels and value displays.
+			return;
+		}
+	}
+	
+	@Override
+	public void onBackPressed() {
+		/* undo "New Session" using back button */
+		if (mStartButton.getVisibility() == View.VISIBLE) {
+			mStartButton.setVisibility(View.GONE);
+			mNewSessionButton.setVisibility(View.VISIBLE);
+			mService.stopTracking();
+			mService.reset();
+		} else {
+			super.onBackPressed();
+		}
+	}
+	
 	public void onNewSessionClicked(View view) {
 		if (!mLocationMgr.isProviderEnabled(LocationManager.GPS_PROVIDER)) {
 			showDialog(DIALOG_ENABLE_GPS);
@@ -193,14 +245,6 @@ public class MainActivity extends MapActivity implements TrackerService.Listener
 		});
 	}
 
-	public void onCancelClicked(View view) {
-		mCancelButton.setVisibility(View.GONE);
-		mStartButton.setVisibility(View.GONE);
-		mNewSessionButton.setVisibility(View.VISIBLE);
-		mService.stopTracking();
-		mService.reset();
-	}
-	
 	public void onStartClicked(View view) {
 		mStartButton.setVisibility(View.GONE);
 		mPauseButton.setVisibility(View.VISIBLE);
@@ -263,28 +307,6 @@ public class MainActivity extends MapActivity implements TrackerService.Listener
 		mNewSessionButton.setVisibility(View.VISIBLE);
 	}
 	
-	@Override
-	protected void onActivityResult(int requestCode, int resultCode, Intent data) {
-		switch(requestCode) {
-		case REQUEST_ENABLING_GPS:
-			// see if user enabled GPS
-			if (!mLocationMgr.isProviderEnabled(LocationManager.GPS_PROVIDER)) {
-				showDialog(DIALOG_ENABLE_GPS);	// if not, once again ask to enable it.
-			} else {
-				waitForSatisfactoryStartingLocation();
-			}
-			return;
-		case REQUEST_LOAD_SESSION:
-			if (resultCode == RESULT_OK) {
-				long id = data.getLongExtra("id", -1);
-				Session session = mPersistence.load(id);
-				mService.setSession(session);
-				adjustMap(session.positions);
-			}
-			return;
-		}
-	}
-
 	/** 
 	 * zoom/move map so that start and end point are visible.
 	 * based on http://stackoverflow.com/questions/7513247/how-to-zoom-a-mapview-so-it-always-includes-two-geopoints
@@ -380,7 +402,7 @@ public class MainActivity extends MapActivity implements TrackerService.Listener
 	@Override
 	public void onTimerChanged(long timeMillis) {
 		setTime(mService.elapsedTimeMillis);
-		setCalories(Util.calculateCalories(0, 86.5f, mService.elapsedTimeMillis, mService.pathLength, 0f));
+		setCalories(Util.calculateCalories(mGender, mWeight, mService.elapsedTimeMillis, mService.pathLength, 0f));
 	}
 	
 	@Override
