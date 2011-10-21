@@ -55,10 +55,8 @@ public class SettingsActivity extends PreferenceActivity implements SharedPrefer
         SharedPreferences sharedPreferences = PreferenceManager.getDefaultSharedPreferences(this);
         
         // Setup the initial values
-        String distanceUnit = getListLabel(R.array.prefs_unit_entries, R.array.prefs_unit_entryValues, sharedPreferences.getString(DISTANCE_UNIT_KEY, "km"));
-        mDistanceUnitPreference.setSummary(distanceUnit);
-        String gender = getListLabel(R.array.prefs_gender_entries, R.array.prefs_gender_entryValues, sharedPreferences.getString(GENDER_KEY, "0"));
-        mGenderPreference.setSummary(gender); 
+        mDistanceUnitPreference.setSummary(getListEntry(mDistanceUnitPreference));
+        mGenderPreference.setSummary(getListEntry(mGenderPreference)); 
         mWeightPreference.setSummary(sharedPreferences.getString(WEIGHT_KEY, ""+Util.DEFAULT_WEIGHT)+" kg");
         
         // Set up a listener whenever a key changes            
@@ -73,15 +71,8 @@ public class SettingsActivity extends PreferenceActivity implements SharedPrefer
         PreferenceManager.getDefaultSharedPreferences(this).unregisterOnSharedPreferenceChangeListener(this);    
     }
     
-    private String getListLabel(int labelArrayResourceId, int valueArrayResourceId, String value) {
-        String[] labels = getResources().getStringArray(labelArrayResourceId);
-        String[] values = getResources().getStringArray(valueArrayResourceId);
-        for (int i=0; i<values.length; i++) {
-        	if (values[i].equals(value)) {
-        		return labels[i];
-        	}
-        }
-        return "";
+    private CharSequence getListEntry(ListPreference pref) {
+    	return pref.getEntry() != null ? pref.getEntry() : pref.getEntries()[0];
     }
     
 	// ------------------------------------------------ SharedPreferences.OnSharedPreferenceChangeListener Implementation
@@ -89,11 +80,9 @@ public class SettingsActivity extends PreferenceActivity implements SharedPrefer
 	@Override
 	public void onSharedPreferenceChanged(SharedPreferences sharedPreferences, String key) {
 		if (DISTANCE_UNIT_KEY.equals(key)) {
-	        String distanceUnit = getListLabel(R.array.prefs_unit_entries, R.array.prefs_unit_entryValues, sharedPreferences.getString(DISTANCE_UNIT_KEY, "km"));
-	        mDistanceUnitPreference.setSummary(distanceUnit);
+	        mDistanceUnitPreference.setSummary(mDistanceUnitPreference.getEntry());
 		} else if (GENDER_KEY.equals(key)) {
-	        String gender = getListLabel(R.array.prefs_gender_entries, R.array.prefs_gender_entryValues, sharedPreferences.getString(GENDER_KEY, "0"));
-	        mGenderPreference.setSummary(gender); 
+	        mGenderPreference.setSummary(mGenderPreference.getEntry()); 
 		} else if (WEIGHT_KEY.equals(key)) {
 	        mWeightPreference.setSummary(sharedPreferences.getString(WEIGHT_KEY, ""+Util.DEFAULT_WEIGHT)+" kg");
 		}

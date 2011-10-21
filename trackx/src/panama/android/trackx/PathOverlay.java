@@ -46,9 +46,8 @@ public class PathOverlay extends Overlay {
 		mPathPaint.setStyle(Paint.Style.STROKE);
 		mPathPaint.setStrokeJoin(Paint.Join.ROUND);
 		mPathPaint.setStrokeCap(Paint.Cap.ROUND);
+		mPathPaint.setStrokeWidth(5);
 		mPathPaint.setMaskFilter(new BlurMaskFilter(2f, BlurMaskFilter.Blur.NORMAL));
-
-		// TODO rebuild mPoints from savedInstanceState (if not null)
 	}
 	
 	public void setPositions(List<Position> positions) {
@@ -81,11 +80,10 @@ public class PathOverlay extends Overlay {
 			return;	// we don't have a shadow.
 		}
 		if (mPositions != null && mPositions.size() > 0) {
-			float width = mapView.getZoomLevel() / 2;
-			mPathPaint.setStrokeWidth(width);
+			//float width = mapView.getZoomLevel() / 2;
+			//mPathPaint.setStrokeWidth(width);
 
 			// path jedesmal neu aufbauen weil sich zoom und scroll verändert haben könnten
-			// TODO? hier ist ggf. Optimierungspotential -- so lang sich zoom und scroll nicht ändern müsste der Pfad nicht neu gebaut werden, sondern es könnte die letzte Position einfach angehängt werden
 			mPath.reset();
 			boolean start = true;
 			for (Position p : mPositions) {

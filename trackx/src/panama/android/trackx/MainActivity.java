@@ -9,10 +9,10 @@ import android.app.ProgressDialog;
 import android.content.ComponentName;
 import android.content.Context;
 import android.content.DialogInterface;
-import android.content.SharedPreferences;
 import android.content.DialogInterface.OnCancelListener;
 import android.content.Intent;
 import android.content.ServiceConnection;
+import android.content.SharedPreferences;
 import android.location.Location;
 import android.location.LocationManager;
 import android.os.Bundle;
@@ -30,7 +30,7 @@ import android.view.View.OnTouchListener;
 import android.view.animation.Animation;
 import android.view.animation.AnimationUtils;
 import android.widget.Button;
-import android.widget.ImageButton;
+import android.widget.ImageView;
 import android.widget.TextView;
 import android.widget.Toast;
 
@@ -64,7 +64,7 @@ public class MainActivity extends MapActivity implements TrackerService.Listener
 	private Button mStopButton;
 	private Button mDiscardButton;
 	private Button mSaveButton;
-	private ImageButton mToggleMapButton;
+	private ImageView mToggleMapButton;
 	private ProgressDialog mWaitingDialog;
 
 	private PowerManager.WakeLock mWakeLock;
@@ -119,7 +119,7 @@ public class MainActivity extends MapActivity implements TrackerService.Listener
 		mMyLocationOverlay = new MyLocationOverlay();
 		mMapView.getOverlays().add(mPathOverlay);
 		mMapView.getOverlays().add(mMyLocationOverlay);
-		mToggleMapButton = (ImageButton)findViewById(R.id.toggleMap);
+		mToggleMapButton = (ImageView)findViewById(R.id.toggleMap);
 		mToggleMapButton.setOnTouchListener(mToggleMapButtonListener);	// eigener Listener um pressed Status fix setzen zu können, sodass er auch bleibt.
 		
 		// Bind to TrackerService (asynchronous)
@@ -451,13 +451,14 @@ public class MainActivity extends MapActivity implements TrackerService.Listener
 					in.setZAdjustment(Animation.ZORDER_TOP);
 					mMapView.setVisibility(View.VISIBLE);
 					mMapView.startAnimation(in);
-					v.setPressed(true);
+					v.setBackgroundColor(0xff6688aa);
+					//v.setPressed(true);
 				} else {
 					mMapView.getZoomButtonsController().setVisible(false);	// remove zoom buttons immediately
 					Animation out = AnimationUtils.loadAnimation(MainActivity.this, R.anim.shift_out_to_bottom);
 					mMapView.startAnimation(out);
 					mMapView.setVisibility(View.GONE);
-					v.setPressed(false);
+					v.setBackgroundColor(0x00000000);
 				}
 			}
 			return true;
