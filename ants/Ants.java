@@ -357,6 +357,13 @@ public class Ants {
     public void clearEnemyHills() {
         enemyHills.clear();
     }
+
+	public void clearFood() {
+        for (Tile food : foodTiles) {
+            map[food.getRow()][food.getCol()] = Ilk.LAND;
+        }
+        foodTiles.clear();
+	}
     
     /**
      * Updates game state information about new ants and food locations.
