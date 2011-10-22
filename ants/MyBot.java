@@ -96,6 +96,9 @@ public class MyBot extends Bot {
 
  	private Aim traceBack(Tile current, Tile start) {
 		QueueData back = traceBackData.get(current);
+		if (back == null) {
+			return null;
+		}
 		while (!back.origin.equals(start)) {
 			back = traceBackData.get(back.origin);
 		}
