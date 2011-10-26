@@ -49,7 +49,7 @@ public class Tile {
     @Override
     public boolean equals(Object o) {
         boolean result = false;
-        if (o instanceof Tile) {
+        if (o != null && o instanceof Tile) {
             Tile tile = (Tile)o;
             result = row == tile.row && col == tile.col;
         }
