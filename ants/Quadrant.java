@@ -18,15 +18,30 @@
  * @author ridcully
  *
  */
-public class QueueData {
+public class Quadrant {
 
-	public Tile origin;
-	public Aim originAimed;
-	public int steps;
+	public int minRow, minCol, maxRow, maxCol;
+	public int myAntsCount = 0;
 	
-	public QueueData(Tile origin, Aim originAimed, int steps) {
-		this.origin = origin;
-		this.originAimed = originAimed;
-		this.steps = steps;
+	public Quadrant(int minRow, int minCol, int maxRow, int maxCol) {
+		this.minRow = minRow;
+		this.minCol = minCol;
+		this.maxRow = maxRow;
+		this.maxCol = maxCol;
+	}
+	
+	public boolean contains(int row, int col) {
+		return minRow <= row &&
+		  row <= maxRow &&
+		  minCol <= col &&
+		  col <= maxCol;
+	}
+	
+	public boolean contains(Tile tile) {
+		return contains(tile.getRow(), tile.getCol());
+	}
+	
+	public String toString() {
+		return "["+minRow+", "+minCol+"]-["+maxRow+", "+maxCol+"]:"+myAntsCount;
 	}
 }

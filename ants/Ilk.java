@@ -2,7 +2,7 @@
  * Represents type of tile on the game map.
  */
 public enum Ilk {
-    /** Water tile. */
+	/** Water tile. */
     WATER,
     
     /** Food tile. */
@@ -19,7 +19,7 @@ public enum Ilk {
     
     /** Enemy ant tile. */
     ENEMY_ANT;
-    
+        
     /**
      * Checks if this type of tile is passable, which means it is not a water tile.
      * 

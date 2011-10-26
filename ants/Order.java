@@ -2,11 +2,11 @@
  * Represents an order to be issued.
  */
 public class Order {
-    private final int row;
+    public final int row;
     
-    private final int col;
+    public final int col;
     
-    private final char direction;
+    public final char direction;
     
     /**
      * Creates new {@link Order} object.
