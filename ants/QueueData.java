@@ -19,21 +19,14 @@
  *
  */
 public class QueueData {
-	
-	public Tile origin;
-	public Tile cameFrom;
-	public Aim direction;
-	public int steps;
 
-	/* compatible */
-	public QueueData(Tile cameFrom, Aim cameFromAimed, int steps) {
-		this(null, cameFrom, cameFromAimed, steps); 
-	}
+	public Tile origin;
+	public Aim originAimed;
+	public int steps;
 	
-	public QueueData(Tile origin, Tile cameFrom, Aim cameFromAimed, int steps) {
+	public QueueData(Tile origin, Aim originAimed, int steps) {
 		this.origin = origin;
-		this.cameFrom = cameFrom;
-		this.direction = cameFromAimed;
+		this.originAimed = originAimed;
 		this.steps = steps;
 	}
 }

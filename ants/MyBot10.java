@@ -8,9 +8,9 @@ import java.util.Map;
 import java.util.Set;
 
 /**
- * Version 11
+ * Version 10
  */
-public class MyBot extends Bot {
+public class MyBot10 extends Bot {
 	
 	private final static boolean LOGGING = true;
 	private final static int ALMOST_TIMEOUT = 10;
@@ -23,7 +23,7 @@ public class MyBot extends Bot {
      * @throws IOException if an I/O error occurs
      */
     public static void main(String[] args) throws IOException {
-        new MyBot().readSystemInput();
+        new MyBot10().readSystemInput();
     }
 
     // for leftyMove

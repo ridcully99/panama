@@ -8,7 +8,7 @@ import java.util.Set;
 /**
  * Version 9
  */
-public class MyPreviousBot extends Bot {
+public class MyBot9 extends Bot {
 	
 	private final static boolean LOGGING = true;
 	
@@ -20,7 +20,7 @@ public class MyPreviousBot extends Bot {
      * @throws IOException if an I/O error occurs
      */
     public static void main(String[] args) throws IOException {
-        new MyPreviousBot().readSystemInput();
+        new MyBot9().readSystemInput();
     }
     
     private Ants ants;
@@ -91,13 +91,13 @@ public class MyPreviousBot extends Bot {
 
  	private Aim traceBack(Tile current, Tile start) {
 		QueueData back = traceBackData.get(current);
-		if (back.cameFrom == null) {
+		if (back.origin == null) {
 			return null;	// totally blocked, nowhere to go right now
 		}
-		while (!back.cameFrom.equals(start)) {
-			back = traceBackData.get(back.cameFrom);
+		while (!back.origin.equals(start)) {
+			back = traceBackData.get(back.origin);
 		}
-		return back.direction;
+		return back.originAimed;
 	}
 
 	/* nicht diagonal */
