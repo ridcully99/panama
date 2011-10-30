@@ -6,7 +6,7 @@ import java.util.Map;
 import java.util.Set;
 
 /**
- * Version 9
+ * Version 9 - online as of 30.10.2011
  */
 public class MyBot9 extends Bot {
 	
