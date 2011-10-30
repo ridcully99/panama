@@ -1,9 +1,7 @@
 import java.io.IOException;
-import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.HashSet;
 import java.util.LinkedList;
-import java.util.List;
 import java.util.Map;
 import java.util.Set;
 
@@ -26,15 +24,12 @@ public class MyBot extends Bot {
         new MyBot().readSystemInput();
     }
 
-    // for leftyMove
-    private Map<Tile, Aim> antStraight = new HashMap<Tile, Aim>();	// long-term tracking, dont clear each turn
-    private Map<Tile, Aim> antLefty = new HashMap<Tile, Aim>();		// long-term tracking, dont clear each turn
-
     private Map<Tile, Tile> longTermDestination = new HashMap<Tile, Tile>();	// ant --> destination
     
     private Ants ants;
     private Set<Tile> blocked = new HashSet<Tile>();
     private int turn = 0;
+    private int antsInHive = 0;
     
     /**
      */
@@ -141,80 +136,7 @@ public class MyBot extends Bot {
 
  	private void clearLongTermDestination(Tile ant) {
  		longTermDestination.remove(ant);
-		antStraight.remove(ant);
-		antLefty.remove(ant);
  	}
- 	
- 	/** from LeftyBot example */
- 	private Aim leftyMove(Tile location) {
-		// send new ants in a straight line
-		if (!antStraight.containsKey(location) && !antLefty.containsKey(location)) {
-			Aim direction;
-			if (location.row % 2 == 0) {
-				if (location.col % 2 == 0) {
-					direction = Aim.NORTH;
-				} else {
-					direction = Aim.SOUTH;
-				}
-			} else {
-				if (location.col % 2 == 0) {
-					direction = Aim.EAST;
-				} else {
-					direction = Aim.WEST;
-				}
-			}
-			antStraight.put(location, direction);
-		}
-		// send ants going in a straight line in the same direction
-		if (antStraight.containsKey(location)) {
-			Aim direction = antStraight.get(location);
-			Tile destination = ants.getTile(location, direction);
-			if (ants.getIlk(destination).isPassable()) {
-				if (ants.getIlk(destination).isUnoccupied() && !blocked.contains(destination)) {
-					antStraight.remove(location);				// remember movement
-					antStraight.put(destination, direction);	// -""-
-					return direction;
-				} else {
-					// pause ant, turn and try again next turn
-					antStraight.put(location, direction.left());
-					blocked.add(location);
-					return null;
-				}
-			} else {
-				// hit a wall, start following it
-				antStraight.remove(location);
-				antLefty.put(location, direction.right());
-			}
-		}
-		// send ants following a wall, keeping it on their left
-		if (antLefty.containsKey(location)) {
-			Aim direction = antLefty.get(location);
-			List<Aim> directions = new ArrayList<Aim>();
-			directions.add(direction.left());
-			directions.add(direction);
-			directions.add(direction.right());
-			directions.add(direction.behind());
-			// try 4 directions in order, attempting to turn left at corners
-			for (Aim newDirection : directions) {
-				Tile destination = ants.getTile(location, newDirection);
-				if (ants.getIlk(destination).isPassable()) {
-					if (ants.getIlk(destination).isUnoccupied() && !blocked.contains(destination)) {
-						antLefty.remove(location);					// remember movement
-						antLefty.put(destination, newDirection);	// -""-
-						return newDirection;
-					} else {
-						// pause ant, turn and send straight
-						antLefty.remove(location);
-						antStraight.put(location, direction.right());
-						blocked.add(location);
-						return null;
-					}
-				}
-			}
-		}
-		return null;
- 	}
- 	
  	
 	/* nicht diagonal */
     private boolean isNextToFood(Tile ant) {
