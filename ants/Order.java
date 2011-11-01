@@ -8,6 +8,8 @@ public class Order {
     
     public final char direction;
     
+    public int distanceToTarget;
+    
     /**
      * Creates new {@link Order} object.
      * 

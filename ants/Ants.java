@@ -43,6 +43,9 @@ public class Ants {
     
     private final Set<Order> orders = new HashSet<Order>();
     
+    public Set<Tile> knownTerritory = new HashSet<Tile>();
+
+    
     /**
      * Creates new {@link Ants} object.
      * 
@@ -384,6 +387,7 @@ public class Ants {
                 enemyAnts.add(tile);
             break;
         }
+        knownTerritory.add(tile);
     }
     
     /**

@@ -45,6 +45,7 @@ public class MyBot extends Bot {
     private int antsDied = 0;
     private int foodEaten = 0;
     private Set<Tile> foodLastTurn = new HashSet<Tile>();
+    private boolean attack = false;
     
     /**
      */
@@ -54,8 +55,12 @@ public class MyBot extends Bot {
     	foodEaten += foodEatenLastTurn();
     	int antsInHive = (1+foodEaten-antsDied)-ants.getMyAnts().size();	// wieviele es sein sollten - wieviele es sind
     	int minAntsToKeepInHive = (int)Math.sqrt(ants.getMyAnts().size()) - 1;	// keep some ants in hive for safety (to defend hill)
+    	float knownTerritoryPercent = ((ants.knownTerritory.size()*100f)/(ants.getCols()*ants.getRows()));
+    	int assumedTotalEnemies = (int)(ants.getEnemyAnts().size()*100/knownTerritoryPercent);	// hochrechnen anhand bekannter anzahl und % knownTerritory
+    	attack = ants.getMyAnts().size() > assumedTotalEnemies;
+    	log("known territory: "+knownTerritoryPercent+"%");
+
     	blocked.clear();
-        log("known territory: "+((ants.knownTerritory.size()*100f)/(ants.getCols()*ants.getRows()))+"%");
         for (Tile myAnt : ants.getMyAnts()) {
         	// defense
         	if (ants.getMyHills().contains(myAnt) && 				// ant sitting on own hill
@@ -87,18 +92,14 @@ public class MyBot extends Bot {
     private Map<Tile, QueueData> traceBackData = new HashMap<Tile, QueueData>();
     
     private Aim findBestDirection(Tile myAnt) {
-    	Tile mostUnknown = null;
-    	int maxUnknown = 0;
     	floodFillQueue.clear();
     	traceBackData.clear();
     	floodFillQueue.add(myAnt);
     	traceBackData.put(myAnt, new QueueData(null, null, 0));
     	Tile current = null;	// ausserhalb damit ich nachher das Tile das als letztes aus Queue genommen wurde, habe --> wenn kein Food dann in die Richtung gehen weil "am weitesten freie Bahn"
-    	queue:
     	while(!floodFillQueue.isEmpty() && ants.getTimeRemaining() >= ALMOST_TIMEOUT) {
     		current = floodFillQueue.pollFirst();
     		int currentDepth = traceBackData.get(current).steps;
-    		int currentUnknown = traceBackData.get(current).unknown;
     		if (currentDepth == 0 && current.equals(longTermDestination.get(myAnt))) {
     			log(myAnt+" has reached longterm destination; removing it.");
     			clearLongTermDestination(myAnt);
@@ -123,31 +124,24 @@ public class MyBot extends Bot {
         			clearLongTermDestination(myAnt);
         			return traceBack(current, myAnt);
         		}
+        		if (attack && ants.getEnemyAnts().contains(dest)) {
+        			clearLongTermDestination(myAnt);
+            		traceBackData.put(dest, new QueueData(current, direction, currentDepth+1));	// required by trace back
+            		return traceBack(dest, myAnt);
+        		}
         		if (dest.equals(longTermDestination.get(myAnt))) {								// hit long term destination?
             		traceBackData.put(dest, new QueueData(current, direction, currentDepth+1));	// required by trace back
             		return traceBack(dest, myAnt);
         		}
         		floodFillQueue.addLast(dest);
-        		int newUnknown = currentUnknown;
-        		if (!ants.knownTerritory.contains(dest)) {
-        			newUnknown += 1;
-        			if (newUnknown > maxUnknown) {
-        				maxUnknown = newUnknown;
-        				mostUnknown = dest;
-        			}
-        		}
-        		traceBackData.put(dest, new QueueData(current, direction, currentDepth+1, newUnknown));
+        		traceBackData.put(dest, new QueueData(current, direction, currentDepth+1));
      		}
     	}
     	// nichts besonderes gefunden.
     	if (current != null) {	// current ist als letztes in Queue gewesen und somit am weitesten vom Ausgangspunkt weg == weitester freier Weg
 			// entweder hatte ant noch kein longtermdestination oder hat es nicht schon vorher gefunden (was eigentlich nur durch temporaere blockierungen passiert sein kann)
     		if (!longTermDestination.containsKey(myAnt)) {	// noch kein longtermdest --> eines setzen
-    			if (mostUnknown != null) {
-    				longTermDestination.put(myAnt, mostUnknown);
-    			} else {
-    				longTermDestination.put(myAnt, current);
-    			}
+   				longTermDestination.put(myAnt, current);
     			return traceBack(current, myAnt);
     		} else {
     			// hat schon eines, hat's aber via floodfill nicht erreicht... dont move, vielleicht gehts naechstesmal besser.
