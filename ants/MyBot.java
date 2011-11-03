@@ -7,6 +7,11 @@ import java.util.Set;
 
 /**
  * Version 11 (online als Version 10)
+ * added (since Version 9):
+ * - Timeout Prevention
+ * - Defense (including calculation of ants in hive)
+ * - Offense (including calculation of % of known territory [ignoring viewradius, only counting tiles like ants, food, hills, water])
+ * - Let nearest get the food
  */
 public class MyBot extends Bot {
 	
@@ -100,6 +105,7 @@ public class MyBot extends Bot {
     	while(!floodFillQueue.isEmpty() && ants.getTimeRemaining() >= ALMOST_TIMEOUT) {
     		current = floodFillQueue.pollFirst();
     		int currentDepth = traceBackData.get(current).steps;
+    		int ownMet = traceBackData.get(current).ownMet;
     		if (currentDepth == 0 && current.equals(longTermDestination.get(myAnt))) {
     			log(myAnt+" has reached longterm destination; removing it.");
     			clearLongTermDestination(myAnt);
@@ -120,7 +126,7 @@ public class MyBot extends Bot {
             		traceBackData.put(dest, new QueueData(current, direction, currentDepth+1));	// required by trace back
             		return traceBack(dest, myAnt);
         		}
-        		if (ants.getFoodTiles().contains(dest)) {
+        		if (ants.getFoodTiles().contains(dest) && ownMet == 0) {	// food und myAnt am naehesten
         			clearLongTermDestination(myAnt);
         			return traceBack(current, myAnt);
         		}
@@ -133,8 +139,9 @@ public class MyBot extends Bot {
             		traceBackData.put(dest, new QueueData(current, direction, currentDepth+1));	// required by trace back
             		return traceBack(dest, myAnt);
         		}
+        		int metOwn = ants.getMyAnts().contains(dest) ? 1 : 0;
         		floodFillQueue.addLast(dest);
-        		traceBackData.put(dest, new QueueData(current, direction, currentDepth+1));
+        		traceBackData.put(dest, new QueueData(current, direction, currentDepth+1, ownMet + metOwn));
      		}
     	}
     	// nichts besonderes gefunden.
