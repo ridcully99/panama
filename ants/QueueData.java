@@ -24,6 +24,7 @@ public class QueueData {
 	public Aim originAimed;
 	public int steps;
 	public int unknown;
+	public int ownMet;
 	
 	public QueueData(Tile origin, Aim originAimed, int steps) {
 		this.origin = origin;
@@ -31,11 +32,11 @@ public class QueueData {
 		this.steps = steps;
 	}
 
-	public QueueData(Tile origin, Aim originAimed, int steps, int unknown) {
+	public QueueData(Tile origin, Aim originAimed, int steps, int ownMet) {
 		this.origin = origin;
 		this.originAimed = originAimed;
 		this.steps = steps;
-		this.unknown = unknown;
+		this.ownMet = ownMet;
 	}
 
 }
