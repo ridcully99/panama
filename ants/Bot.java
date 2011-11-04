@@ -40,8 +40,8 @@ public abstract class Bot extends AbstractSystemInputParser {
         ants.setTurnStartTime(System.currentTimeMillis());
         ants.clearMyAnts();
         ants.clearEnemyAnts();
-        ants.clearMyHills();
-        ants.clearEnemyHills();
+        //ants.clearMyHills();
+        //ants.clearEnemyHills();
         ants.getFoodTiles().clear();
         ants.getOrders().clear();
         ants.clearMap();

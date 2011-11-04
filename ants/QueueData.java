@@ -25,6 +25,13 @@ public class QueueData {
 	public int steps;
 	public int unknown;
 	public int ownMet;
+	public int enemiesMet;
+	
+	public QueueData(Tile origin, QueueData previous, Aim direction, boolean metOwn, boolean metEnemy) {
+		this(origin, direction, previous.steps+1);
+		ownMet = previous.ownMet + (metOwn ? 1 : 0);
+		enemiesMet = previous.enemiesMet + (metEnemy ? 1: 0);
+	}
 	
 	public QueueData(Tile origin, Aim originAimed, int steps) {
 		this.origin = origin;
