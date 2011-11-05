@@ -8,7 +8,11 @@ import java.util.Map;
 import java.util.Set;
 
 /**
- * Version 12 (online auch als Version 12)
+ * Version 13 (online auch als Version 13)
+ * 
+ * changed (since Version 12)
+ * - implemented correct attacking algorithm 
+ * 
  * changed (since Version 11)
  * 
  * - sophisticated hill defense
@@ -30,6 +34,8 @@ public class MyBot extends Bot {
 	private final static boolean LOGGING = true;
 	private final static int ALMOST_TIMEOUT = 10;
 	
+	private int extendedAttackRadius2;	// extended weil wir 1 Step vorausblicken
+	
     /**
      * Main method executed by the game engine for starting the bot.
      * 
@@ -44,6 +50,8 @@ public class MyBot extends Bot {
     @Override
     public void setup(int loadTime, int turnTime, int rows, int cols, int turns, int viewRadius2, int attackRadius2, int spawnRadius2) {
     	super.setup(loadTime, turnTime, rows, cols, turns, viewRadius2, attackRadius2, spawnRadius2);
+    	double attackRadius = Math.sqrt(attackRadius2-1);
+    	extendedAttackRadius2 = (int)(1d+(attackRadius+1d) * (attackRadius+1d));
     }
     
     @Override
@@ -191,12 +199,32 @@ public class MyBot extends Bot {
         		if (!ants.getIlk(dest).isPassable()) {
         			continue;	// da gehts nicht weiter
         		}
+        		
         		if (currentData.steps == 0 && blocked.contains(dest)) {
         			continue;	// von anderem Befehl blockiert
         		}
+
+        		if (currentData.steps == 0 && enemyInRange(dest, extendedAttackRadius2)) {
+        			if (!wouldSurviveFight(dest, extendedAttackRadius2)) {
+        				if (enemyHillInRange(dest, extendedAttackRadius2)) {
+            				log("harakiri!");
+                			clearLongTermDestination(myAnt);
+                			return direction;
+        				} else {
+	        				log("avoid fight");
+	        				continue;
+        				}
+        			} else {
+        				log("attack!");
+            			clearLongTermDestination(myAnt);
+            			return direction;
+        			}
+        		}
+
         		if (traceBackData.containsKey(dest)) {
         			continue;	// got covered already
         		}
+        		
         		boolean metOwn = ants.getMyAnts().contains(dest);
         		boolean metEnemy = ants.getEnemyAnts().contains(dest);
         		
@@ -272,7 +300,7 @@ public class MyBot extends Bot {
 		}
     }
 
- 	private Aim traceBack(Tile current, Tile start) {
+	private Aim traceBack(Tile current, Tile start) {
 		QueueData back = traceBackData.get(current);
 		if (back.origin == null) {
 			return anyWhere(start);	// totally blocked?, nowhere to go right now? try to find any way to go.
@@ -325,9 +353,71 @@ public class MyBot extends Bot {
     	return count;
 	}
 
+	// ---- logging ---------------------------------------------------------------------------------
+    
 	private void log(Object s) {
 		if (LOGGING) {
 			System.err.println(turn+": "+s.toString());
 		}
+	}
+	
+	// ---- fighting stuff --------------------------------------------------------------------------
+	
+	private Map<Tile, Integer> antOwners = new HashMap<Tile, Integer>();
+	
+	/**
+	 * override to be able to tell which enemy an ant belongs to
+	 */
+	@Override
+	public void addAnt(int row, int col, int owner) {
+		super.addAnt(row, col, owner);
+		antOwners.put(new Tile(row, col), owner);
+	}
+	
+	/** quick test, if any enemies in range */
+	private boolean enemyInRange(Tile myAnt, int radius2) {
+		for (Tile enemy : ants.getEnemyAnts()) {
+			if (ants.getDistance(myAnt, enemy) <= radius2) {
+				return true;
+			}
+		}
+		return false;
+	}
+	
+ 	private boolean enemyHillInRange(Tile myAnt, int radius2) {
+		for (Tile enemyHill : ants.getEnemyHills()) {
+			if (ants.getDistance(myAnt, enemyHill) <= radius2) {
+				return true;
+			}
+		}
+		return false;
 	}	
+	
+	private Set<Tile> getEnemiesInRange(Tile center, int owner, int radius2) {
+		Set<Tile> inRange = new HashSet<Tile>();
+		for (Map.Entry<Tile, Integer> a : antOwners.entrySet()) {
+			if (a.getValue() != owner && ants.getDistance(center, a.getKey()) <= radius2) {
+				inRange.add(a.getKey());
+			}
+		}
+		return inRange;
+	}
+	
+	/**
+	 * checks if my ant would survive fight, according to rules of website
+	 * "Then, if there is _any_ ant is next to an enemy with an equal or lesser number, it will die"
+	 */
+	private boolean wouldSurviveFight(Tile location, int radius2) {
+		Set<Tile> enemies = getEnemiesInRange(location, 0, radius2);
+		if (enemies.size() == 0) {
+			return true;
+		}
+		for (Tile enemy : enemies) {
+			Set<Tile> enemiesEnemies = getEnemiesInRange(enemy, antOwners.get(enemy), radius2);
+			if (enemiesEnemies.size() <= enemies.size()) {
+				return false;
+			}
+		}
+		return true;
+	}
 }
