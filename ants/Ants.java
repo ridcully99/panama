@@ -409,10 +409,11 @@ public class Ants {
      * @param myAnt map tile with my ant
      * @param direction direction in which to move my ant
      */
-    public void issueOrder(Tile myAnt, Aim direction) {
+    public Order issueOrder(Tile myAnt, Aim direction) {
         Order order = new Order(myAnt, direction);
         orders.add(order);
         System.out.println(order);
         System.out.flush();
+        return order;
     }
 }

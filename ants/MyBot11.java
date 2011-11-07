@@ -15,7 +15,7 @@ import java.util.Set;
  */
 public class MyBot11 extends Bot {
 	
-	private final static boolean LOGGING = true;
+	private final static boolean LOGGING = false;
 	private final static int ALMOST_TIMEOUT = 10;
 	
     /**

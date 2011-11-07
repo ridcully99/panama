@@ -33,7 +33,7 @@ import java.util.Set;
  * - Offense (including calculation of % of known territory [ignoring viewradius, only counting tiles like ants, food, hills, water])
  * - Let nearest get the food
  */
-public class MyBot extends Bot {
+public class MyBot14 extends Bot {
 	
 	private final static boolean LOGGING = false;
 	private final static int ALMOST_TIMEOUT = 20;
@@ -50,7 +50,7 @@ public class MyBot extends Bot {
      * @throws IOException if an I/O error occurs
      */
     public static void main(String[] args) throws IOException {
-        new MyBot().readSystemInput();
+        new MyBot14().readSystemInput();
     }
 
     @Override

@@ -10,7 +10,7 @@ import java.util.Set;
  */
 public class MyBot9 extends Bot {
 	
-	private final static boolean LOGGING = true;
+	private final static boolean LOGGING = false;
 	
     /**
      * Main method executed by the game engine for starting the bot.
