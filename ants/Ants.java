@@ -43,8 +43,7 @@ public class Ants {
     
     private final Set<Order> orders = new HashSet<Order>();
     
-    public Set<Tile> knownTerritory = new HashSet<Tile>();
-
+    public Set<Integer> unseen = new HashSet<Integer>();	/* row * MAX_MAP_SIZE + col */
     
     /**
      * Creates new {@link Ants} object.
@@ -71,6 +70,11 @@ public class Ants {
         map = new Ilk[rows][cols];
         for (Ilk[] row : map) {
             Arrays.fill(row, Ilk.LAND);
+        }
+        for (int r = 0; r < rows; r++) {
+        	for (int c = 0; c < cols; c++) {
+        		unseen.add(r*MAX_MAP_SIZE+c);
+        	}
         }
     }
     
@@ -375,19 +379,44 @@ public class Ants {
      * @param tile location on the game map to be updated
      */
     public void update(Ilk ilk, Tile tile) {
-        map[tile.getRow()][tile.getCol()] = ilk;
+        map[tile.getRow()][tile.getCol()] = ilk;	// hinterher damit unseens bis hier erhalten bleiben
         switch (ilk) {
             case FOOD:
                 foodTiles.add(tile);
             break;
             case MY_ANT:
                 myAnts.add(tile);
+                removeUnseen(tile);
             break;
             case ENEMY_ANT:
                 enemyAnts.add(tile);
             break;
         }
-        knownTerritory.add(tile);
+    }
+    
+    /**
+     * Checks if a tile is unseen
+     * 
+     * @param tile
+     * @return
+     */
+    public boolean isUnseen(Tile tile) {
+    	int v = tile.row * MAX_MAP_SIZE + tile.col;
+    	return unseen.contains(v);
+    }
+    
+    
+    private void removeUnseen(Tile center) {
+    	Tile u = new Tile(0, 0);	// schneller als lauter neue objekte
+    	Set<Integer> seen = new HashSet<Integer>();
+    	for (int i : unseen) {
+    		u.row = i / MAX_MAP_SIZE;
+    		u.col = i % MAX_MAP_SIZE;
+    		if (getDistance(center, u) < getViewRadius2()) {
+    			seen.add(i);
+    		}
+    	}
+    	unseen.removeAll(seen);
     }
     
     /**

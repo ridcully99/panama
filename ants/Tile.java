@@ -2,9 +2,9 @@
  * Represents a tile of the game map.
  */
 public class Tile {
-    public final int row;
+    public int row;
     
-    public final int col;
+    public int col;
     
     /**
      * Creates new {@link Tile} object.

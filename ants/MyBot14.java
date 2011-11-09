@@ -97,9 +97,6 @@ public class MyBot14 extends Bot {
 	    	}
     	}
     	
-    	float knownTerritoryPercent = ((ants.knownTerritory.size()*100f)/(ants.getCols()*ants.getRows()));
-    	log("known territory: "+knownTerritoryPercent+"%");
-    	
     	blocked.clear();
         for (Tile myAnt : ants.getMyAnts()) {
         	// da wir uns enemy-hills jetzt fuer immer merken, muessen wir eroberte selbst aus liste entfernen, sonst werden sie unnoetig weiter angegriffen

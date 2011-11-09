@@ -60,7 +60,7 @@ public class MyBot11 extends Bot {
     	foodEaten += foodEatenLastTurn();
     	int antsInHive = (1+foodEaten-antsDied)-ants.getMyAnts().size();	// wieviele es sein sollten - wieviele es sind
     	int minAntsToKeepInHive = (int)Math.sqrt(ants.getMyAnts().size()) - 1;	// keep some ants in hive for safety (to defend hill)
-    	float knownTerritoryPercent = ((ants.knownTerritory.size()*100f)/(ants.getCols()*ants.getRows()));
+    	float knownTerritoryPercent = 20;
     	int assumedTotalEnemies = (int)(ants.getEnemyAnts().size()*100/knownTerritoryPercent);	// hochrechnen anhand bekannter anzahl und % knownTerritory
     	attack = ants.getMyAnts().size() > assumedTotalEnemies;
     	log("known territory: "+knownTerritoryPercent+"%");
