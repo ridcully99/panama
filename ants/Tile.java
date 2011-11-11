@@ -3,8 +3,8 @@
  */
 public class Tile {
     public int row;
-    
     public int col;
+    private int hash;
     
     /**
      * Creates new {@link Tile} object.
@@ -15,6 +15,11 @@ public class Tile {
     public Tile(int row, int col) {
         this.row = row;
         this.col = col;
+        this.hash = row * Ants.MAX_MAP_SIZE + col;
+    }
+    
+    public void recalcHash() {
+        this.hash = row * Ants.MAX_MAP_SIZE + col;
     }
     
     /**
@@ -40,7 +45,7 @@ public class Tile {
      */
     @Override
     public int hashCode() {
-        return row * Ants.MAX_MAP_SIZE + col;
+        return hash;
     }
     
     /**

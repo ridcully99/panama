@@ -9,13 +9,13 @@ import java.util.Set;
 /**
  * Version 15 (...)
  * 
+ * FAIL: fighting zentriert auf enemy Ants nicht gut genug da Move des Enemies nicht beruecksichtigt.
+ * 
  * changed since version 14
  * - unseen tiles richtig berechnen und als ziel fuer ausbreitung verwenden
  * - Abbruch nach n steps entfernt
  * - Bestimmung longtermdest nach queue-Abarbeitung nicht mehr via ownMet sondern ganz simpel currentData.origin (wie am Anfang).
- * - Bug in fighting-Berechnung gefixt (antOwners wurde nie resettet)
- * - fight-Berechnung in Ueberarbeitung
- * 
+ * - fighting aus Sicht der enemy Ants berechnen
  *
  * changed (since Version 13)
  * - fixed and improved hill defense (less sophisticated, better working)
@@ -40,25 +40,12 @@ import java.util.Set;
  * - Offense (including calculation of % of known territory [ignoring viewradius, only counting tiles like ants, food, hills, water])
  * - Let nearest get the food
  */
-public class MyBot extends Bot {
+public class _MyBot15Failure1 extends Bot {
 	
 	private final static boolean LOGGING = true;
-	//private final static int ALMOST_TIMEOUT = 20;
-	/*DEBUG ONLY!!!*/private final static int ALMOST_TIMEOUT = Integer.MIN_VALUE;
+	private final static int ALMOST_TIMEOUT = 20;
+	//*DEBUG ONLY!!!*/private final static int ALMOST_TIMEOUT = Integer.MIN_VALUE;
 
-    private Map<Tile, Tile> longTermDestination = new HashMap<Tile, Tile>();	// ant --> destination
-    private Ants ants;
-    private Set<Tile> blocked = new HashSet<Tile>();
-    private Set<Tile> attackers = new HashSet<Tile>();
-    private int turn = 0;
-    private int antsDied = 0;
-    private int foodEaten = 0;
-    private Set<Tile> foodLastTurn = new HashSet<Tile>();
-    private Map<Tile, Tile> hilldefenders = new HashMap<Tile, Tile>();	// Ant->Hill; werden bei bestDirection beruecksichtigt
-	private Map<Tile, Integer> antOwners = new HashMap<Tile, Integer>();
-    private int antsInHive;
-	private int extendedAttackRadius2;		// extended weil wir 1 Step vorausblicken
-	
     /**
      * Main method executed by the game engine for starting the bot.
      * 
@@ -67,30 +54,14 @@ public class MyBot extends Bot {
      * @throws IOException if an I/O error occurs
      */
     public static void main(String[] args) throws IOException {
-        new MyBot().readSystemInput();
+        new _MyBot15Failure1().readSystemInput();
     }
 
     @Override
     public void setup(int loadTime, int turnTime, int rows, int cols, int turns, int viewRadius2, int attackRadius2, int spawnRadius2) {
     	super.setup(loadTime, turnTime, rows, cols, turns, viewRadius2, attackRadius2, spawnRadius2);
-    	extendedAttackRadius2 = 10; //9;//attackRadius2;//2*(int)(1d+(attackRadius+2d) * (attackRadius+2d));
     }
     
-    @Override
-    public void beforeUpdate() {
-    	super.beforeUpdate();
-    	antOwners.clear();
-    }
-    
-	/**
-	 * override to be able to tell which enemy an ant belongs to
-	 */
-	@Override
-	public void addAnt(int row, int col, int owner) {
-		super.addAnt(row, col, owner);
-		antOwners.put(new Tile(row, col), owner);
-	}
-	
     @Override
     public void removeAnt(int row, int col, int owner) {
     	super.removeAnt(row, col, owner);
@@ -99,6 +70,18 @@ public class MyBot extends Bot {
     		longTermDestination.remove(new Tile(row, col));
     	}
     }
+    
+    private Map<Tile, Tile> longTermDestination = new HashMap<Tile, Tile>();	// ant --> destination
+    
+    private Ants ants;
+    private Set<Tile> blocked = new HashSet<Tile>();
+    private Set<Tile> attackers = new HashSet<Tile>();
+    private int turn = 0;
+    private int antsDied = 0;
+    private int foodEaten = 0;
+    private Set<Tile> foodLastTurn = new HashSet<Tile>();
+    private Map<Tile, Tile> hilldefenders = new HashMap<Tile, Tile>();	// Ant->Hill; werden bei bestDirection beruecksichtigt
+    private int antsInHive;
     
     /**
      */
@@ -126,6 +109,11 @@ public class MyBot extends Bot {
     	
     	blocked.clear();
     	attackers.clear();
+    	
+    	// check and try attacks on enemy ants
+    	for (Tile enemyAnt : ants.getEnemyAnts()) {
+    		tryAttack(enemyAnt);
+    	}
     	
         for (Tile myAnt : ants.getMyAnts()) {
         	if (attackers.contains(myAnt)) {
@@ -209,24 +197,6 @@ public class MyBot extends Bot {
      * find best direction for ant
      */
     private Aim findBestDirection(Tile myAnt) {
-
-    	// fight resolving
-    	Tile enemyInRange = enemyInRange(myAnt, extendedAttackRadius2);
-		boolean enemyHillInRange = enemyHillInRange(myAnt, extendedAttackRadius2);
-    	if (enemyInRange != null && !enemyHillInRange) {	// bei enemyHillsInRage wird eh in loop angegriffen und dort der richtige Weg zum Hill gefunden.
-    		boolean hillDefender = hilldefenders.containsKey(myAnt);
-    		boolean wouldSurvive = wouldSurviveFight(myAnt);
-    		if (hillDefender || wouldSurvive) {
-				log(myAnt +" attack "+enemyInRange);
-				// hin zu naehester enemyAnt (TODO besser waere in den Tracebackmechanismus einbauen aber dann muss ich ueberal pruefen ob attacking)
-				return findMoveTowardsEnemy(myAnt, enemyInRange);
-    		} else {
-				log(myAnt + " avoid fight against "+enemyInRange);
-				// weg von naehester enemyAnt (ist die die von enemyInRange gefunden wird)
-				return findMoveAwayFromEnemey(myAnt, enemyInRange);
-			}
-		}
-    	
     	floodFillQueue.clear();
     	traceBackData.clear();
     	floodFillQueue.add(myAnt);
@@ -277,15 +247,15 @@ public class MyBot extends Bot {
             		return traceBack(dest, myAnt);
         		}
         		
-//        		// enemy in der naehe, dann weggehen - offenbar hat tryAttack Angriff nicht durchgefuehrt.
-//        		if (metEnemy) {
-//        			int dist = ants.getDistance(myAnt, dest);
-//        			if (dist <= 10) {
-//        				clearLongTermDestination(myAnt);
-//        				log(myAnt+" avoids enemy "+dest);
-//        				return findMoveAwayFromEnemey(myAnt, dest);
-//        			}
-//        		}
+        		// enemy in der naehe, dann weggehen - offenbar hat tryAttack Angriff nicht durchgefuehrt.
+        		if (metEnemy) {
+        			int dist = ants.getDistance(myAnt, dest);
+        			if (dist <= 10) {
+        				clearLongTermDestination(myAnt);
+        				log(myAnt+" avoids enemy "+dest);
+        				return findMoveAwayFromEnemey(myAnt, dest);
+        			}
+        		}
         		
         		if (ants.getFoodTiles().contains(dest) && currentData.ownMet == 0) {	// food und myAnt am naehesten
         			clearLongTermDestination(myAnt);
@@ -394,63 +364,75 @@ public class MyBot extends Bot {
 	
 	// ---- fighting stuff --------------------------------------------------------------------------
 	
-//	Map<Tile, Aim> movesTowardsEnemy = new HashMap<Tile, Aim>();
-//	Set<Tile> tempBlocked = new HashSet<Tile>();
-//	
-//	private void tryAttack(Tile enemyAnt) {
-//		int enemy = antOwners.get(enemyAnt);
-//		movesTowardsEnemy.clear();
-//		tempBlocked.clear();
-//		for (Tile ant : ants.getMyAnts()) {
-//			if (attackers.contains(ant)) {	// not available anymore
-//				continue;
-//			}
-//			int dist = ants.getDistance(ant, enemyAnt);
-//			if (dist <= 10) {											// can attack with zero or one step
-//				Aim direction = findMoveTowardsEnemy(ant, enemyAnt);	// aufpassen das nicht 2 eigene kollidieren
-//				if (direction != null) {
-//					movesTowardsEnemy.put(ant, direction);
-//					tempBlocked.add(ants.getTile(ant, direction));
-//// TODO wenns prinzipiell geht, dann hier Optimieren mit vorzeitigem Abbruch
-////					if (movesTowardsEnemy.size() >= 4) {				// das wird wohl reichen, erspart weitere Ants zu testen
-////						break;
-////					}
-//				}
-//			}
-//		}
-//		//enemies zaehlen
-//		int enemies = 0; 												// der im zentrum wird bei loop mitgezaehlt
-//		int enemiesEnemies = 0;											// Ants die weder mir noch angegriffenem enemy gehoeren
-//		for (Tile ant : ants.getEnemyAnts()) {
-//			int dist = ants.getDistance(ant, enemyAnt);
-//			if (dist > 10) {
-//				continue;
-//			}
-//			if (antOwners.get(ant) == enemy) {
-//				enemies++;
-//			} else {
-//				enemiesEnemies++;
-//			}
-//		}
-//		
-//		// angriff wagen?
-//		if (movesTowardsEnemy.size() > enemies) {
-//			log("attacking ant at "+enemyAnt+" with "+movesTowardsEnemy.size()+" ants.");
-//			for (Map.Entry<Tile, Aim> entry : movesTowardsEnemy.entrySet()) {
-//				sendAnt(entry.getKey(), entry.getValue());
-//				attackers.add(entry.getKey());
-//			}
-//		}
-//	}
-//
-//	
+	private Map<Tile, Integer> antOwners = new HashMap<Tile, Integer>();
+	
+	/**
+	 * override to be able to tell which enemy an ant belongs to
+	 */
+	@Override
+	public void addAnt(int row, int col, int owner) {
+		super.addAnt(row, col, owner);
+		antOwners.put(new Tile(row, col), owner);
+	}
+	
+	Map<Tile, Aim> movesTowardsEnemy = new HashMap<Tile, Aim>();
+	Set<Tile> tempBlocked = new HashSet<Tile>();
+	
+	private void tryAttack(Tile enemyAnt) {
+		int enemy = antOwners.get(enemyAnt);
+		movesTowardsEnemy.clear();
+		tempBlocked.clear();
+		for (Tile ant : ants.getMyAnts()) {
+			if (attackers.contains(ant)) {	// not available anymore
+				continue;
+			}
+			int dist = ants.getDistance(ant, enemyAnt);
+			if (dist <= 10) {											// can attack with zero or one step
+				Aim direction = findMoveTowardsEnemy(ant, enemyAnt);	// aufpassen das nicht 2 eigene kollidieren
+				if (direction != null) {
+					movesTowardsEnemy.put(ant, direction);
+					tempBlocked.add(ants.getTile(ant, direction));
+// TODO wenns prinzipiell geht, dann hier Optimieren mit vorzeitigem Abbruch
+//					if (movesTowardsEnemy.size() >= 4) {				// das wird wohl reichen, erspart weitere Ants zu testen
+//						break;
+//					}
+				}
+			}
+		}
+		//enemies zaehlen
+		int enemies = 0; 												// der im zentrum wird bei loop mitgezaehlt
+		int enemiesEnemies = 0;											// Ants die weder mir noch angegriffenem enemy gehoeren
+		for (Tile ant : ants.getEnemyAnts()) {
+			int dist = ants.getDistance(ant, enemyAnt);
+			if (dist > 10) {
+				continue;
+			}
+			if (antOwners.get(ant) == enemy) {
+				enemies++;
+			} else {
+				enemiesEnemies++;
+			}
+		}
+		
+		// angriff wagen?
+		if (movesTowardsEnemy.size() > enemies) {
+			log("attacking ant at "+enemyAnt+" with "+movesTowardsEnemy.size()+" ants.");
+			for (Map.Entry<Tile, Aim> entry : movesTowardsEnemy.entrySet()) {
+				sendAnt(entry.getKey(), entry.getValue());
+				attackers.add(entry.getKey());
+			}
+		}
+	}
+
+	
 	private Aim findMoveTowardsEnemy(Tile me, Tile enemy) {
 		List<Aim> directions = ants.getDirections(me, enemy);
 		for (Aim direction : directions) {
 			Tile dest = ants.getTile(me, direction);
 			Ilk ilk = ants.getIlk(dest);
 			if (ilk.isPassable() && 
-				(ilk.isUnoccupied() || ants.getMyAnts().contains(dest))) {
+				(ilk.isUnoccupied() || ants.getMyAnts().contains(dest)) &&
+				!tempBlocked.contains(dest)) {
 				return direction;
 			}
 		}
@@ -509,12 +491,12 @@ public class MyBot extends Bot {
 	 * "Then, if there is _any_ ant is next to an enemy with an equal or lesser number, it will die"
 	 */
 	private boolean wouldSurviveFight(Tile location) {
-		Set<Tile> enemies = getEnemiesInRange(location, 0, extendedAttackRadius2);
+		Set<Tile> enemies = getEnemiesInRange(location, 0, ants.getAttackRadius2());
 		if (enemies.size() == 0) {
 			return true;
 		}
 		for (Tile enemy : enemies) {
-			Set<Tile> enemiesEnemies = getEnemiesInRange(enemy, antOwners.get(enemy), extendedAttackRadius2);	// da den originalradius
+			Set<Tile> enemiesEnemies = getEnemiesInRange(enemy, antOwners.get(enemy), ants.getAttackRadius2());	// da den originalradius
 			if (enemiesEnemies.size() <= enemies.size()) {
 				return false;
 			}

@@ -412,6 +412,7 @@ public class Ants {
     	for (int i : unseen) {
     		u.row = i / MAX_MAP_SIZE;
     		u.col = i % MAX_MAP_SIZE;
+    		u.recalcHash();
     		if (getDistance(center, u) < getViewRadius2()) {
     			seen.add(i);
     		}
