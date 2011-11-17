@@ -15,6 +15,7 @@ import java.util.Set;
  * - Bestimmung longtermdest nach queue-Abarbeitung nicht mehr via ownMet sondern ganz simpel currentData.origin (wie am Anfang).
  * - Bug in fighting-Berechnung gefixt (antOwners wurde nie resettet)
  * - fight-Berechnung in Ueberarbeitung
+ * - hill-defending in ueberarbeitung
  * 
  *
  * changed (since Version 13)
@@ -48,12 +49,14 @@ public class MyBot extends Bot {
     private Map<Tile, Tile> longTermDestination = new HashMap<Tile, Tile>();	// ant --> destination
     private Ants ants;
     private Set<Tile> blocked = new HashSet<Tile>();
+    private Set<Tile> sent = new HashSet<Tile>();								// keep track of ants, already sent
     private int turn = 0;
     private int antsDied = 0;
     private int foodEaten = 0;
     private Set<Tile> foodLastTurn = new HashSet<Tile>();
     private Map<Tile, Tile> hillDefenders = new HashMap<Tile, Tile>();				// Ant->Hill; werden bei bestDirection beruecksichtigt
-    private int hillDefenderMaxSteps = 2;											// werden bei bestDirection beruecksichtigt, immer gleich, da bei openness<1 weniger verteidiger haben diese dann gleich viel platz wie die von offenen hills
+    private int hillDefenderMaxSteps = 2;											// werden bei bestDirection beruecksichtigt
+    private int hillDefenderCount = 0;
     
 	private Map<Tile, Integer> antOwners = new HashMap<Tile, Integer>();
     private int antsInHive;
@@ -68,10 +71,13 @@ public class MyBot extends Bot {
      */
     public static void main(String[] args) throws IOException {
     	MyBot myBot = new MyBot();
-        myBot.readSystemInput();
-        if (args[0] == "debug") {
+        if (args.length > 0 && "debug".equals(args[0])) {
         	myBot.ALMOST_TIMEOUT = Integer.MIN_VALUE;
         }
+        if (args.length > 0 && "tcp".equals(args[0])) {
+        	myBot.ALMOST_TIMEOUT = 1000;
+        }
+        myBot.readSystemInput();
     }
 
     @Override
@@ -108,18 +114,22 @@ public class MyBot extends Bot {
      */
     @Override
     public void doTurn() {
-    	ants = getAnts();
-
     	try {
+	    	ants = getAnts();
+	    	sent.clear();
 	    	// ants in hive bestimmen
 	    	foodEaten += foodEatenLastTurn();
 	    	antsInHive = (1+foodEaten-antsDied)-ants.getMyAnts().size();	// wieviele es sein sollten - wieviele es sind
 	
 	    	findHillDefenders();
+	    	//findEnemyHillAttackers();
 	    	
 	    	blocked.clear();
 	    	
 	        for (Tile myAnt : ants.getMyAnts()) {
+	        	if (sent.contains(myAnt)) {
+	        		continue;
+	        	}
 	        	// da wir uns enemy-hills jetzt fuer immer merken, muessen wir eroberte selbst aus liste entfernen, sonst werden sie unnoetig weiter angegriffen
 	        	if (ants.getEnemyHills().contains(myAnt)) {
 	        		ants.getEnemyHills().remove(myAnt);
@@ -159,6 +169,7 @@ public class MyBot extends Bot {
     	} else {
     		log("no move for ant "+myAnt);
     	}
+    	sent.add(myAnt);
 	}
 
 	private LinkedList<Tile> floodFillQueue = new LinkedList<Tile>();
@@ -180,10 +191,12 @@ public class MyBot extends Bot {
 		if (ants.getMyAnts().size() >= 20 * ants.getMyHills().size()) {
 			defenderCountPerHill = (ants.getMyAnts().size()/ants.getMyHills().size())/10;
 		}
-		if (defenderCountPerHill > 6) {
-			defenderCountPerHill = 6;
+		if (defenderCountPerHill > 8) {
+			defenderCountPerHill = 8;
 		}
-    	hillDefenderMaxSteps = 2;
+		hillDefenderCount = Math.max(defenderCountPerHill, hillDefenderCount);	// einmal erreichte Zahl nicht mehr verringern
+		
+		hillDefenderMaxSteps = 2;
     	if (defenderCountPerHill >= 4) {
     		hillDefenderMaxSteps = 3;
     	}
@@ -191,7 +204,7 @@ public class MyBot extends Bot {
     		hillDefenderMaxSteps = 4;
     	}
     	for (Tile hill : ants.getMyHills()) {
-    		findHillDefenders(hill, defenderCountPerHill, hillDefenderMaxSteps);
+    		findHillDefenders(hill, hillDefenderCount, hillDefenderMaxSteps);
     	}
     }
     
@@ -204,13 +217,12 @@ public class MyBot extends Bot {
     private void findHillDefenders(Tile hill, int num, int defenderMaxSteps) {
     	
     	floodFillQueue.clear();
-    	floodFillQueue.add(hill);
     	traceBackData.clear();
+    	floodFillQueue.add(hill);
     	traceBackData.put(hill, new QueueData(null, null, 0));
     	Tile currentTile = null;		// ausserhalb damit ich nachher das Tile das als letztes aus Queue genommen wurde, habe --> wenn kein Food dann in die Richtung gehen weil "am weitesten freie Bahn"
     	QueueData currentData = null;	// -""-
-    	int found = 0;
-    	while(!floodFillQueue.isEmpty() && found < num) {
+    	while(!floodFillQueue.isEmpty() && num > 0) {
     		timeoutCheck();
     		currentTile = floodFillQueue.pollFirst();
     		currentData = traceBackData.get(currentTile);
@@ -222,7 +234,7 @@ public class MyBot extends Bot {
         		boolean hitWater = false;
         		if (!ants.getIlk(dest).isPassable()) {
         			if (currentData.steps+1 <= defenderMaxSteps) {	// wasser im verteidigungsbereich --> als verteidiger zaehlen
-        				found++;
+        				num--;
         				//log("hilldefender: "+dest+" (water)");
         				hitWater = true;
         			}
@@ -231,7 +243,7 @@ public class MyBot extends Bot {
         		boolean metOwn = ants.getMyAnts().contains(dest);
         		if (metOwn && !currentData.hitWater) {		// nur wenn nicht uebers wasser erreicht
         			hillDefenders.put(dest, hill);
-        			found++;
+        			num--;
         			//log("hilldefender: "+dest);
         		}
         		floodFillQueue.addLast(dest);
@@ -241,14 +253,60 @@ public class MyBot extends Bot {
     	}
     }
     
+    
+//    /**
+//     * 
+//     */
+//    private void findEnemyHillAttackers() {
+//    	if (ants.getEnemyHills().size() == 0) {
+//    		return;
+//    	}
+//    	int toSend = (ants.getMyAnts().size() / 1) / ants.getEnemyHills().size();
+//    	for (Tile hill : ants.getEnemyHills()) {
+//    		findEnemyHillAttackers(hill, toSend);
+//    	}
+//    }
+//    
+//    private void findEnemyHillAttackers(Tile hill, int toSend) {
+//    	log("finding attackers for enemy hill at "+hill);
+//    	floodFillQueue.clear();
+//    	traceBackData.clear();
+//    	floodFillQueue.add(hill);
+//        traceBackData.put(hill, new QueueData(null, null, 0));
+//    	Tile currentTile = null;
+//    	QueueData currentData = null;
+//    	while(!floodFillQueue.isEmpty() && toSend > 0) {
+//    		timeoutCheck();
+//    		currentTile = floodFillQueue.pollFirst();
+//    		currentData = traceBackData.get(currentTile);
+//     		for (Aim direction : Aim.values()) {
+//        		Tile dest = ants.getTile(currentTile, direction);
+//        		if (traceBackData.containsKey(dest)) {
+//        			continue;	// got covered already
+//        		}
+//        		if (!ants.getIlk(dest).isPassable()) {
+//        			continue;
+//        		}
+//        		if (ants.getMyAnts().contains(dest) && !sent.contains(dest)) {
+//    				clearLongTermDestination(dest);
+//    				sendAnt(dest, direction.behind());	// von currentTile gings in direction to unserer Ant, daher gehts in die andere Richtung auf dem floodfillweg zum Hill
+//    				log(dest + " heading for enemy hill at "+hill);
+//    				toSend--;        			
+//        		}
+//        		floodFillQueue.addLast(dest);
+//        		QueueData qd = new QueueData(currentTile, currentData, direction, false, false);
+//        		traceBackData.put(dest, qd);
+//     		}
+//    	}
+//    }
+    
     /**
      * find best direction for ant
      */
     private Aim findBestDirection(Tile myAnt) {
 
     	Tile enemyInRange = enemyInRange(myAnt, extendedAttackRadius2);
-		boolean enemyHillInRange = enemyHillInRange(myAnt, extendedAttackRadius2);
-    	if (enemyInRange != null && !enemyHillInRange) {	// bei enemyHillsInRage wird eh in loop angegriffen und dort der richtige Weg zum Hill gefunden.
+    	if (enemyInRange != null) {
     		boolean hillDefender = hillDefenders.containsKey(myAnt);
     		boolean wouldSurvive = wouldSurviveFight(myAnt);
     		if (hillDefender || wouldSurvive) {
@@ -432,6 +490,7 @@ public class MyBot extends Bot {
 			Tile dest = ants.getTile(me, direction);
 			Ilk ilk = ants.getIlk(dest);
 			if (ilk.isPassable() && 
+				!blocked.contains(dest) &&
 				(ilk.isUnoccupied() || ants.getMyAnts().contains(dest))) {
 				return direction;
 			}
@@ -449,6 +508,7 @@ public class MyBot extends Bot {
 			Tile dest = ants.getTile(me, direction);
 			Ilk ilk = ants.getIlk(dest);
 			if (ilk.isPassable() && 
+				!blocked.contains(dest) &&
 				(ilk.isUnoccupied() || ants.getMyAnts().contains(dest))) {
 				return direction;
 			}
@@ -497,7 +557,7 @@ public class MyBot extends Bot {
 		}
 		for (Tile enemy : enemies) {
 			timeoutCheck();
-			Set<Tile> enemiesEnemies = getEnemiesInRange(enemy, antOwners.get(enemy), extendedAttackRadius2);	// da den originalradius
+			Set<Tile> enemiesEnemies = getEnemiesInRange(enemy, antOwners.get(enemy), extendedAttackRadius2);
 			if (enemiesEnemies.size() <= enemies.size()) {
 				return false;
 			}
