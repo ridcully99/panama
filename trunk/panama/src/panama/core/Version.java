@@ -27,7 +27,7 @@ public class Version {
 	// b: Revision (increases when cool new features are added)
 	// c: Minor	(increases when updates or fixes are made - even numbers mark stable releases)
 	
-	public final static String VERSION = "3.3.5";
+	public final static String VERSION = "3.3.6";
 	
 	public final static String LOGO_ASCIIART = 
 	" ______ _______ _______ _______ _______ _______ \n"+
@@ -40,6 +40,7 @@ public class Version {
 
 	/* 	History
 	 * ---------------------------------------------------------------------------------
+	 * 3.3.6	2011-11-18 Added a few convinience methods (see issue #22 and #23)
 	 * 3.3.5    2011-08-15 Added source of simple-log instead of the package, as it isn't maintained anymore since years and I don't want to lose it.
 	 * 3.3.4    2011-06-24 Fixed issue #11 (fluid validator adding), #13 (shortening id field length of PersistentBean)
 	 * 3.3.3    2011-04-28 Explicity destroying/removing value of Context-ThreadLocal at the end of handleRequest (obviously it's a memory leak otherwise)
