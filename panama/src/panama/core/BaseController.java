@@ -19,6 +19,7 @@ import java.io.UnsupportedEncodingException;
 import java.net.URLEncoder;
 import java.util.ArrayList;
 import java.util.Arrays;
+import java.util.HashMap;
 import java.util.Iterator;
 import java.util.List;
 import java.util.Map;
@@ -112,9 +113,38 @@ public class BaseController {
 	 * @return A Target object
 	 */		
 	public Target redirectToAction(String action) {
-		return redirectToAction(this.getClass(), action, null);
+		return redirectToAction(this.getClass(), action, new HashMap<Object, Object>());
 	}	
 
+	/**
+	 * Defines a redirect to other action.
+	 *
+	 * Sends a temporary redirect response to the client using a URL created from the
+	 * current Controller and the specified action and parameters
+	 * The URL has the form: ../controllerName/action?param1=value1&param2=value2...
+	 * 
+	 * The parameter names and values are url-encoded by this method.
+	 * 
+	 * Note: Use redirect only if you need the client browser's URL to have a new URL.
+	 *       Its <strong>much faster</strong> to use simply invoke the method of the required action and return it's result.
+	 * 
+	 * @param action
+	 * @param paramsAndValues a variable list of parameters and values, alternating like so: param1, value1, param2, value2...
+	 * @return A Target object
+	 */		
+	public Target redirectToAction(String action, String... paramsAndValues) {
+		Map<Object, Object> parameterMap = null;
+		if (paramsAndValues != null && paramsAndValues.length > 0) {
+			parameterMap = new HashMap<Object, Object>();
+			for (int i=0; i<paramsAndValues.length; i+=2) {
+				Object key = paramsAndValues[i];
+				Object value = i+1 < paramsAndValues.length ? paramsAndValues[i+1] : "";
+				parameterMap.put(key, value);
+			}
+		}
+		return redirectToAction(action, parameterMap);
+	}
+	
 	/**
 	 * Defines a redirect to other action.
 	 *
@@ -131,7 +161,7 @@ public class BaseController {
 	 * @param parameterMap
 	 * @return A Target object
 	 */		
-	public Target redirectToAction(String action, Map parameterMap) {
+	public Target redirectToAction(String action, Map<Object, Object> parameterMap) {
 		return redirectToAction(this.getClass(), action, parameterMap);
 	}
 	
@@ -150,9 +180,39 @@ public class BaseController {
 	 * @return A Target object
 	 */	
 	public Target redirectToAction(Class<? extends BaseController> controllerClass, String action) {
-		return redirectToAction(controllerClass, action, null);
+		return redirectToAction(controllerClass, action, new HashMap<Object, Object>());
 	}
 
+	/**
+	 * Defines a redirect to other action.
+	 *
+	 * Sends a temporary redirect response to the client using a URL created from the
+	 * specified controllerClass and the specified action and parameters
+	 * The URL has the form: ../controllerName/action?param1=value1&param2=value2...
+	 * 
+	 * The parameter names and values are url-encoded by this method.
+	 * 
+	 * Note: Use redirect only if you need the client browser's URL to have a new URL.
+	 *       Its <strong>much faster</strong> to use simply invoke the method of the required action and return it's result.
+	 * 
+	 * @param controllerClass
+	 * @param action
+	 * @param paramsAndValues a variable list of parameters and values, alternating like so: param1, value1, param2, value2...
+	 * @return A Target object
+	 */		
+	public Target redirectToAction(Class<? extends BaseController> controllerClass, String action, String... paramsAndValues) {
+		Map<Object, Object> parameterMap = null;
+		if (paramsAndValues != null && paramsAndValues.length > 0) {
+			parameterMap = new HashMap<Object, Object>();
+			for (int i=0; i<paramsAndValues.length; i+=2) {
+				Object key = paramsAndValues[i];
+				Object value = i+1 < paramsAndValues.length ? paramsAndValues[i+1] : "";
+				parameterMap.put(key, value);
+			}
+		}
+		return redirectToAction(controllerClass, action, parameterMap);
+	}
+	
 	/**
 	 * Defines a redirect to other action.
 	 *
@@ -170,7 +230,8 @@ public class BaseController {
 	 * @param parameterMap A map of parameter/value pairs.
 	 * @return A Target object
 	 */	
-	public Target redirectToAction(Class<? extends BaseController> controllerClass, String action, Map parameterMap) {
+	@SuppressWarnings("rawtypes")
+	public Target redirectToAction(Class<? extends BaseController> controllerClass, String action, Map<Object, Object> parameterMap) {
 		Controller annotation = controllerClass.getAnnotation(Controller.class);
 		String ctrlName = annotation != null && !StringUtils.isEmpty(annotation.alias()) ? annotation.alias() : controllerClass.getName();
 		StringBuffer url = new StringBuffer();
@@ -179,7 +240,7 @@ public class BaseController {
 			url.append(action);
 		}
 		try {
-			if (parameterMap != null) {
+			if (parameterMap != null && !parameterMap.isEmpty()) {
 				boolean first = true;
 				for (Iterator it = parameterMap.entrySet().iterator(); it.hasNext(); ) {
 					url.append(first ? "?" : "&");

@@ -587,6 +587,16 @@ public class FormData {
 	}
 	
 	/**
+	 * Sets error message for the specified field.
+	 * An already existing error message will be overridden by calling this methd.
+	 * @param fieldName
+	 * @param errorMessage
+	 */
+	public void setError(String fieldName, String errorMessage) {
+		errors.put(fieldName, new ValidatorException(errorMessage));
+	}
+	
+	/**
 	 * Checks if there are errors
 	 * @return true if there are errors, false otherwise
 	 */
