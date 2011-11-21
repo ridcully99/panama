@@ -285,7 +285,7 @@ public class Dispatcher implements Filter {
 		adb.scanArchives(WarUrlFinder.findWebInfClassesPath(applicationContext));
 		adb.scanArchives(WarUrlFinder.findWebInfLibClasspaths(applicationContext));
 
-		Set<String> ctrls = adb.getAnnotationIndex().get(panama.annotations.Controller.class.getName());
+		Set<String> ctrls = adb.getAnnotationIndex().get(Controller.class.getName());
 		
 		for (String n : ctrls) {
 			Class<? extends BaseController> c = null;
@@ -298,7 +298,7 @@ public class Dispatcher implements Filter {
 			controllerClasses.put(n, c);
 			log.debug(c+" -> "+c);
 			collectActions(c);
-			String alias = c.getAnnotation(panama.annotations.Controller.class).alias();
+			String alias = c.getAnnotation(Controller.class).alias();
 			if 	(StringUtils.isNotEmpty(alias)) {
 				alias = alias.trim();
 				if (alias.contains("/")) {
