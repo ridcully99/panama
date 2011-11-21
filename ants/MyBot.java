@@ -1,4 +1,5 @@
 import java.io.IOException;
+import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.HashSet;
 import java.util.LinkedList;
@@ -10,12 +11,10 @@ import java.util.Set;
  * Version 15 (...)
  * 
  * changed since version 14
- * - unseen tiles richtig berechnen und als ziel fuer ausbreitung verwenden
- * - Abbruch nach n steps entfernt
- * - Bestimmung longtermdest nach queue-Abarbeitung nicht mehr via ownMet sondern ganz simpel currentData.origin (wie am Anfang).
+ * - unseen tiles richtig berechnen und als ziel fuer ausbreitung verwenden -- aber nicht nur.
  * - Bug in fighting-Berechnung gefixt (antOwners wurde nie resettet)
  * - fight-Berechnung in Ueberarbeitung
- * - hill-defending in ueberarbeitung
+ * - dynamic-defense
  * 
  *
  * changed (since Version 13)
@@ -45,6 +44,12 @@ public class MyBot extends Bot {
 	
 	private final static boolean LOGGING = true;
 	public int ALMOST_TIMEOUT = 20;
+	
+	public int VIEWRADIUS_STEPS = 12;	// ca. 12 steps entsprechen akt. viewradius2 von 77
+	
+	private final static int I_WOULD_DIE = -1;
+	private final static int BOTH_WOULD_DIE = 0;
+	private final static int I_WOULD_SURVIVE = 1;
 
     private Map<Tile, Tile> longTermDestination = new HashMap<Tile, Tile>();	// ant --> destination
     private Ants ants;
@@ -55,12 +60,12 @@ public class MyBot extends Bot {
     private int foodEaten = 0;
     private Set<Tile> foodLastTurn = new HashSet<Tile>();
     private Map<Tile, Tile> hillDefenders = new HashMap<Tile, Tile>();				// Ant->Hill; werden bei bestDirection beruecksichtigt
-    private int hillDefenderMaxSteps = 2;											// werden bei bestDirection beruecksichtigt
-    private int hillDefenderCount = 0;
+    private boolean keepWatch = false;
     
 	private Map<Tile, Integer> antOwners = new HashMap<Tile, Integer>();
     private int antsInHive;
 	private int extendedAttackRadius2;		// extended weil wir 1 Step vorausblicken
+	private int maxStepsToAttackHill;		// wenn mehr steps als diese bis Hill, dann nicht explizit angreifen
 	
     /**
      * Main method executed by the game engine for starting the bot.
@@ -84,6 +89,7 @@ public class MyBot extends Bot {
     public void setup(int loadTime, int turnTime, int rows, int cols, int turns, int viewRadius2, int attackRadius2, int spawnRadius2) {
     	super.setup(loadTime, turnTime, rows, cols, turns, viewRadius2, attackRadius2, spawnRadius2);
     	extendedAttackRadius2 = 17; //10; //9;//attackRadius2;//2*(int)(1d+(attackRadius+2d) * (attackRadius+2d));
+    	maxStepsToAttackHill = Math.max(getAnts().getRows(), getAnts().getCols()) / 3;
     }
     
     @Override
@@ -122,7 +128,6 @@ public class MyBot extends Bot {
 	    	antsInHive = (1+foodEaten-antsDied)-ants.getMyAnts().size();	// wieviele es sein sollten - wieviele es sind
 	
 	    	findHillDefenders();
-	    	//findEnemyHillAttackers();
 	    	
 	    	blocked.clear();
 	    	
@@ -143,7 +148,7 @@ public class MyBot extends Bot {
     		log("almost-timeout exception");
     		e.printStackTrace(System.err);
     	} finally {
-	        log("time-spent: "+(ants.getTurnTime()-ants.getTimeRemaining())+" ; #unseen: "+ants.unseen.size());
+	        log("time-spent: "+(ants.getTurnTime()-ants.getTimeRemaining())+" ; #ants: "+ants.getMyAnts().size()+" #unseen: "+ants.unseen.size());
     		turn++;
     	}
     }
@@ -168,6 +173,7 @@ public class MyBot extends Bot {
         	}
     	} else {
     		log("no move for ant "+myAnt);
+    		blocked.add(myAnt);
     	}
     	sent.add(myAnt);
 	}
@@ -176,129 +182,79 @@ public class MyBot extends Bot {
     private Map<Tile, QueueData> traceBackData = new HashMap<Tile, QueueData>();
     
     /**
-     * find ants next to hills and uses them as defenders
-     * 1 so schnell wie moeglich,
-     * dann 2 ab 20, 3 ab 30 usw.
-     * hillDefenderMaxSteps steigt mit anzahl defenders
      */
     private void findHillDefenders() {
     	
     	hillDefenders.clear();
-    	if (ants.getMyHills().size() == 0 || (ants.getMyAnts().size() < 2 * ants.getMyHills().size())) {
-    		return;
-    	}
-    	int defenderCountPerHill = 1;
-		if (ants.getMyAnts().size() >= 20 * ants.getMyHills().size()) {
-			defenderCountPerHill = (ants.getMyAnts().size()/ants.getMyHills().size())/10;
-		}
-		if (defenderCountPerHill > 8) {
-			defenderCountPerHill = 8;
-		}
-		hillDefenderCount = Math.max(defenderCountPerHill, hillDefenderCount);	// einmal erreichte Zahl nicht mehr verringern
-		
-		hillDefenderMaxSteps = 2;
-    	if (defenderCountPerHill >= 4) {
-    		hillDefenderMaxSteps = 3;
-    	}
-    	if (defenderCountPerHill >= 6) {
-    		hillDefenderMaxSteps = 4;
-    	}
     	for (Tile hill : ants.getMyHills()) {
-    		findHillDefenders(hill, hillDefenderCount, hillDefenderMaxSteps);
+    		findHillDefenders(hill);
     	}
     }
     
-    
     /** 
-     * die step-maessig num naehesten finden und als verteidiger nehmen
-     * jedes wasser innerhalb defenderMaxSteps als verteidiger zaehlen (-->weniger verteidiger fuer haufen am wasser)
-     * floodfill auch quer durch wasser fortsetzen, dabei metEnemy als Marker missbrauchen um spaetere eigene Ants (auf anderer Seite) nicht als Verteidiger zu zaehlen
      */
-    private void findHillDefenders(Tile hill, int num, int defenderMaxSteps) {
-    	
+    private void findHillDefenders(Tile hill) {
+    	List<Tile> antsMet = new ArrayList<Tile>();	// Liste der getroffenen Ameisen, geordnet anhand Naehe zum Hill
+    	int balance = 0;
     	floodFillQueue.clear();
     	traceBackData.clear();
     	floodFillQueue.add(hill);
     	traceBackData.put(hill, new QueueData(null, null, 0));
     	Tile currentTile = null;		// ausserhalb damit ich nachher das Tile das als letztes aus Queue genommen wurde, habe --> wenn kein Food dann in die Richtung gehen weil "am weitesten freie Bahn"
     	QueueData currentData = null;	// -""-
-    	while(!floodFillQueue.isEmpty() && num > 0) {
+    	queue:
+    	while(!floodFillQueue.isEmpty()) {
     		timeoutCheck();
     		currentTile = floodFillQueue.pollFirst();
     		currentData = traceBackData.get(currentTile);
+    		
+    		// fuer eigene currentTile nehmen statt dest, damit die eines naeher sein muessen als die gegner
+    		if (ants.getMyAnts().contains(currentTile)) {
+    			antsMet.add(currentTile);
+    			balance++;
+    		}
+    		
      		for (Aim direction : Aim.values()) {
         		Tile dest = ants.getTile(currentTile, direction);
+        		if (!ants.getIlk(dest).isPassable()) {
+        			continue;	// da gehts nicht weiter
+        		}
+        		
         		if (traceBackData.containsKey(dest)) {
         			continue;	// got covered already
         		}
-        		boolean hitWater = false;
-        		if (!ants.getIlk(dest).isPassable()) {
-        			if (currentData.steps+1 <= defenderMaxSteps) {	// wasser im verteidigungsbereich --> als verteidiger zaehlen
-        				num--;
-        				//log("hilldefender: "+dest+" (water)");
-        				hitWater = true;
-        			}
+        		
+        		boolean metOwn = ants.getMyAnts().contains(dest);		// nur fuer queuedata
+        		boolean metEnemy = ants.getEnemyAnts().contains(dest);	
+        		if (metEnemy && currentData.steps <= VIEWRADIUS_STEPS) { // enemies nur so weit beruecksichtigen wie viewradius
+           			antsMet.add(dest);
+           		    balance--; 
         		}
-
-        		boolean metOwn = ants.getMyAnts().contains(dest);
-        		if (metOwn && !currentData.hitWater) {		// nur wenn nicht uebers wasser erreicht
-        			hillDefenders.put(dest, hill);
-        			num--;
-        			//log("hilldefender: "+dest);
+        		if (balance > 0 && currentData.steps > VIEWRADIUS_STEPS) {
+        			break queue;
         		}
         		floodFillQueue.addLast(dest);
-        		QueueData qd = new QueueData(currentTile, currentData, direction, metOwn, false, hitWater);
+        		QueueData qd = new QueueData(currentTile, currentData, direction, metOwn, metEnemy, false, false);
         		traceBackData.put(dest, qd);
      		}
     	}
+    	
+    	balance = 0;
+    	if (keepWatch) {	// balance so, dass mindest. 1 beim hill bleibt
+    		balance = -1;
+    	}
+    	for (Tile ant : antsMet) {
+    		if (ants.getMyAnts().contains(ant)) {
+    			if (balance < 0) {	// mehr gegner als eigene zw. ant und hill --> zurueck zum hill!
+    				hillDefenders.put(ant, hill);
+    			}
+    			balance++;
+    		} else {
+    			balance--;
+    		}
+    	}
     }
     
-    
-//    /**
-//     * 
-//     */
-//    private void findEnemyHillAttackers() {
-//    	if (ants.getEnemyHills().size() == 0) {
-//    		return;
-//    	}
-//    	int toSend = (ants.getMyAnts().size() / 1) / ants.getEnemyHills().size();
-//    	for (Tile hill : ants.getEnemyHills()) {
-//    		findEnemyHillAttackers(hill, toSend);
-//    	}
-//    }
-//    
-//    private void findEnemyHillAttackers(Tile hill, int toSend) {
-//    	log("finding attackers for enemy hill at "+hill);
-//    	floodFillQueue.clear();
-//    	traceBackData.clear();
-//    	floodFillQueue.add(hill);
-//        traceBackData.put(hill, new QueueData(null, null, 0));
-//    	Tile currentTile = null;
-//    	QueueData currentData = null;
-//    	while(!floodFillQueue.isEmpty() && toSend > 0) {
-//    		timeoutCheck();
-//    		currentTile = floodFillQueue.pollFirst();
-//    		currentData = traceBackData.get(currentTile);
-//     		for (Aim direction : Aim.values()) {
-//        		Tile dest = ants.getTile(currentTile, direction);
-//        		if (traceBackData.containsKey(dest)) {
-//        			continue;	// got covered already
-//        		}
-//        		if (!ants.getIlk(dest).isPassable()) {
-//        			continue;
-//        		}
-//        		if (ants.getMyAnts().contains(dest) && !sent.contains(dest)) {
-//    				clearLongTermDestination(dest);
-//    				sendAnt(dest, direction.behind());	// von currentTile gings in direction to unserer Ant, daher gehts in die andere Richtung auf dem floodfillweg zum Hill
-//    				log(dest + " heading for enemy hill at "+hill);
-//    				toSend--;        			
-//        		}
-//        		floodFillQueue.addLast(dest);
-//        		QueueData qd = new QueueData(currentTile, currentData, direction, false, false);
-//        		traceBackData.put(dest, qd);
-//     		}
-//    	}
-//    }
     
     /**
      * find best direction for ant
@@ -306,19 +262,23 @@ public class MyBot extends Bot {
     private Aim findBestDirection(Tile myAnt) {
 
     	Tile enemyInRange = enemyInRange(myAnt, extendedAttackRadius2);
-    	if (enemyInRange != null) {
-    		boolean hillDefender = hillDefenders.containsKey(myAnt);
-    		boolean wouldSurvive = wouldSurviveFight(myAnt);
-    		if (hillDefender || wouldSurvive) {
+		boolean hillDefender = hillDefenders.containsKey(myAnt);
+    	if (enemyInRange != null && !hillDefender) {
+    		int fightPrediction = simulateFight(myAnt);
+    		if (fightPrediction > 0) {
 				log(myAnt +" attack "+enemyInRange);
 				// hin zu naehester enemyAnt
 				return findMoveTowardsEnemy(myAnt, enemyInRange);
-    		} else {
-				log(myAnt + " avoid fight against "+enemyInRange);
+    		} else if (fightPrediction == 0) {	// stehen bleiben
+    			return null;
+    		} else { // I_WOULD_DIE
+				log(myAnt + " avoid fight against "+enemyInRange+"; would need "+Math.abs(fightPrediction)+" verstaerkung");
 				// weg von naehester enemyAnt (ist die die von enemyInRange gefunden wird)
 				return findMoveAwayFromEnemey(myAnt, enemyInRange);
 			}
 		}
+    	
+    	Map<QueueData, Tile> enemyHillAttacks = new HashMap<QueueData, Tile>();
     	
     	floodFillQueue.clear();
     	traceBackData.clear();
@@ -328,6 +288,7 @@ public class MyBot extends Bot {
     	Tile currentTile = null;		// ausserhalb damit ich nachher das Tile das als letztes aus Queue genommen wurde, habe --> wenn kein Food dann in die Richtung gehen weil "am weitesten freie Bahn"
     	QueueData currentData = null;	// -""-
 
+    	queue:
     	while(!floodFillQueue.isEmpty()) {
     		timeoutCheck();
     		currentTile = floodFillQueue.pollFirst();
@@ -351,49 +312,59 @@ public class MyBot extends Bot {
         		
         		boolean metOwn = ants.getMyAnts().contains(dest);
         		boolean metEnemy = ants.getEnemyAnts().contains(dest);
+        		boolean hitUnseen = ants.isUnseen(dest);
         		
-        		// hilldefender und dest mein hill?
+        		if (metEnemy) {
+        			keepWatch = true;
+        		}
+        		
+        		// hilldefender und dest mein hill? naeher zum hill gehen aber nicht drauf (daher currentTile, nicht dest)
         		if (hillDefenders.containsKey(myAnt) && dest.equals(hillDefenders.get(myAnt))) {
     				clearLongTermDestination(myAnt);
-        			if (currentData.steps < hillDefenderMaxSteps) {		// zu nah, weiter weg
-                		traceBackData.put(dest, new QueueData(currentTile, currentData, direction.behind(), metOwn, metEnemy));	// required by trace back
-        				return traceBack(dest, myAnt);
-        			} else if (currentData.steps > hillDefenderMaxSteps) {	// zu weit weg, naeher hin
-                		traceBackData.put(dest, new QueueData(currentTile, currentData, direction, metOwn, metEnemy));	// required by trace back
-        				return traceBack(dest, myAnt);
-        			}
+        			return traceBack(currentTile, myAnt);
         		}
         		
         		// enemy hills angreifen
-        		if (ants.getEnemyHills().contains(dest)) {
+        		if (ants.getEnemyHills().contains(dest) && currentData.steps < maxStepsToAttackHill) {
         			clearLongTermDestination(myAnt);
-            		traceBackData.put(dest, new QueueData(currentTile, currentData, direction, metOwn, metEnemy));	// required by trace back
-            		log(myAnt + " heading for enemy hill at "+dest);
-            		return traceBack(dest, myAnt);
+        			enemyHillAttacks.put(new QueueData(currentTile, currentData, direction, metOwn, metEnemy, false, hitUnseen), dest);
+        			continue;
         		}
         		
-        		if (ants.getFoodTiles().contains(dest) && currentData.ownMet == 0) {								// food und myAnt am naehesten
+        		if (ants.getFoodTiles().contains(dest) && currentData.ownMet == 0 && enemyHillAttacks.isEmpty()) {		// food und myAnt am naehesten und nicht hill naeher als food
         			clearLongTermDestination(myAnt);
         			return traceBack(currentTile, myAnt);
         		}
 
         		if (dest.equals(longTermDestination.get(myAnt))) {													// hit long term destination?
-            		traceBackData.put(dest, new QueueData(currentTile, currentData, direction, metOwn, metEnemy));	// required by trace back
-            		log(myAnt + " reached longtermdest "+dest);
-            		return traceBack(dest, myAnt);
-        		}
-
-        		// unseen und noch kein anderer dorthin unterwegs?
-        		if (ants.isUnseen(dest) && !longTermDestination.values().contains(dest)) {
-            		traceBackData.put(dest, new QueueData(currentTile, currentData, direction, metOwn, metEnemy));	// required by trace back
-            		//log(myAnt + " heads for unseen at "+dest);
+            		traceBackData.put(dest, new QueueData(currentTile, currentData, direction, metOwn, metEnemy, false, hitUnseen));	// required by trace back
+            		//log(myAnt + " continues on path to longtermdest "+dest);
             		return traceBack(dest, myAnt);
         		}
         		
+        		if (currentData.unseenMet > 0/* || currentData.steps >= ants.getRows()/2*/) {
+        			log(myAnt+" is heading for unseen at "+dest);
+        			break queue;
+        		}
+        		
         		floodFillQueue.addLast(dest);
-        		traceBackData.put(dest, new QueueData(currentTile, currentData, direction, metOwn, metEnemy));
+        		traceBackData.put(dest, new QueueData(currentTile, currentData, direction, metOwn, metEnemy, false, hitUnseen));
      		}
     	}
+    	
+    	if (!enemyHillAttacks.isEmpty()) {	// go to enemy-hill where least enemies are underway
+    		clearLongTermDestination(myAnt);
+    		QueueData best = null;
+    		for (QueueData q : enemyHillAttacks.keySet()) {
+    			if (best == null || best.enemiesMet > q.enemiesMet || (best.enemiesMet == q.enemiesMet && q.steps < best.steps)) {
+    				best = q;
+    			}
+    		}
+    		Tile dest = enemyHillAttacks.get(best);
+    		traceBackData.put(dest, best);
+    		return traceBack(dest, myAnt);
+    	}
+    	
     	// nichts besonderes gefunden.
 		if (currentData.steps < 2) {						// hm, nicht weit gekommen --> irgendwohin gehen
 			log(myAnt + " steps < 2");
@@ -402,12 +373,29 @@ public class MyBot extends Bot {
 				
     	// entweder hatte ant noch kein longtermdestination oder hat es nicht schon vorher gefunden 
 		// (was durch temporaere blockierungen passiert sein kann, oder seit version 12 auch durch "break queue" oder am wahrscheinlichsten durch terrain das beim festlegen nicht bekannt war.
-		longTermDestination.remove(myAnt);	// raushau'n und neues suchen
+		clearLongTermDestination(myAnt);
 		
-		// wie am Anfang einfach currentData.origin als longtermdest nehmen
-		longTermDestination.put(myAnt, currentData.origin);
-		log(myAnt + " got new longtermdestination " + currentData.origin);
-		return traceBack(currentData.origin, myAnt);
+		// alle mit Tiefe >= currentData.steps suchen.
+		int ownMetMinimum = 9999;
+		int maxUnseen = -1;
+		List<Tile> longTermTargets = new ArrayList<Tile>();
+		for (QueueData d : traceBackData.values()) {
+			if (d.steps >= currentData.steps) {
+				if (d.ownMet < ownMetMinimum || d.unseenMet > maxUnseen) {
+    				ownMetMinimum = Math.min(ownMetMinimum, d.ownMet);
+    				maxUnseen = Math.max(maxUnseen, d.unseenMet);
+    				longTermTargets.clear();
+    				longTermTargets.add(d.origin);			// ist halt das vorige, aber auch ok. ganz korrekt waere der key zum value.
+				} else if (d.ownMet == ownMetMinimum) {
+					longTermTargets.add(d.origin);			// ist halt das vorige, aber auch ok. ganz korrekt waere der key zum value.
+				}
+			}
+		}
+		Tile firstDest = longTermTargets.get(0);	// TODO eventuell das nehmen mit den meisten getroffenen enemies? oder zumindest unter gewissen umstaenden?
+		
+		longTermDestination.put(myAnt, firstDest);
+		log(myAnt + " got new longtermdest "+firstDest);
+		return traceBack(firstDest, myAnt);
     }
 
 
@@ -495,7 +483,7 @@ public class MyBot extends Bot {
 				return direction;
 			}
 		}
-		return null;
+		return anyWhere(me);	// towards not possible, at least move anywhere, otherwise might crash with own ant!
 	}
 
 	
@@ -513,7 +501,7 @@ public class MyBot extends Bot {
 				return direction;
 			}
 		}
-		return null;
+		return anyWhere(me);	// away not possible, at least move anywhere, otherwise might crash with own ant!
 	}
 	
 	
@@ -550,18 +538,27 @@ public class MyBot extends Bot {
 	 * checks if my ant would survive fight, according to rules of website
 	 * "Then, if there is _any_ ant is next to an enemy with an equal or lesser number, it will die"
 	 */
-	private boolean wouldSurviveFight(Tile location) {
+	private int simulateFight(Tile location) {
 		Set<Tile> enemies = getEnemiesInRange(location, 0, extendedAttackRadius2);
 		if (enemies.size() == 0) {
-			return true;
+			return I_WOULD_SURVIVE;
 		}
+		int result = I_WOULD_SURVIVE;
+		int lowest = 999;
 		for (Tile enemy : enemies) {
 			timeoutCheck();
-			Set<Tile> enemiesEnemies = getEnemiesInRange(enemy, antOwners.get(enemy), extendedAttackRadius2);
-			if (enemiesEnemies.size() <= enemies.size()) {
-				return false;
+			Set<Tile> enemiesEnemies = getEnemiesInRange(enemy, antOwners.get(enemy), 10);	// reduced exendedAttackRadius2
+			result = enemiesEnemies.size() - enemies.size();
+			lowest = Math.min(result, lowest);
+			if (enemiesEnemies.size() < enemies.size()) {
+//				result = I_WOULD_DIE;
+//				break;
+			}
+			if (enemiesEnemies.size() == enemies.size()) {
+//				result = BOTH_WOULD_DIE;
 			}
 		}
-		return true;
+//		return result;
+		return lowest;	// wenn negativ, dann wuerde ich verlieren - und braeuchte |lowest| verstaerkung
 	}
 }
