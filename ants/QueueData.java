@@ -25,11 +25,13 @@ public class QueueData {
 	public int steps;
 	public int ownMet;
 	public int enemiesMet;
-	public boolean hitWater;	// used for finding hill defenders
-
-	public QueueData(Tile origin, QueueData previous, Aim direction, boolean metOwn, boolean metEnemy, boolean hitWater) {
+	public int waterMet;	// used for finding hill defenders
+	public int unseenMet;
+	
+	public QueueData(Tile origin, QueueData previous, Aim direction, boolean metOwn, boolean metEnemy, boolean hitWater, boolean hitUnseen) {
 		this(origin, previous, direction, metOwn, metEnemy);
-		this.hitWater = previous.hitWater || hitWater;
+		waterMet = previous.waterMet + (hitWater ? 1 : 0);
+		unseenMet = previous.unseenMet + (hitUnseen ? 1 : 0);
 	}
 	
 	public QueueData(Tile origin, QueueData previous, Aim direction, boolean metOwn, boolean metEnemy) {
@@ -42,13 +44,6 @@ public class QueueData {
 		this.origin = origin;
 		this.originAimed = originAimed;
 		this.steps = steps;
-	}
-
-	public QueueData(Tile origin, Aim originAimed, int steps, int ownMet) {
-		this.origin = origin;
-		this.originAimed = originAimed;
-		this.steps = steps;
-		this.ownMet = ownMet;
 	}
 
 }

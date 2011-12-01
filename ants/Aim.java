@@ -25,6 +25,12 @@ public enum Aim {
 
     private static final Map<Character, Aim> symbolLookup = new HashMap<Character, Aim>();
     
+    private static final Aim[][] aims = new Aim[][] {
+    	{NORTH, EAST, SOUTH, WEST},
+    	{EAST, SOUTH, WEST, NORTH},
+    	{SOUTH, WEST, NORTH, EAST},
+    	{WEST, NORTH, EAST, SOUTH}};
+    
     static {
 		rightLookup.put(NORTH, EAST);
 		rightLookup.put(EAST, SOUTH);
@@ -104,5 +110,9 @@ public enum Aim {
 
 	public Aim behind() {
 		return behindLookup.get(this);
-	}    
+	}
+	
+	public static Aim[] getAims(int n) {
+		return aims[n%4];
+	}
 }
