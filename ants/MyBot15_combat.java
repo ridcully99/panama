@@ -462,10 +462,10 @@ public class MyBot15_combat extends Bot {
 	private final static int KILL = 1;
 	private final static int DIE = 2;
 	
-	private int combatPlayerInfluence[][][] = new int[10][200][200];	// array mit den influences pro tile fuer bis zu 20 players
-	private int combatInfluenceTotal[][] = new int[200][200];
-	private int combatFighting[][][] = new int[10][200][200];
-	private int combatStatus[][][] = new int[10][200][200];
+	private int combatPlayerInfluence[][][];	// array mit den influences pro tile fuer bis zu 20 players
+	private int combatInfluenceTotal[][];
+	private int combatFighting[][][];
+	private int combatStatus[][][];
 	
 	private void calculateCombat() {
 
