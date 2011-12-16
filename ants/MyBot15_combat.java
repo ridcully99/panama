@@ -51,10 +51,6 @@ public class MyBot15_combat extends Bot {
 	public int ALMOST_TIMEOUT = 20;
 	public int VIEWRADIUS_STEPS = 12;	// ca. 12 steps entsprechen akt. viewradius2 von 77
 	
-	private final static int I_WOULD_DIE = -1;
-	private final static int BOTH_WOULD_DIE = 0;
-	private final static int I_WOULD_SURVIVE = 1;
-
     private Map<Tile, Tile> longTermDestination = new HashMap<Tile, Tile>();	// ant --> destination
     private Ants ants;
     private Set<Tile> blocked = new HashSet<Tile>();
@@ -462,14 +458,14 @@ public class MyBot15_combat extends Bot {
 	private final static int KILL = 1;
 	private final static int DIE = 2;
 	
-	private int combatPlayerInfluence[][][];	// array mit den influences pro tile fuer bis zu 20 players
+	private int combatPlayerInfluence[][][];
 	private int combatInfluenceTotal[][];
 	private int combatFighting[][][];
 	private int combatStatus[][][];
 	
 	private void calculateCombat() {
 
-		combatPlayerInfluence = new int[MAX_PLAYERS][ants.getRows()][ants.getCols()];	// array mit den influences pro tile fuer bis zu 20 players
+		combatPlayerInfluence = new int[MAX_PLAYERS][ants.getRows()][ants.getCols()];	// array mit den influences pro tile fuer bis zu MAX_PLAYERS
 		combatInfluenceTotal = new int[ants.getRows()][ants.getCols()];
 		combatFighting = new int[MAX_PLAYERS][ants.getRows()][ants.getCols()];
 		combatStatus = new int[MAX_PLAYERS][ants.getRows()][ants.getCols()];
