@@ -17,7 +17,6 @@ package panama.android.trackx;
 
 import java.util.List;
 
-import android.graphics.BlurMaskFilter;
 import android.graphics.Canvas;
 import android.graphics.Paint;
 import android.graphics.Path;
@@ -37,6 +36,7 @@ public class PathOverlay extends Overlay {
 	private Path mPath;
 	private Paint mPathPaint;
 	private Point mHelperPoint = new Point();
+	private Point mHelperPoint2 = new Point();
 	
 	public PathOverlay() {
 		mPath = new Path();
@@ -46,8 +46,7 @@ public class PathOverlay extends Overlay {
 		mPathPaint.setStyle(Paint.Style.STROKE);
 		mPathPaint.setStrokeJoin(Paint.Join.ROUND);
 		mPathPaint.setStrokeCap(Paint.Cap.ROUND);
-		mPathPaint.setStrokeWidth(5);
-		mPathPaint.setMaskFilter(new BlurMaskFilter(2f, BlurMaskFilter.Blur.NORMAL));
+		mPathPaint.setStrokeWidth(7);
 	}
 	
 	public void setPositions(List<Position> positions) {
@@ -77,20 +76,30 @@ public class PathOverlay extends Overlay {
 	@Override
 	public void draw(Canvas canvas, MapView mapView, boolean shadow) {
 		if (shadow) {
-			return;	// we don't have a shadow.
+			return;	// path has no shadow
 		}
 		if (mPositions != null && mPositions.size() > 0) {
-			//float width = mapView.getZoomLevel() / 2;
-			//mPathPaint.setStrokeWidth(width);
-
 			// path jedesmal neu aufbauen weil sich zoom und scroll verändert haben könnten
 			mPath.reset();
 			boolean start = true;
-			for (Position p : mPositions) {
-				mapView.getProjection().toPixels(p.geoPoint, mHelperPoint);
-				if (start) {
+//			for (Position p : mPositions) {
+//				mapView.getProjection().toPixels(p.geoPoint, mHelperPoint);
+//				if (start) {
+//					mPath.moveTo(mHelperPoint.x, mHelperPoint.y);
+//					start = false;
+//				} else {
+//					mPath.lineTo(mHelperPoint.x, mHelperPoint.y);
+//				}
+//			}
+			for (int n=0; n<mPositions.size(); n++) {
+				mapView.getProjection().toPixels(mPositions.get(n).geoPoint, mHelperPoint);
+				if (n == 0) {
 					mPath.moveTo(mHelperPoint.x, mHelperPoint.y);
-					start = false;
+				}
+				if (n < mPositions.size()-3) {
+					mapView.getProjection().toPixels(mPositions.get(n+1).geoPoint, mHelperPoint2);
+					mPath.quadTo(mHelperPoint.x, mHelperPoint.y, mHelperPoint2.x, mHelperPoint2.y);
+					n++;
 				} else {
 					mPath.lineTo(mHelperPoint.x, mHelperPoint.y);
 				}

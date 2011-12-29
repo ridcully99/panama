@@ -37,7 +37,6 @@ import android.widget.Toast;
 import com.google.android.maps.GeoPoint;
 import com.google.android.maps.MapActivity;
 import com.google.android.maps.MapView;
-import com.google.android.maps.OverlayItem;
 
 public class MainActivity extends MapActivity implements TrackerService.Listener {
 
@@ -204,14 +203,14 @@ public class MainActivity extends MapActivity implements TrackerService.Listener
 				long id = data.getLongExtra("id", -1);
 				Session session = mPersistence.load(id);
 				mService.applySession(session);
-				mMilestoneOverlay.reset(session.positions, 1000, "km");
+				mMilestoneOverlay.setComplete(true);
 				adjustMap(session.positions);
 			}
 			return;
 		case REQUEST_SETTINGS:
 			mGender = Integer.parseInt(mPrefs.getString(SettingsActivity.GENDER_KEY, ""+Util.GENDER_UNKNOWN));
 			mWeight = Float.parseFloat(mPrefs.getString(SettingsActivity.WEIGHT_KEY, ""+Util.DEFAULT_WEIGHT));
-			// TODO check if units preference has changed and adapt labels and value displays.
+			// TODO check if units preference has changed and adapt labels and value displays and rebuild milestoneoverlay.
 			return;
 		}
 	}
@@ -224,6 +223,7 @@ public class MainActivity extends MapActivity implements TrackerService.Listener
 			mNewSessionButton.setVisibility(View.VISIBLE);
 			mService.stopTracking();
 			mService.reset();
+			mMilestoneOverlay.setComplete(false);
 		} else {
 			super.onBackPressed();
 		}
@@ -241,6 +241,7 @@ public class MainActivity extends MapActivity implements TrackerService.Listener
 	private void waitForSatisfactoryStartingLocation() {
 		mService.startTracking();
 		mService.reset();
+		mMilestoneOverlay.setComplete(false);
 		mWaitingDialog = ProgressDialog.show(this, "", "Let's see were we are right now...", true, true, new OnCancelListener() {
 			@Override
 			public void onCancel(DialogInterface dialog) {
@@ -254,6 +255,7 @@ public class MainActivity extends MapActivity implements TrackerService.Listener
 		mStartButton.setVisibility(View.GONE);
 		mPauseButton.setVisibility(View.VISIBLE);
 		mStopButton.setVisibility(View.VISIBLE);
+		mMilestoneOverlay.setComplete(false);
 		mService.startRecording();
 		mWakeLock.acquire();										// standby verhindern
 	}
@@ -283,6 +285,7 @@ public class MainActivity extends MapActivity implements TrackerService.Listener
 		mSaveButton.setVisibility(View.VISIBLE);
 		mService.stopRecording();
 		mService.stopTracking();	// versuchsweise mal
+		mMilestoneOverlay.setComplete(true);
 		setCurrentPace(0);
 
 		if (mWakeLock.isHeld()) {
@@ -296,6 +299,7 @@ public class MainActivity extends MapActivity implements TrackerService.Listener
 		mSaveButton.setVisibility(View.GONE);
 		mNewSessionButton.setVisibility(View.VISIBLE);
 		mService.reset();
+		mMilestoneOverlay.setComplete(false);
 	}
 	
 	public void onSaveClicked(View view) {
@@ -391,6 +395,7 @@ public class MainActivity extends MapActivity implements TrackerService.Listener
 		
 		mMyLocationOverlay.setLocation(mService.currentLocation);
 		mPathOverlay.setPositions(mService.positions);
+		mMilestoneOverlay.setPositions(mService.positions);
 		if (location != null) {
 			mMapView.getController().setCenter(Util.locationToGeoPoint(location));
 		}

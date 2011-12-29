@@ -149,7 +149,7 @@ public class TrackerService extends Service {
 		averagePace = 0;
 	}
 	
-	/** set data from session (called after load) */
+	/** use data from session (called after load) */
 	public void applySession(Session session) {
 		pathLength = session.distance;
 		sessionStartedAtMillis = session.timestamp;

@@ -31,65 +31,111 @@ import com.google.android.maps.OverlayItem;
  */
 public class MilestoneOverlay extends ItemizedOverlay<OverlayItem> {
 
-	private List<OverlayItem> items = new ArrayList<OverlayItem>();
-	public boolean drawAsShadow = false;
+	public boolean drawShadow = false;
+
+	private boolean mComplete = false;	// true, wenn session fertig (gestoppt, oder nach Laden)
+	private List<Position> mPositions;
+	private List<OverlayItem> mItems = new ArrayList<OverlayItem>();
+	private int mInterval = 1000;	// interval in meters between milestones
+	private String mUnit = "km";	// km or mi
 	
 	public MilestoneOverlay(Drawable defaultMarker) {
 		super(boundCenterBottom(defaultMarker));
 		populate();
 	}
 
-	public void addMarker(OverlayItem marker) {
-		items.add(marker);
+	public void setPositions(List<Position> positions) {
+		mPositions = positions;
+	}
+	
+	public void setInterval(int interval) {
+		mInterval = interval;
+	}
+	
+	public void setUnit(String unit) {
+		mUnit = unit;
+	}
+	
+	public void setComplete(boolean complete) {
+		mComplete = complete;
+	}
+	
+	/**
+	 * 
+	 * @param p
+	 * @param distance distance in meters
+	 * @param unit
+	 */
+	private void addMarker(Position p, float distance, String unit) {
+		OverlayItem item = new OverlayItem(p.geoPoint, "", "");
+		Drawable milestoneDrawable = new MilestoneDrawable(this, Util.formatMilestoneDistance(distance), unit);
+		boundCenterBottom(milestoneDrawable);
+		item.setMarker(milestoneDrawable);
+		mItems.add(item);
 		populate();
 	}
 	
 	public void clear() {
-		items.clear();
+		mItems.clear();
 		populate();
 	}
 	
 	@Override
 	protected OverlayItem createItem(int i) {
-		return items.get(i);
+		return mItems.get(i);
 	}
 
 	@Override
 	public int size() {
-		return items.size();
+		return mItems.size();
 	}
 
 	@Override
 	public void draw(Canvas canvas, MapView mapView, boolean shadow) {
-		drawAsShadow = shadow;
+		drawShadow = shadow;
+		if (shadow) {				// shadow wird immer zuerst gemalt
+			rebuildMilestones();	// jedesmal neu bauen (aber wenigstens für shadow und nicht shadow gleiche verwenden)
+		}
 		super.draw(canvas, mapView, shadow);
 	}
 
 	/**
-	 * set milestone markers ever interval meters
-	 * @param positions
-	 * @param interval distance in meters between milestones
-	 * @param unit 'km' or 'mi'
+	 * creates milestone markers every interval meters
 	 */
-	public void reset(List<Position> positions, int interval, String unit) {
+	public void rebuildMilestones() {
 		clear();
+		if (mPositions == null) {
+			return;
+		}
+		if (mPositions.size() > 0) {
+			addStartMarker(mPositions.get(0));
+		}
 		float intervals = 0;
 		float dist = 0;
 		Position prev = null;
-		for (Position p : positions) {
+		for (Position p : mPositions) {
 			if (prev != null) {
 				dist += prev.distance;
 			}
-			if (dist > interval) {
+			if (dist > mInterval) {
 				dist = 0;
 				intervals++;
-				OverlayItem item = new OverlayItem(p.geoPoint, "", "");
-				Drawable milestoneDrawable = new MilestoneDrawable(this, Util.formatMilestoneDistance(interval*intervals), unit);
-				boundCenterBottom(milestoneDrawable);
-				item.setMarker(milestoneDrawable);
-				addMarker(item);
+				addMarker(p, mInterval*intervals, mUnit);
 			}
 			prev = p;
 		}
+		if (mComplete && mPositions.size() > 0) {
+			addFinishMarker(mPositions.get(mPositions.size()-1));
+		}
+	}
+
+	private void addStartMarker(Position position) {
+		// TODO Icon statt Texten
+		addMarker(position, 0, "Finish");
+	}
+
+	private void addFinishMarker(Position position) {
+		// TODO Icon statt Texten
+		addMarker(position, 0, "Start");
 	}
 }

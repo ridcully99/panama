@@ -42,6 +42,7 @@ public class MilestoneDrawable extends Drawable {
 	private final static int SNIPPET_FONT_SIZE = 12;
 	private final static int PADDING = 4;
 	private final static int POST_HEIGHT = 15;
+	private final static int POST_WIDTH = 12;
 	
 	private MilestoneOverlay mOverlay;
 	private String mTitle;
@@ -88,7 +89,10 @@ public class MilestoneDrawable extends Drawable {
 	
 	@Override
 	public void draw(Canvas canvas) {
-		if (mOverlay != null && mOverlay.drawAsShadow) {
+		if (mOverlay == null) {
+			return;
+		}
+		if (mOverlay.drawShadow) {
 			mPaint.setMaskFilter(blurMaskFilter);
 		} else {
 			mPaint.setMaskFilter(null);
@@ -101,26 +105,22 @@ public class MilestoneDrawable extends Drawable {
 		Rect bounds = getBounds();
 		Path p = new Path();
 		p.moveTo(0, 0);
-		p.lineTo(bounds.width()/4f, -POST_HEIGHT);
+		p.lineTo(POST_WIDTH/2, -POST_HEIGHT);
 		p.lineTo(bounds.width()/2f, -POST_HEIGHT);
 		p.lineTo(bounds.width()/2f, -bounds.height());
 		p.lineTo(-bounds.width()/2f, -bounds.height());
 		p.lineTo(-bounds.width()/2f, -POST_HEIGHT);
-		p.lineTo(-bounds.width()/4f, -POST_HEIGHT);
+		p.lineTo(-POST_WIDTH/2, -POST_HEIGHT);
 		p.close();
 		canvas.drawPath(p, mPaint);
-		//canvas.drawRoundRect(mRectF, PADDING, PADDING, mPaint);
-		if (mOverlay != null && !mOverlay.drawAsShadow) {
+		if (!mOverlay.drawShadow) {
 			mPaint.setColor(Color.BLACK);
 			canvas.drawText(mSnippet, 0, -(PADDING+POST_HEIGHT), mPaint);
 			mPaint.setStyle(Style.STROKE);
 			mPaint.setStrokeWidth(1.5f);
 			canvas.drawText(mTitle, 0, -(POST_HEIGHT+PADDING+mPaint.getTextSize()+PADDING), mTitlePaint);
 			canvas.drawPath(p, mPaint);
-			//canvas.drawRoundRect(mRectF, PADDING, PADDING, mPaint);
 		}
-		//mPaint.setStrokeWidth(4f);
-		//canvas.drawLine(0, 0, 0, -POST_HEIGHT, mPaint);
 	}
 
 	@Override
