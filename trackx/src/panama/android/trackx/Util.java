@@ -31,6 +31,7 @@ import com.google.android.maps.MapView;
  */
 public class Util {
 
+	public final static float METERS_PER_MILE = 1609.344f;
 	public final static int SECOND_IN_MILLIS = 1000;
 	public final static int MAX_STARTOK_FIX_ACCURACY = 30;
 	
@@ -66,7 +67,7 @@ public class Util {
 	 */
 	public static int metersToRadius(float meters, MapView map, double latitude) {
 		return (int) (map.getProjection().metersToEquatorPixels(meters) * (1/FloatMath.cos((float)Math.toRadians(latitude))));
-	}	
+	}
 	
 	public static String formatTime(long millis) {
 		long secs = millis / 1000;	// sekundengenau reicht
@@ -88,7 +89,15 @@ public class Util {
 
 	public static String formatDistance(float meters) {
 		return String.format("%.2f", meters/1000f);
-	}	
+	}
+	
+	public static String formatMilestoneDistance(float meters) {
+		if (meters % 1000 == 0) {
+			return ""+(int)(meters/1000);	// no decimals if none required
+		} else {
+			return String.format("%.1f", meters/1000f);
+		}
+	}
 	
 	public static CharSequence formatDateLong(long timestampMillis) {
 		return longerDateFormat.format(timestampMillis);

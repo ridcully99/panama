@@ -37,6 +37,7 @@ import android.widget.Toast;
 import com.google.android.maps.GeoPoint;
 import com.google.android.maps.MapActivity;
 import com.google.android.maps.MapView;
+import com.google.android.maps.OverlayItem;
 
 public class MainActivity extends MapActivity implements TrackerService.Listener {
 
@@ -51,6 +52,7 @@ public class MainActivity extends MapActivity implements TrackerService.Listener
 	private MapView mMapView;
 	private PathOverlay mPathOverlay;
 	private MyLocationOverlay mMyLocationOverlay;
+	private MilestoneOverlay mMilestoneOverlay;
 	private TextView mSessionStartView;
 	private TextView mDistanceView;
 	private TextView mTimerView;
@@ -117,8 +119,10 @@ public class MainActivity extends MapActivity implements TrackerService.Listener
 		mMapView.getController().setZoom(19);
 		mPathOverlay = new PathOverlay();
 		mMyLocationOverlay = new MyLocationOverlay();
+		mMilestoneOverlay = new MilestoneOverlay(new MilestoneDrawable(null, "1", "km"));
 		mMapView.getOverlays().add(mPathOverlay);
 		mMapView.getOverlays().add(mMyLocationOverlay);
+		mMapView.getOverlays().add(mMilestoneOverlay);
 		mToggleMapButton = (ImageView)findViewById(R.id.toggleMap);
 		mToggleMapButton.setOnTouchListener(mToggleMapButtonListener);	// eigener Listener um pressed Status fix setzen zu können, sodass er auch bleibt.
 		
@@ -199,7 +203,8 @@ public class MainActivity extends MapActivity implements TrackerService.Listener
 			if (resultCode == RESULT_OK) {
 				long id = data.getLongExtra("id", -1);
 				Session session = mPersistence.load(id);
-				mService.setSession(session);
+				mService.applySession(session);
+				mMilestoneOverlay.reset(session.positions, 1000, "km");
 				adjustMap(session.positions);
 			}
 			return;

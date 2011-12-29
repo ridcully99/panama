@@ -150,7 +150,7 @@ public class TrackerService extends Service {
 	}
 	
 	/** set data from session (called after load) */
-	public void setSession(Session session) {
+	public void applySession(Session session) {
 		pathLength = session.distance;
 		sessionStartedAtMillis = session.timestamp;
 		elapsedTimeMillis = session.time;
