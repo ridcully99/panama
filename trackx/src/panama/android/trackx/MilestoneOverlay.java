@@ -33,7 +33,6 @@ public class MilestoneOverlay extends ItemizedOverlay<OverlayItem> {
 
 	public boolean drawShadow = false;
 
-	private boolean mComplete = false;	// true, wenn session fertig (gestoppt, oder nach Laden)
 	private List<Position> mPositions;
 	private List<OverlayItem> mItems = new ArrayList<OverlayItem>();
 	private int mInterval = 1000;	// interval in meters between milestones
@@ -56,21 +55,16 @@ public class MilestoneOverlay extends ItemizedOverlay<OverlayItem> {
 		mUnit = unit;
 	}
 	
-	public void setComplete(boolean complete) {
-		mComplete = complete;
-	}
-	
 	/**
 	 * 
 	 * @param p
 	 * @param distance distance in meters
 	 * @param unit
 	 */
-	private void addMarker(Position p, float distance, String unit) {
+	private void addMarker(Position p, Drawable drawable) {
 		OverlayItem item = new OverlayItem(p.geoPoint, "", "");
-		Drawable milestoneDrawable = new MilestoneDrawable(this, Util.formatMilestoneDistance(distance), unit);
-		boundCenterBottom(milestoneDrawable);
-		item.setMarker(milestoneDrawable);
+		boundCenterBottom(drawable);
+		item.setMarker(drawable);
 		mItems.add(item);
 		populate();
 	}
@@ -107,9 +101,6 @@ public class MilestoneOverlay extends ItemizedOverlay<OverlayItem> {
 		if (mPositions == null) {
 			return;
 		}
-		if (mPositions.size() > 0) {
-			addStartMarker(mPositions.get(0));
-		}
 		float intervals = 0;
 		float dist = 0;
 		Position prev = null;
@@ -120,22 +111,15 @@ public class MilestoneOverlay extends ItemizedOverlay<OverlayItem> {
 			if (dist > mInterval) {
 				dist = 0;
 				intervals++;
-				addMarker(p, mInterval*intervals, mUnit);
+				addMarker(p, new MilestoneDrawable(this, Util.formatMilestoneDistance(mInterval*intervals), mUnit));
+			}
+			if (p.type == Position.TYPE_START) {
+				addMarker(p, new StartDrawable(this));
+			}
+			if (p.type == Position.TYPE_FINISH) {
+				addMarker(p, new FinishDrawable(this));
 			}
 			prev = p;
 		}
-		if (mComplete && mPositions.size() > 0) {
-			addFinishMarker(mPositions.get(mPositions.size()-1));
-		}
-	}
-
-	private void addStartMarker(Position position) {
-		// TODO Icon statt Texten
-		addMarker(position, 0, "Finish");
-	}
-
-	private void addFinishMarker(Position position) {
-		// TODO Icon statt Texten
-		addMarker(position, 0, "Start");
 	}
 }

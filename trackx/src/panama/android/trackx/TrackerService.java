@@ -102,7 +102,7 @@ public class TrackerService extends Service {
 		for (Listener l : mListeners) {
 			l.onRefreshAll();
 		}
-		positions.add(new Position(currentLocation));
+		positions.add(new Position(currentLocation, Position.TYPE_START));
 		mNotification.setLatestEventInfo(this, getText(R.string.notification_recording), getText(R.string.notification_text), mNotification.contentIntent);
 		startForeground(FOREGROUND_WHILE_RECORDING, mNotification);
 		mTimer = new TimerTask();
@@ -114,6 +114,7 @@ public class TrackerService extends Service {
 		mTimer.cancel(true);
 		mTimer = null;
 		stopForeground(true);
+		positions.add(new Position(currentLocation, Position.TYPE_FINISH));
 	}
 	
 	/** returns preliminary location at start */
@@ -247,6 +248,7 @@ public class TrackerService extends Service {
 
 				Position p = new Position(location);
 				p.distance = dist;
+				p.type = Position.TYPE_TRACK;
 				positions.add(p);
 				pathLength += dist;
 			}

@@ -38,15 +38,15 @@ import android.graphics.drawable.Drawable;
  */
 public class MilestoneDrawable extends Drawable {
 
-	private final static int TITLE_FONT_SIZE = 20;
-	private final static int SNIPPET_FONT_SIZE = 12;
-	private final static int PADDING = 4;
-	private final static int POST_HEIGHT = 15;
-	private final static int POST_WIDTH = 12;
+	protected final static int TITLE_FONT_SIZE = 20;
+	protected final static int SNIPPET_FONT_SIZE = 12;
+	protected final static int PADDING = 4;
+	protected final static int POST_HEIGHT = 15;
+	protected final static int POST_WIDTH = 12;
 	
 	private MilestoneOverlay mOverlay;
-	private String mTitle;
-	private String mSnippet;
+	protected String mTitle;
+	protected String mSnippet;
 	public static MaskFilter blurMaskFilter = new BlurMaskFilter(3, Blur.SOLID);
 	public static Paint mPaint; 	// reuse for all markers
 	public static Paint mTitlePaint;
@@ -114,15 +114,20 @@ public class MilestoneDrawable extends Drawable {
 		p.close();
 		canvas.drawPath(p, mPaint);
 		if (!mOverlay.drawShadow) {
+			drawContent(canvas);
 			mPaint.setColor(Color.BLACK);
-			canvas.drawText(mSnippet, 0, -(PADDING+POST_HEIGHT), mPaint);
 			mPaint.setStyle(Style.STROKE);
 			mPaint.setStrokeWidth(1.5f);
-			canvas.drawText(mTitle, 0, -(POST_HEIGHT+PADDING+mPaint.getTextSize()+PADDING), mTitlePaint);
 			canvas.drawPath(p, mPaint);
 		}
 	}
 
+	public void drawContent(Canvas canvas) {
+		canvas.drawText(mTitle, 0, -(POST_HEIGHT+PADDING+mPaint.getTextSize()+PADDING), mTitlePaint);
+		mPaint.setColor(Color.BLACK);
+		canvas.drawText(mSnippet, 0, -(PADDING+POST_HEIGHT), mPaint);
+	}
+	
 	@Override
 	public int getOpacity() {
 		return PixelFormat.TRANSLUCENT;

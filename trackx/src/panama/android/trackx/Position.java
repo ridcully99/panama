@@ -27,13 +27,24 @@ import com.google.android.maps.GeoPoint;
  */
 public class Position {
 
+	public final static int TYPE_TRACK = 0;
+	public final static int TYPE_START = 1;
+	public final static int TYPE_FINISH = 2;
+	
 	public Location location;
 	public GeoPoint geoPoint;
-	public float distance; // to previous position
+	public float distance; 	// to previous position
+	public int type;		// start, track, pause, finish
 	
-	public Position(Location location) {
+	public Position(Location location, int type) {
 		this.location = location;
 		this.geoPoint = Util.locationToGeoPoint(location);
+		this.type = TYPE_TRACK;
+		this.type = type;
+	}
+		
+	public Position(Location location) {
+		this(location, TYPE_TRACK);
 	}
 	
 	public String toString() {
@@ -51,5 +62,6 @@ public class Position {
 		cv.put(SessionPersistence.BEARING, location.getBearing());
 		cv.put(SessionPersistence.PROVIDER, location.getProvider());
 		cv.put(SessionPersistence.DISTANCE, distance);
+		cv.put(SessionPersistence.TYPE, type);
 	}
 }

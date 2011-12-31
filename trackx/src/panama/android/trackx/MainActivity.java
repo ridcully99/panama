@@ -203,7 +203,6 @@ public class MainActivity extends MapActivity implements TrackerService.Listener
 				long id = data.getLongExtra("id", -1);
 				Session session = mPersistence.load(id);
 				mService.applySession(session);
-				mMilestoneOverlay.setComplete(true);
 				adjustMap(session.positions);
 			}
 			return;
@@ -223,7 +222,6 @@ public class MainActivity extends MapActivity implements TrackerService.Listener
 			mNewSessionButton.setVisibility(View.VISIBLE);
 			mService.stopTracking();
 			mService.reset();
-			mMilestoneOverlay.setComplete(false);
 		} else {
 			super.onBackPressed();
 		}
@@ -241,7 +239,6 @@ public class MainActivity extends MapActivity implements TrackerService.Listener
 	private void waitForSatisfactoryStartingLocation() {
 		mService.startTracking();
 		mService.reset();
-		mMilestoneOverlay.setComplete(false);
 		mWaitingDialog = ProgressDialog.show(this, "", "Let's see were we are right now...", true, true, new OnCancelListener() {
 			@Override
 			public void onCancel(DialogInterface dialog) {
@@ -255,7 +252,6 @@ public class MainActivity extends MapActivity implements TrackerService.Listener
 		mStartButton.setVisibility(View.GONE);
 		mPauseButton.setVisibility(View.VISIBLE);
 		mStopButton.setVisibility(View.VISIBLE);
-		mMilestoneOverlay.setComplete(false);
 		mService.startRecording();
 		mWakeLock.acquire();										// standby verhindern
 	}
@@ -285,7 +281,6 @@ public class MainActivity extends MapActivity implements TrackerService.Listener
 		mSaveButton.setVisibility(View.VISIBLE);
 		mService.stopRecording();
 		mService.stopTracking();	// versuchsweise mal
-		mMilestoneOverlay.setComplete(true);
 		setCurrentPace(0);
 
 		if (mWakeLock.isHeld()) {
@@ -299,7 +294,6 @@ public class MainActivity extends MapActivity implements TrackerService.Listener
 		mSaveButton.setVisibility(View.GONE);
 		mNewSessionButton.setVisibility(View.VISIBLE);
 		mService.reset();
-		mMilestoneOverlay.setComplete(false);
 	}
 	
 	public void onSaveClicked(View view) {

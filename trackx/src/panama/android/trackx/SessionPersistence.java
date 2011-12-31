@@ -54,6 +54,7 @@ public class SessionPersistence {
 	public static final String SPEED = "speed";
 	public static final String BEARING = "bearing";
 	public static final String PROVIDER = "provider";
+	public static final String TYPE = "type";
 
 	
 	private Context mContext;
@@ -104,7 +105,7 @@ public class SessionPersistence {
 		session.timestamp = c.getLong(2);
 		c.close();
 
-		c = db.query(TBL_POSITION, new String[] {TIME, LATITUDE, LONGITUDE, ALTITUDE, ACCURACY, SPEED, BEARING, PROVIDER, DISTANCE}, "session_id = "+sessionId, null, null, null, TIME+" asc");
+		c = db.query(TBL_POSITION, new String[] {TIME, LATITUDE, LONGITUDE, ALTITUDE, ACCURACY, SPEED, BEARING, PROVIDER, DISTANCE, TYPE}, "session_id = "+sessionId, null, null, null, TIME+" asc");
 		int n = c.getCount();
 		List<Position> positions = new ArrayList<Position>(n);
 		c.moveToFirst();
@@ -119,6 +120,7 @@ public class SessionPersistence {
 			l.setBearing(c.getFloat(6));
 			Position p = new Position(l);
 			p.distance = c.getFloat(8);
+			p.type = c.getInt(9);
 			positions.add(p);
 			c.moveToNext();
 		}
@@ -147,10 +149,10 @@ public class SessionPersistence {
 		public void onCreate(SQLiteDatabase db) {
 		    db.execSQL("CREATE TABLE " + TBL_SESSION +
 		            " (_id integer primary key autoincrement, "+
-		            NAME  +" text, "+
-		            NOTES + " text, "+
+		            NAME      + " text, "+
+		            NOTES     + " text, "+
 		            TIMESTAMP + " integer, "+ // millis
-		            TIME  + " integer, "+	// millis
+		            TIME      + " integer, "+	// millis
 		        	DISTANCE  + " real " +
 		            " );");
 		
@@ -165,7 +167,8 @@ public class SessionPersistence {
 		        	SPEED     + " real, " +
 		        	BEARING   + " real, " +
 		        	PROVIDER  + " text, " +
-		        	DISTANCE  + " real " +
+		        	DISTANCE  + " real, " +
+		        	TYPE      + " integer " +
 		        	");");
 		}
 

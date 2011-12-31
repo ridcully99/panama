@@ -119,25 +119,26 @@
 + Milestone Overlay mit Markern für Kilometer gemacht (werden wie Path auf Basis von Service.Positions immer neu generiert)
 + Pfad mit quadratischen Bezierkurven (und ohne Blur).
 
-NEXT: Milestones während der Session erzeugen, Marker für Start (Startschusspistole) und Ziel (Flagge), Kilometer/Meilen (Setting) ... mit Infos auf Tap bzgl. Zeit/Distanz? ...
+30.12.2011
++ Start/Finish über Position.type gelöst (--> neue DB nötig)
+
+31.12.2011
++ Start/Finish Icons in den Markern (Play und Stop Symbol)
+
+TODO: Bei Stop gleich Speichern
 
 TODO: Speed und Pace (km/h bzw. min/km)
 
-TODO: während Suche nach better fix irgendwie was anzeigen bzgl. genauigkeit (auch in nummernansicht)
-      und Start prinzipiell erlauben sobald ich eine zeitlich aktuelle Position habe ... je länger man dann wartet, desto genauer wird sie halt.
-      --> statt Progress-Dialog vielleicht dann auch was anderes machen
-      
-TODO: mal echten Map API Key generieren und einbauen      
+TODO: mal echten Map API Key generieren und einbauen
       
 TODO: GPS Stärke anzeigen in Titelzeile
 
 TODO: Sessionliste -- Icon (wie bei PowerAMP), Context-Menü wenn lang, bzw. rechts gedrückt - Löschen|Laden|Export|??
+TODO: Bei leerer Sessionliste irgendwas anzeigen
 
 TODO: Für den Fall das Activity tot ist müsste ich bei onCreate ode wo schau'n ob mService.isRunning und dann gleich die Buttons umschalten und
       onLocationChanged(mService.currentLocation) aufrufen zum Bildaufbau.
       Wie Testen? Testweise finishActivity via Menüoption triggerbar machen.
-
-TODO: Pause, Resume implementieren
 
 TODO: Für gespeicherte Sessions statt den Buttons unten einen Schieberegler zum Durchscrollen der Route
 	(Sobald das Speichern einer Session fertig ist, auch diesen Schieberegler anzeigen, statt wie bisher das Save zu disablen)
@@ -147,8 +148,6 @@ TODO: Für gespeicherte Sessions statt den Buttons unten einen Schieberegler zum
 	Zeichnen: zuerst den ganzen gedämpften, darüber den teilweisen (gleiche Positions, einfach abbrechen an entsprechender Stelle) 
 
 TODO: Speichern mit Kommentar, Typ (Laufen, Radln, Wandern, ...), Route (Auswahl aus bereits eingegebenen, oder neuen Namen eingeben)
-
-TODO: wenn geht (oder als Option) die Karte drehen sodass Pfeil immer "nach oben" zeigt, i.e. in Laufrichtung.
 
 TODO: Export in Standardformaten (GPX?) via Share oder so?
 
@@ -162,3 +161,4 @@ TODO: Optionen:
 		
 MAYBE: current pace rot oder grün, wenn über oder unter'm durchschnitt oder Pfeilchen rauf, Pfeilchen runter (optisch vielleicht ruhiger)
 
+MAYBE: wenn geht (oder als Option) die Karte drehen sodass Pfeil immer "nach oben" zeigt, i.e. in Laufrichtung.
