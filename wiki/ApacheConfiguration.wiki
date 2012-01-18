@@ -8,7 +8,8 @@ For production environments, it is quite common to have an Apache server at port
 
 For our examples, we suppose you have one web server, running the Apache on port 80 (which is accessible from the internet via http://www.example.com) and a Tomcat Application server on port 8080 (not accessible from the internet) running our application as 'myapp'. 
 
-= One Web Application only =
+= Configurations =
+== One Web Application only ==
 
 As you know, running on the Application server, the URLs for any application (except the for the root application) contain the name of the application, e.g. http://localhost:8080/myapp/controller/action.
 
@@ -39,7 +40,7 @@ ProxyPassReverseCookiePath /myapp /
 
 Make sure, you do not forget the trailing slashes, and when using the AJP connector, make sure, that the ProxyPassReverse statement does *not* have the port 8080 part in the localhost-URL.
 
-= More than one Web Application =
+== More than one Web Application ==
 
 If you have more than one application, you will want to access them via http://www.example.com/app1/controller/action, http://www.example.com/app2/controller/action ...
 
@@ -66,3 +67,8 @@ ProxyPass /app2 ajp://localhost:8009/app2-has-a-strange-internal-name
 ProxyPassReverse /app2 http://localhost/app2-has-a-strange-internal-name
 ProxyPassReverseCookiePath /app2-has-a-strange-internal-name /app2
 }}}
+
+= Explanations = 
+
+The tricky part is the ProxyPassReverse part. This is mainly used to rewrite redirect requests (hence mod_headers is required) coming from the Application server. 
+And, if you're using the AJP connector, these redirect requests, the Application server sends, do not contain the port 8080, because in that case, the Application server believes it's running on port 80 which it does not add to the URL, therefore we have to write http://localhost/app1 without a port specified.
