@@ -57,8 +57,14 @@ public class MediaSupport {
 	/**
 	 * Creates a different flavor of a given image.
 	 * 
-	 * @param imageData Document data as from upload.
-	 * @return data for resized JPG image.
+	 * @param imageData data of the original image.
+	 * @param contentType the content type of the resulting image -- must be one of CONTENTTYPE_IMAGE_... constants
+	 * @param width the width of the resulting image. Specify -1 to take the width of the original image.
+	 * @param height the height of the resulting image. Specify -1 to take the height of the original image.
+	 * @param keepRatio set true, to keep the width/height ratio of the original image
+	 * @param clipToFit set true, to clip the image to fit the provided width/height rectangle if necessary. When clipping the image is centered.
+	 * @param jpegQuality quality to use when generating jpeg images. Value must be between 0 (lowest quality, smallest in size) and 1 (highest quality, largest in size)
+	 * @return data for resized image.
 	 */
 	public static synchronized byte[] createImageFlavor(byte[] imageData, String contentType, int width, int height, boolean keepRatio, boolean clipToFit, float jpegQuality) {
 		try {
@@ -121,6 +127,8 @@ public class MediaSupport {
 			BufferedOutputStream out = new BufferedOutputStream(outStream);
 			
 			if (CONTENTTYPE_IMAGE_JPEG.equals(contentType)) {
+				if (jpegQuality < 0) { jpegQuality = 0; }
+				if (jpegQuality > 1) { jpegQuality = 1; }
 				// ImageIO.write(destImage, "jpg", out); <-- simple but cannot control quality
 				// http://www.universalwebservices.net/web-programming-resources/java/adjust-jpeg-image-compression-quality-when-saving-images-in-java
 				Iterator<ImageWriter> iter = ImageIO.getImageWritersByFormatName("jpeg");
