@@ -64,13 +64,14 @@ public class QueryListModel implements ListModel, Serializable {
 	}
 
 	/**
-	 * @param q
+	 * @param query
+	 * @return a new Query object (even if no filters exist)
 	 */
 	protected Query applyFilters(Query query) {
-		if (table.getFilters().isEmpty()) {
-			return query;
-		}
 		Query q = query.copy();
+		if (table.getFilters().isEmpty()) {
+			return q;
+		}
 		for (Map.Entry<String, Filter> e : table.getFilters().entrySet()) {
 			String k = e.getKey();
 			Filter f = e.getValue();
