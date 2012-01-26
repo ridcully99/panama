@@ -190,7 +190,7 @@ SimpleLog requires a `simplelog.properties` file in the _src_ root directory. Ac
 
 == Avaje Ebean ORM ==
 
-If you're using the integrated Persistence layer based on Avaje Ebean ORM, you'll have to provide an `ebean.properties` file in the _src_ root directory. Please see the chapter about [#Persistence] and http://www.avaje.org for further information.
+If you're using the integrated Persistence layer based on Avaje Ebean ORM, you'll have to provide an `ebean.properties` file in the _src_ root directory. Please see the [#Persistence] section below and http://www.avaje.org for further information.
 
 == Custom ==
 
@@ -251,7 +251,7 @@ In line (2) we provide our form data with some input. Here we take all the input
 
 In line (3) we fetch the first name, entered into the HTML form; nothing special here.
 
-In line (4) we fetch the birthday, entered into the HTML form; here the input is automatically converted to a `Date` object, using the pattern we provided when creating the `DateField`. If this goes wrong, `getDate()` returns `null` and the error is remembered within our form data's `errors` structure. This is explained in depth in the section about [#Input Validation] below.
+In line (4) we fetch the birthday, entered into the HTML form; here the input is automatically converted to a `Date` object, using the pattern we provided when creating the `DateField`. If this goes wrong, `getDate()` returns `null` and the error is remembered within our form data's `errors` structure. This is explained in depth in the section about [#Input_Validation] below.
 
 === Java => HTML ===
 
@@ -315,4 +315,65 @@ The optional parameter map extends or the alters the original request parameters
 
 = Persistence =
 
-== JNDI ==
+== Ebean ORM with JNDI ==
+
+For production environment, we recommend to use a JNDI datasource instead of Ebean's internal connection pool. Here is, how that can be archieved:
+
+=== META-INF/context.xml ===
+
+First, create a `context.xml` file in the `META-INF` directory of your project (instead of that, you could also specify a datasource in your application server's server.xml, but if you do it like explained here, everything is nicely self-contained).
+
+{{{
+<?xml version="1.0" encoding="UTF-8"?>
+<Context>
+  <Resource 
+    name="jdbc/ExampleDB" 
+    auth="Container" 
+    type="javax.sql.DataSource"
+    maxActive="100" 
+    maxIdle="30"
+    maxWait="10000"
+    username="<username for database>" 
+    password="<password for database>"
+    driverClassName="com.mysql.jdbc.Driver"
+    url="jdbc:mysql://localhost:3306/exampledatabase"
+    validationQuery="select 1 from dual;"
+		
+    removeAbandoned="true"
+    logAbandoned="true"
+    defaultTransactionIsolation="READ_COMMITTED"
+    defaultAutoCommit="false"
+  />
+  <WatchedResource>WEB-INF/web.xml</WatchedResource>
+  <WatchedResource>META-INF/context.xml</WatchedResource>
+</Context>
+}}}
+
+For more information about JNDI configuration, please see the [http://tomcat.apache.org/tomcat-6.0-doc/jndi-datasource-examples-howto.html JNDI Datasource HOW-TO].
+
+=== web.xml ===
+
+Add the following snippet to you`r web.xml` file.
+
+{{{
+<resource-ref>
+  <description>DB Connection</description>
+  <res-ref-name>jdbc/ExampleDB</res-ref-name>
+  <res-type>javax.sql.DataSource</res-type>
+  <res-auth>Container</res-auth>
+</resource-ref>
+}}}
+
+=== ebean.properties ===
+
+Finally, in your `ebean.properties`, specify the usage of your JNDI datasource like so:
+
+{{{
+datasource.default=jndi
+# -------------------------------------------------------------  
+# JNDI DataSource  
+# -------------------------------------------------------------   
+ebean.jndi.dataSourceJndiName=java:comp/env/jdbc/ExampleDB
+ebean.datasource.factory=jndi
+ebean.datasource.jndi.prefix=java:comp/env/jdbc/ 
+}}}
