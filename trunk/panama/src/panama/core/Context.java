@@ -91,7 +91,7 @@ public class Context {
 	/**
 	 * Static creator - created Context is stored in threadlocal variable and
 	 * may be accessed via getInstance()
-	 * @param s Servlet
+	 * @param core Dispatcher
 	 * @param sess Session
 	 * @param req Request
 	 * @param res Response

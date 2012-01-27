@@ -28,8 +28,6 @@ import java.util.List;
 import java.util.Map;
 import java.util.Set;
 
-import org.apache.commons.lang.StringEscapeUtils;
-import org.apache.velocity.tools.generic.EscapeTool;
 import org.grlea.log.SimpleLogger;
 
 import panama.core.Context;
@@ -434,7 +432,7 @@ public class DefaultTable implements Table, Comparator, Serializable {
 	}
 
 	/**
-	 * @see panama.collections.Table#searchLink()
+	 * @see panama.collections.Table#searchLink(String...)
 	 */
 	public String searchLink(String... properties) {
 		StringBuffer b = new StringBuffer("../"+TableController.class.getName()+"/setsearchquery?tableid="+key+"&properties=");

@@ -33,7 +33,7 @@ public interface Table {
 	
 	/**
 	 * Returns unique key for the table
-	 * @return
+	 * @return unique key of the table
 	 */
 	public String getKey();
 	
@@ -105,7 +105,7 @@ public interface Table {
 	 * @see #setSortDirection(String)
 	 * @param sortBy
 	 * @param sortDirection
-	 * @return
+	 * @return the Table object
 	 */
 	public Table setSortBy(String sortBy, String sortDirection);
 
@@ -193,7 +193,7 @@ public interface Table {
 
 	/**
 	 * Creates a link for use in search form
-	 * @param propertyNames, names of properties to search in
+	 * @param propertyNames names of properties to search in
 	 * @return a link invoking TableController
 	 */
 	public String searchLink(String... propertyNames);
