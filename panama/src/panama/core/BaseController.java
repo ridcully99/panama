@@ -321,7 +321,6 @@ public class BaseController {
 	 * If no table with specified key exists in current session, a new entry with the specified initialTable is created
 	 * and returned, otherwise the already existing table is returned.
 	 * In any case, the table is put into request scope using it's key as key.
-	 * @param key
 	 * @param initialTable
 	 * @return existing or initial table
 	 */
@@ -346,9 +345,8 @@ public class BaseController {
 	/**
 	 * If no tree with specified key exists in current session, a new entry with the specified initialTree is created
 	 * and returned, otherwise the already existing tree is returned.
-	 * @param key
 	 * @param initialTree
-	 * @return
+	 * @return the existing or initial Tree object
 	 */
 	public Tree registerTree(Tree initialTree) {
 		TreeController trees = new TreeController();

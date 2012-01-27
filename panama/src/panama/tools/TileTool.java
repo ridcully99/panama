@@ -24,6 +24,7 @@ import org.apache.velocity.tools.config.DefaultKey;
 import org.apache.velocity.tools.config.InvalidScope;
 
 import panama.core.Context;
+import panama.core.Dispatcher;
 import panama.core.Target;
 import panama.core.TemplateTarget;
 
@@ -46,10 +47,11 @@ public class TileTool {
 	 * a template rendering your cart, you may execute that action from within every
 	 * template you like and #include the result to include the cart-template within your
 	 * template.
+	 * 
+	 * @see Dispatcher#handleAction(Context, String)
 	 *
 	 * @param controllerName The name of the controller to use.
 	 * @param actionName The name of the action to execute.
-	 * @see Dispatcher#handleAction(Context, String)
 	 */
 	public void embed(String controllerName, String actionName) throws Exception {
 		Context ctx = Context.getInstance();
@@ -66,7 +68,7 @@ public class TileTool {
 	 * Note, that the additional parameters only exist during the execution of the action.
 	 * After that, the original parameters are restored.
 	 * 
-	 * @see #executeAction(String controllerName, String actionName)
+	 * @see #embed(String, String)
 	 * @param controllerName The name of the controller to use.
 	 * @param actionName The name of the action to execute.
 	 * @param parameterMap A map of additional parameters; all keys an values should be strings or will converted using toString().
