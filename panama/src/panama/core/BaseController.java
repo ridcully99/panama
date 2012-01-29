@@ -99,23 +99,6 @@ public class BaseController {
 		return t;
 	}
 
-//	/**
-//	 * Defines a redirect to other action.
-//	 *
-//	 * Sends a temporary redirect response to the client using a URL created from the
-//	 * current Controller and the specified action.
-//	 * The URL has the form: ../controllerName/action
-//	 * 
-//	 * Note: Use redirect only if you need the client browser's URL to have a new URL.
-//	 *       Its <strong>much faster</strong> to use simply invoke the method of the required action and return it's result.
-//	 * 
-//	 * @param action
-//	 * @return A Target object
-//	 */		
-//	public Target redirectToAction(String action) {
-//		return internalRedirectToAction(this.getClass(), action, new HashMap<Object, Object>());
-//	}	
-
 	/**
 	 * Defines a redirect to other action.
 	 *
@@ -129,36 +112,18 @@ public class BaseController {
 	 *       Its <strong>much faster</strong> to use simply invoke the method of the required action and return it's result.
 	 * 
 	 * @param action
-	 * @param paramsAndValues a variable list of parameters and values, alternating like so: param1, value1, param2, value2...
+	 * @param optionalParamsAndValues an optional list of parameters and values, alternating like so: param1, value1, param2, value2...
 	 * @return A Target object
 	 */		
-	public Target redirectToAction(String action, String... paramsAndValues) {
-		return redirectToAction(this.getClass(), action, paramsAndValues);
+	public Target redirectToAction(String action, String... optionalParamsAndValues) {
+		return redirectToAction(this.getClass(), action, optionalParamsAndValues);
 	}
 	
-//	/**
-//	 * Defines a redirect to other action.
-//	 *
-//	 * Sends a temporary redirect response to the client using a URL created from the
-//	 * specified controllerClass and action.
-//	 * The URL has the form: ../controllerName/action.now
-//	 * 
-//	 * Note: Use redirect only if you need the client browser's URL to have a new URL.
-//	 *       Its <strong>much faster</strong> to create a new instance of controllerClass, invoke the required action's method and return it's result.
-//	 * 
-//	 * @param controllerClass
-//	 * @param action
-//	 * @return A Target object
-//	 */	
-//	public Target redirectToAction(Class<? extends BaseController> controllerClass, String action) {
-//		return internalRedirectToAction(controllerClass, action, new HashMap<Object, Object>());
-//	}
-
 	/**
 	 * Defines a redirect to other action.
 	 *
 	 * Sends a temporary redirect response to the client using a URL created from the
-	 * specified controllerClass and the specified action and parameters
+	 * specified controllerClass, action and the specified action and parameters
 	 * The URL has the form: ../controllerName/action?param1=value1&param2=value2...
 	 * 
 	 * The parameter names and values are url-encoded by this method.
@@ -168,11 +133,11 @@ public class BaseController {
 	 * 
 	 * @param controllerClass
 	 * @param action
-	 * @param paramsAndValues a variable list of parameters and values, alternating like so: param1, value1, param2, value2...
+	 * @param optionalParamsAndValues an optional list of parameters and values, alternating like so: param1, value1, param2, value2...
 	 * @return A Target object
 	 */		
-	public Target redirectToAction(Class<? extends BaseController> controllerClass, String action, String... paramsAndValues) {
-		Map<Object, Object> parameterMap = buildParameterMap(paramsAndValues);
+	public Target redirectToAction(Class<? extends BaseController> controllerClass, String action, String... optionalParamsAndValues) {
+		Map<Object, Object> parameterMap = buildParameterMap(optionalParamsAndValues);
 		return internalRedirectToAction(controllerClass, action, parameterMap);
 	}
 	
@@ -204,37 +169,24 @@ public class BaseController {
 	}
 	
 	/**
-	 * Executes another action of same controller.
-	 * @param actionName Name of the action
-	 * @return The resulting Target of the executed action
-	 * @throws ForceTargetException 
-	 * @throws NoSuchActionException
-	 * @throws AuthorizationException 
-	 */
-	public Target executeAction(String actionName) throws ForceTargetException, NoSuchActionException, AuthorizationException {
-		Context ctx = Context.getInstance();
-		return ctx.getCore().executeAction(ctx, this, actionName);
-	}
-	
-	/**
-	 * Executes an action of the same controller with the specified set of parameters.
+	 * Executes an action of the same controller with an optional set of parameters.
 	 * After execution, the original parameters are restored.
 	 * @param actionName Name of the action
-	 * @param paramsAndValues a variable list of parameters and values, alternating like so: param1, value1, param2, value2...; These replace the original parameters during the execution of the action.
+	 * @param optionalParamsAndValues an optional list of parameters and values, alternating like so: param1, value1, param2, value2...; These replace the original parameters during the execution of the action.
 	 * @return The resulting Target of the executed action
 	 * @throws ForceTargetException
 	 * @throws NoSuchActionException
 	 * @throws AuthorizationException
 	 */
-	public Target executeAction(String actionName, String... paramsAndValues) throws ForceTargetException, NoSuchActionException, AuthorizationException {
+	public Target executeAction(String actionName, String... optionalParamsAndValues) throws ForceTargetException, NoSuchActionException, AuthorizationException {
 		@SuppressWarnings("rawtypes")
-		Map originalParameters = Context.getInstance().getParameterMap();
+		Map originalParameters = context.getParameterMap();
 		try {
-			Map<Object, Object> parameterMap = buildParameterMap(paramsAndValues);
-			Context.getInstance().setParameterMap(parameterMap);
-			return executeAction(actionName);
+			Map<Object, Object> parameterMap = buildParameterMap(optionalParamsAndValues);
+			context.setParameterMap(parameterMap);
+			return context.getCore().executeAction(context, this, actionName);
 		} finally {
-			Context.getInstance().setParameterMap(originalParameters);
+			context.setParameterMap(originalParameters);
 		}
 	}
 
