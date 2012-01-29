@@ -46,7 +46,7 @@ import panama.util.TreeController;
 public class BaseController {
 
 	/** Logging */
-	protected static SimpleLogger log = new SimpleLogger(Dispatcher.class);
+	protected static SimpleLogger log = new SimpleLogger(BaseController.class);
 	
 	/** Current context for convinience */
 	protected final Context context = Context.getInstance();
@@ -113,7 +113,7 @@ public class BaseController {
 	 * @return A Target object
 	 */		
 	public Target redirectToAction(String action) {
-		return redirectToAction(this.getClass(), action, new HashMap<Object, Object>());
+		return internalRedirectToAction(this.getClass(), action, new HashMap<Object, Object>());
 	}	
 
 	/**
@@ -142,27 +142,7 @@ public class BaseController {
 				parameterMap.put(key, value);
 			}
 		}
-		return redirectToAction(action, parameterMap);
-	}
-	
-	/**
-	 * Defines a redirect to other action.
-	 *
-	 * Sends a temporary redirect response to the client using a URL created from the
-	 * current Controller and the specified action and parameters.
-	 * The URL has the form: ../controllerName/action.now?param1=value1&param2=value2 ....
-	 * 
-	 * The parameter names and values are url-encoded by this method.
-	 * 
-	 * Note: Use redirect only if you need the client browser's URL to have a new URL.
-	 *       Its <strong>much faster</strong> to use simply invoke the method of the required action and return it's result.
-	 * 
-	 * @param action
-	 * @param parameterMap
-	 * @return A Target object
-	 */		
-	public Target redirectToAction(String action, Map<Object, Object> parameterMap) {
-		return redirectToAction(this.getClass(), action, parameterMap);
+		return internalRedirectToAction(this.getClass(), action, parameterMap);
 	}
 	
 	/**
@@ -180,7 +160,7 @@ public class BaseController {
 	 * @return A Target object
 	 */	
 	public Target redirectToAction(Class<? extends BaseController> controllerClass, String action) {
-		return redirectToAction(controllerClass, action, new HashMap<Object, Object>());
+		return internalRedirectToAction(controllerClass, action, new HashMap<Object, Object>());
 	}
 
 	/**
@@ -210,11 +190,12 @@ public class BaseController {
 				parameterMap.put(key, value);
 			}
 		}
-		return redirectToAction(controllerClass, action, parameterMap);
+		return internalRedirectToAction(controllerClass, action, parameterMap);
 	}
 	
 	/**
 	 * Defines a redirect to other action.
+	 * This internal method is used by all the public redirectToAction() methods.
 	 *
 	 * Sends a temporary redirect response to the client using a URL created from the
 	 * specified controllerClass, action and parameters.
@@ -231,7 +212,7 @@ public class BaseController {
 	 * @return A Target object
 	 */	
 	@SuppressWarnings("rawtypes")
-	public Target redirectToAction(Class<? extends BaseController> controllerClass, String action, Map<Object, Object> parameterMap) {
+	private Target internalRedirectToAction(Class<? extends BaseController> controllerClass, String action, Map<Object, Object> parameterMap) {
 		Controller annotation = controllerClass.getAnnotation(Controller.class);
 		String ctrlName = annotation != null && !StringUtils.isEmpty(annotation.alias()) ? annotation.alias() : controllerClass.getName();
 		StringBuffer url = new StringBuffer();
