@@ -13,8 +13,8 @@ To follow this guide, you'll need an Eclipse IDE for Java EE Developers (3.5 or 
 == Step By Step ==
 
   # Create a Dynamic Web Application with Eclipse.
-  # Download the latest `panama-x.y.z.jar` and put it into your project's `WEB-INF/lib` directory.
-  # Download the matching `panama-x.y.z-dependencies.zip`, and unpack it into your project's `WEB-INF/lib` directory. There should now be a list of jar Files. These are required by Panama.
+  # Download the latest *`panama-x.y.z.jar`* and put it into your project's `WEB-INF/lib` directory.
+  # Download the matching *`panama-x.y.z-dependencies.zip`*, and unpack it into your project's `WEB-INF/lib` directory. There should now be a list of jar Files. These are required by Panama.
   # Edit your project's `WEB-INF/web.xml` and replace everything after `</display-name>` all the way down to `</web-app>` with the following snippet:
 {{{
 <filter>
@@ -60,11 +60,13 @@ public class ExampleController extends BaseController {
 }}}
   # Publish your application onto your application server.
   # Start your application server.
-  # Open this URL in your browser: `http://localhost:8080/<your project's name>/controller/action`. This should show a quite large *Welcome to Panama!* on your browser. Congratulation, you've just finished your first Panama Application.
+  # Open this URL in your browser: `http://localhost:8080/<your project's name>/controller/action`.<br>
+This should show a quite large *Welcome to Panama!* on your browser.<br>
+Congratulations! You've just finished your first Panama Application.
 
 == What next ==
 
-* Have a look at the [http://code.google.com/p/panama/source/browse/#svn%2Ftrunk%2Fpanama-examples panama-examples] project in the SVN and try it's examples.
-* Read the [Documentation]
-* Have a look at the [http://panama.googlecode.com/svn/trunk/panama/doc/index.html Javadoc]
-* Post your questions in our [https://groups.google.com/group/panama-framework Discussion Group]
+  * Have a look at the [http://code.google.com/p/panama/source/browse/#svn%2Ftrunk%2Fpanama-examples panama-examples] project in the SVN and try it's examples.
+  * Read the [Documentation]
+  * Have a look at the [http://panama.googlecode.com/svn/trunk/panama/doc/index.html Javadoc]
+  * Post your questions in our [https://groups.google.com/group/panama-framework Discussion Group]
