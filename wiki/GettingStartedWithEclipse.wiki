@@ -15,21 +15,6 @@ To follow this guide, you'll need an Eclipse IDE for Java EE Developers (3.5 or 
   # Create a Dynamic Web Application with Eclipse.
   # Download the latest *`panama-x.y.z.jar`* and put it into your project's `WEB-INF/lib` directory.
   # Download the matching *`panama-x.y.z-dependencies.zip`*, and unpack it into your project's `WEB-INF/lib` directory. There should now be a list of jar Files. These are required by Panama.
-  # Edit your project's `WEB-INF/web.xml` and replace everything after `</display-name>` all the way down to `</web-app>` with the following snippet:
-{{{
-<filter>
-  <filter-name>panama</filter-name>
-  <filter-class>panama.core.Dispatcher</filter-class>
-</filter>
-<filter-mapping>
-  <filter-name>panama</filter-name>
-  <url-pattern>/*</url-pattern>
-</filter-mapping>
-<welcome-file-list>
-  <welcome-file>index.html</welcome-file>
-</welcome-file-list>
-</web-app>
-}}}
   # Create a package named panama.kickstart in your project's `src` directory.
   # Create a class named `ExampleController.java` in there. Edit it and replace all of it's content with the following and save the file:
 {{{
@@ -57,6 +42,21 @@ public class ExampleController extends BaseController {
         <h1>Welcome to $name!</h1>
     </body>
 </html>
+}}}
+  # Edit your project's `WEB-INF/web.xml` and replace everything after `</display-name>` all the way down to `</web-app>` with the following snippet:
+{{{
+<filter>
+  <filter-name>panama</filter-name>
+  <filter-class>panama.core.Dispatcher</filter-class>
+</filter>
+<filter-mapping>
+  <filter-name>panama</filter-name>
+  <url-pattern>/*</url-pattern>
+</filter-mapping>
+<welcome-file-list>
+  <welcome-file>index.html</welcome-file>
+</welcome-file-list>
+</web-app>
 }}}
   # Publish your application onto your application server.
   # Start your application server.
