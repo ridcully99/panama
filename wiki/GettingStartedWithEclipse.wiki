@@ -10,7 +10,7 @@ For information on how to use a database with Panama (which will mosten often be
 
 To follow this guide, you'll need an Eclipse IDE for Java EE Developers (3.5 or higher) and an application server (e.g. Tomcat) to the ready. (Of course you can use Panama and the examples in any other environment as well, but the example project and this page are optimized for the described environment.)
 
-== Step By Step ==
+== Your First Panama Application in 10 Easy Steps ==
 
   # Create a Dynamic Web Application with Eclipse.
   # Download the latest *`panama-x.y.z.jar`* and put it into your project's `WEB-INF/lib` directory.
@@ -63,6 +63,19 @@ public class ExampleController extends BaseController {
   # Open this URL in your browser: `http://localhost:8080/<your project's name>/controller/action`.<br>
 This should show a quite large *Welcome to Panama!* on your browser.<br>
 Congratulations! You've just finished your first Panama Application.
+
+== Your First Panama Application With Database Support ==
+
+=== Ebean ORM and Eclipse Plugin ===
+
+Panama uses the [[http://www.avaje.org/ Avaje Ebean ORM]] as it's Persistence Layer. To use it in your Eclipse projects, you must install the Ebean-Eclipse plugin (add `http://www.avaje.org/eclipseupdate/` to the list of Available Software Sites and install the plugin from there).
+Background information about what the plugin does and why that is good, can be found in the [[http://www.avaje.org/ebean/documentation.html Ebean documentation]].
+
+After you have installed the plugin, you have to activate the plugin for your project, by selecting _Enable Ebean Enhancement_ from the project's context menu.
+
+=== Driver and Configuration ===
+
+Now, add the driver-jar for your database to the `WEB-INF/lib` directory of your project and put an `ebean.properties` file directly into the `src` directory of your project. See Ebean's [[http://www.avaje.org/ebean/getstarted_props.html Get Started with Ebean]] for further information.
 
 == What next ==
 
