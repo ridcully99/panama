@@ -35,8 +35,7 @@ To follow this guide, you'll need an Eclipse IDE for Java EE Developers (3.5 or 
 {{{
 package panama.kickstart;
 
-import javax.xml.ws.Action;
-
+import panama.annotations.Action;
 import panama.annotations.Controller;
 import panama.core.BaseController;
 import panama.core.Target;
@@ -49,7 +48,8 @@ public class ExampleController extends BaseController {
         return render("example.vm");
     }
 }
-}}}# Create a text-file in the same package and name it `example.vm`. Edit it, put the following text there and save it.
+}}}
+  # Create a text-file in the same package and name it `example.vm`. Edit it, put the following text there and save it.
 {{{
 <html>
     <head><title>example</title></head>
@@ -57,11 +57,10 @@ public class ExampleController extends BaseController {
         <h1>Welcome to $name!</h1>
     </body>
 </html>
-}}}# Publish your application onto your application server.
+}}}
+  # Publish your application onto your application server.
   # Start your application server.
-  # Open this URL in your browser: *`http://localhost:8080/<your project's name>/controller/action`*
-
-This should show a quite large *Welcome to Panama!* on your browser. Congratulation, you've just finished your first Panama Application.
+  # Open this URL in your browser: `http://localhost:8080/<your project's name>/controller/action`. This should show a quite large *Welcome to Panama!* on your browser. Congratulation, you've just finished your first Panama Application.
 
 == What next ==
 
