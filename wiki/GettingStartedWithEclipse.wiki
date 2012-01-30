@@ -70,14 +70,14 @@ Congratulations! You've just finished your first Panama Application.
 
 == Ebean ORM and Eclipse Plugin ==
 
-Panama uses the [[http://www.avaje.org/ Avaje Ebean ORM]] as it's Persistence Layer. To use it in your Eclipse projects, you must install the Ebean-Eclipse plugin (add `http://www.avaje.org/eclipseupdate/` to the list of Available Software Sites and install the plugin from there).
-Background information about what the plugin does and why that is good, can be found in the [[http://www.avaje.org/ebean/documentation.html Ebean documentation]].
+Panama uses the [http://www.avaje.org/ Avaje Ebean ORM] as it's Persistence Layer. To use it in your Eclipse projects, you must install the Ebean-Eclipse plugin (add `http://www.avaje.org/eclipseupdate/` to the list of Available Software Sites and install the plugin from there).
+Background information about what the plugin does and why that is good, can be found in the [http://www.avaje.org/ebean/documentation.html Ebean documentation].
 
 After you have installed the plugin, you have to activate the plugin for your project, by selecting _Enable Ebean Enhancement_ from the project's context menu.
 
 == Driver and Configuration ==
 
-Now, add the driver-jar for your database to the `WEB-INF/lib` directory of your project and put an `ebean.properties` file directly into the `src` directory of your project. See Ebean's [[http://www.avaje.org/ebean/getstarted_props.html Get Started with Ebean]] for further information.
+Now, add the driver-jar for your database to the `WEB-INF/lib` directory of your project and put an `ebean.properties` file directly into the `src` directory of your project. See Ebean's [http://www.avaje.org/ebean/getstarted_props.html Get Started with Ebean] for further information.
 
 ----
 
