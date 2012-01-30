@@ -49,8 +49,7 @@ public class ExampleController extends BaseController {
         return render("example.vm");
     }
 }
-}}}
-# Create a text-file in the same package and name it `example.vm`. Edit it, put the following text there and save it.
+}}}# Create a text-file in the same package and name it `example.vm`. Edit it, put the following text there and save it.
 {{{
 <html>
     <head><title>example</title></head>
@@ -58,11 +57,15 @@ public class ExampleController extends BaseController {
         <h1>Welcome to $name!</h1>
     </body>
 </html>
-}}}
-  # Publish your application onto your application server.
+}}}# Publish your application onto your application server.
   # Start your application server.
   # Open this URL in your browser: *`http://localhost:8080/<your project's name>/controller/action`*
 
 This should show a quite large *Welcome to Panama!* on your browser. Congratulation, you've just finished your first Panama Application.
 
 == What next ==
+
+* Have a look at the [http://code.google.com/p/panama/source/browse/#svn%2Ftrunk%2Fpanama-examples panama-examples] project in the SVN and try it's examples.
+* Read the [Documentation]
+* Have a look at the [http://panama.googlecode.com/svn/trunk/panama/doc/index.html Javadoc]
+* Post your questions in our [https://groups.google.com/group/panama-framework Discussion Group]
