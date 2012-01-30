@@ -1,0 +1,82 @@
+#summary Explains how to create your first Panama application with Eclipse.
+#labels Phase-Implementation,Featured
+
+== Introduction ==
+
+Getting started with a new web framework is not an easy task per se. To make it as easy as possible for you, we've set up this page that guides you step by step in creating your first Panama powered web application with Eclipse.
+
+== Environment ==
+
+This guide presumes a certain environment:
+
+  * Eclipse IDE for Java EE Developers (3.5 or higher) with an application server (e.g. Tomcat) to the ready. (Of course you can use Panama and the examples in any other environment as well, but the example project and this page are optimized for the described environment.)
+
+  * (optional) A MySQL Database, in case you want your project to have a database. Note, that Panama has [http://www.avaje.org/ Ebean ORM] built in for use as a persistence layer, which requires an Eclipse-Plugin to be installed (see below).
+
+== Step By Step ==
+
+  # Create a Dynamic Web Application with Eclipse.
+
+  # Download the latest `panama-x.y.z.jar` and put it into your project's `WEB-INF/lib` directory.
+
+  # Download the matching `panama-x.y.z-dependencies.zip`, and unpack it into your project's `WEB-INF/lib` directory. There should now be a list of jar Files. These are required by Panama.
+
+  # Edit your project's `WEB-INF/web.xml` and replace everything after `</display-name>` all the way down to `</web-app>` with the following snippet:
+
+{{{
+<filter>
+  <filter-name>panama</filter-name>
+  <filter-class>panama.core.Dispatcher</filter-class>
+</filter>
+<filter-mapping>
+  <filter-name>panama</filter-name>
+  <url-pattern>/*</url-pattern>
+</filter-mapping>
+<welcome-file-list>
+  <welcome-file>index.html</welcome-file>
+</welcome-file-list>
+</web-app>
+}}}
+
+  # 
+
+  # Start Eclipse and import the downloaded zip-file into your workspace:
+    * Open the import dialog using File/Import.../General/Existing Project into Workspace
+    * Enable _Select Archive File_, click _Browse_ and select the downloaded zip-file.
+    * Click Finish and you'll get a new Dynamic Web Project named panama-examples.
+  # Publish panama-examples onto your application server.
+    * In the _Servers_ view, select _Add and remove..._ from the context menu of your application server.
+    * In the upcoming dialog, select panama-examples from the Available column and click the Add button to move it to the Configured column.
+    * Click the Finish button to confirm and close the dialog.
+    * select _Publish_ from the context menu of your application server to publish the project.
+  # Start your application server
+  # Open this URL in your browser: http://localhost:8080/panama-examples
+
+== Examples using database ==
+
+Panama has [http://www.avaje.org/ Ebean ORM] built in for use as a persistence layer. There are some examples that show what you can do with it (and how easily you can do it).
+
+In order to run those examples a few extra requirements and steps are necessary.
+
+=== Environment ===
+
+  * MySQL Database (the driver is included in the examples project)
+  * An empty database schema with UTF-8 encoding.<br>You can create one with `CREATE DATABASE panama_examples DEFAULT CHARACTER SET utf8;`
+  * The *Ebean Eclipse IDE Enhancer Plugin*<br>(see [http://www.avaje.org/doc/ebean-userguide.pdf Reference Guide] chapter 15.5.5)
+
+=== Additional steps ===
+
+  # Edit _ebean.properties_ 
+    * set the following properties according to your system.
+      * `datasource.mysql.username`
+      * `datasource.mysql.password`
+      * `datasource.mysql.databaseUrl`
+    * set the following properties to true (this will generate all required tables in the schema)
+      * `ebean.ddl.generate`
+      * `ebean.ddl.run`
+  # Build, deploy and restart your application server
+  # Open the index URL in your browser: http://localhost:8080/panama-examples
+  # Start one of the database depending examples
+  # Stop the application server
+  # Set `ebean.ddl.generate` and `ebean.ddl.run` to false
+  # Build, deploy and restart your application server
