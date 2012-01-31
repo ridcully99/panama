@@ -378,14 +378,12 @@ public class Dispatcher implements Filter {
 		BaseController ctrl = null;
 		Class<? extends BaseController> clazz = controllerClasses.get(nameOrAlias);
 		if (clazz == null) {
-			log.error("No controller class found for name or alias '"+nameOrAlias+"'");
-			return null;
+			throw new RuntimeException("No controller class found for name or alias '"+nameOrAlias+"'");
 		} else {
 			try {
 				ctrl = clazz.getDeclaredConstructor().newInstance();
 			} catch (Exception e) {
-				log.error("Error creating controller instance");
-				log.errorException(e);
+				throw new RuntimeException("Error creating instance of controller class "+clazz.getName(), e);
 			}
 		}
 		return ctrl;
@@ -413,9 +411,6 @@ public class Dispatcher implements Filter {
 		
 		/* create new instance of controller for specified ctrlName */
 		BaseController ctrl = getController(ctrlName);
-		if (ctrl == null) {
-			throw new RuntimeException("No controller found, means canHandleRequest() is wrong!");
-		}
 		
 		TestTimer timer = new TestTimer("execute");
 		try {
