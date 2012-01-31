@@ -40,6 +40,7 @@ public class Version {
 
 	/* 	History
 	 * ---------------------------------------------------------------------------------
+	 * 3.3.8    2012-01-31 Optimized PersistentBean#findOrCreate(), no casts necessary anymore; updated to Ebean v2.7.4
 	 * 3.3.8    2012-01-29 BaseController logger now references BaseController.class instead of Dispatcher.class, reduced number of BaseController#redirectToAction() methods keeping only those with parameter names and values as alternating list of arguments.  
 	 * 3.3.7    2012-01-24 Fixed bug in QueryListModel (issue #26)
 	 * 3.3.6	2011-11-18 Added a few convinience methods (see issue #22, #23)
