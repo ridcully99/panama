@@ -1,5 +1,5 @@
 /*
- *  Copyright 2004-2010 Robert Brandner (robert.brandner@gmail.com) 
+ *  Copyright 2004-2012 Robert Brandner (robert.brandner@gmail.com) 
  *  
  *  Licensed under the Apache License, Version 2.0 (the "License"); 
  *  you may not use this file except in compliance with the License. 
@@ -35,6 +35,8 @@ import com.avaje.ebean.Ebean;
 @MappedSuperclass
 public class PersistentBean implements Serializable {
 
+	private static final long serialVersionUID = 1L;
+
 	/**
 	 * We use an assigned ID to avoid having to build equals/hashCode methods for each entity class
 	 * VMID() contains an ID unique accross all Java Virtual Machines
@@ -68,8 +70,19 @@ public class PersistentBean implements Serializable {
 		this.timeStamp = timeStamp;
 	}
 	
-	public static PersistentBean findOrCreate(Class<? extends PersistentBean> beanType, String id) {
-		PersistentBean o = null;
+	/**
+	 * Tries to fetch an object of type beanType with specified id from database (using Ebean). 
+	 * If no such object is found, a new one is created and it's id property set to the specified id.
+	 * This newly created object is _not_ saved to the database.
+	 * You can detect wether an object is new or came from the database by checking it's timeStamp property,
+	 * which is null for unsaved objects and not null for saved ones.
+	 * 
+	 * @param beanType
+	 * @param id
+	 * @return an object of class beanType; never null.
+	 */
+	public static <T extends PersistentBean> T findOrCreate(Class<T> beanType, String id) {
+		T o = null;
 		try {
 			if (id == null) {
 				o = beanType.getConstructor().newInstance();
@@ -91,8 +104,7 @@ public class PersistentBean implements Serializable {
 	 */
 	public boolean equals(Object other) {
 		if (this == other) { return true; }
-		if ((other ==null) || (other.getClass() != this.getClass() ) ) return false;
-		if (other == null) { return false; }
+		if ((other == null) || (other.getClass() != this.getClass() ) ) return false;
 		return id.equals(((PersistentBean)other).getId());
 	}
 	
