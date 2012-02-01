@@ -81,8 +81,8 @@ public class PersistentBean implements Serializable {
 	 * @param id
 	 * @return an object of class beanType; never null.
 	 */
-	public static PersistentBean findOrCreate(Class<? extends PersistentBean> beanType, String id) {
-		PersistentBean o = null;
+	public static <T extends PersistentBean> T findOrCreate(Class<T> beanType, String id) {
+		T o = null;
 		try {
 			if (id == null) {
 				o = beanType.getConstructor().newInstance();
