@@ -40,18 +40,18 @@ public class Field {
 
 	private String name;		
 	private List<Validator> validators = new ArrayList<Validator>();
-	private Class valueClass;
+	private Class<?> valueClass;
 	private DefaultFormatter fmttr = new DefaultFormatter();	
 	protected static SimpleLogger log = new SimpleLogger(Form.class);
 	
 	
-	public Field() {}	
+	protected Field() {}	
 	
-	public Field(String name, Class valueClass) {
+	protected Field(String name, Class<?> valueClass) {
 		this(name, valueClass, false);
 	}
 	
-	public Field(String name, Class valueClass, boolean notEmpty) {
+	protected Field(String name, Class<?> valueClass, boolean notEmpty) {
 		setName(name);
 		setValueClass(valueClass);
 		if (notEmpty) {
@@ -67,11 +67,11 @@ public class Field {
 		this.name = name;
 	}
 	
-	public Class getValueClass() {
+	public Class<?> getValueClass() {
 		return valueClass;
 	}
 	
-	public void setValueClass(Class valueClass) {
+	public void setValueClass(Class<?> valueClass) {
 		this.valueClass = valueClass;
 	}
 	

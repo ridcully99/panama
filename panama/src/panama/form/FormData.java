@@ -544,7 +544,7 @@ public class FormData {
 	
 	/**
 	 * Provides a copy of the input map.
-	 * To be used in JSPs with JSTL as ${formdata.input["fieldName"]}
+	 * To be used mainly with JSPs with JSTL as ${formdata.input["fieldName"]}
 	 */
 	public Map getInput() {
 		Map m = new HashMap();

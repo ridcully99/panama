@@ -32,9 +32,9 @@ import panama.persistence.PersistentBean;
  */
 public class PersistentBeanField extends Field {
 
-	protected Class beanClass; 
+	protected Class<? extends PersistentBean> beanClass; 
 
-	public PersistentBeanField(String name, Class beanClass) {
+	public PersistentBeanField(String name, Class<? extends PersistentBean> beanClass) {
 		this(name, false, beanClass);
 	}	
 	
@@ -44,7 +44,7 @@ public class PersistentBeanField extends Field {
 	 * @param notEmpty
 	 * @param beanClass The concrete class (must be derived of the PersistentBean and mapped in your application)
 	 */
-	public PersistentBeanField(String name, boolean notEmpty, Class beanClass) {
+	public PersistentBeanField(String name, boolean notEmpty, Class<? extends PersistentBean> beanClass) {
 		super(name, beanClass, notEmpty);
 		this.beanClass = beanClass;
 	}
@@ -68,10 +68,10 @@ public class PersistentBeanField extends Field {
 	 * This converts the given value into a string representation
 	 * @see Field#valueToString(Object)
 	 * @param value
-	 * @return A String
+	 * @return The ID of value
 	 * @throws ParseException
 	 */	
-	public String valueToString(Object value) throws ParseException {
-		return ((PersistentBean)value).getId();
+	public String valueToString(PersistentBean value) throws ParseException {
+		return value.getId();
 	}	
 }

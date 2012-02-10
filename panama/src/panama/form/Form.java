@@ -124,7 +124,7 @@ public class Form {
 				if (valueInstance != null && valueInstance instanceof Date) {
 					field = new DateField(name);
 				} else if (valueInstance != null && valueInstance instanceof PersistentBean) {
-					field = new PersistentBeanField(name, valueClass);
+					field = new PersistentBeanField(name, (Class<? extends PersistentBean>)valueClass);
 				} else {
 					field = new Field(name, valueClass);
 				}

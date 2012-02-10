@@ -38,8 +38,6 @@ import org.apache.commons.fileupload.FileItem;
  */
 public class FileItemField extends Field {
 
-	public FileItemField() {}	
-	
 	public FileItemField(String name) {
 		this(name, false);
 	}
