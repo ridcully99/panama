@@ -74,12 +74,15 @@ public class MediaSupport {
 		try {
 			InputStream is = new BufferedInputStream(new ByteArrayInputStream(imageData));
 			Image src = null;
+			IIOMetadata imageMetadata = null;
 			Iterator<ImageReader> it = ImageIO.getImageReadersByMIMEType(srcContentType);
 			ImageReader reader = it.next();
 			ImageInputStream iis = ImageIO.createImageInputStream(is);
 			reader.setInput(iis, false, false);
 			src = reader.read(0);
-			IIOMetadata imageMetadata = reader.getImageMetadata(0);
+			if (CONTENTTYPE_IMAGE_JPEG.equals(srcContentType) && CONTENTTYPE_IMAGE_JPEG.equals(destContentType)) {
+				imageMetadata = reader.getImageMetadata(0);
+			}
 			
 			//Image src = ImageIO.read(is);
 			int srcWidth = src.getWidth(null);
