@@ -32,8 +32,11 @@ import java.util.Iterator;
 
 import javax.imageio.IIOImage;
 import javax.imageio.ImageIO;
+import javax.imageio.ImageReader;
 import javax.imageio.ImageWriteParam;
 import javax.imageio.ImageWriter;
+import javax.imageio.metadata.IIOMetadata;
+import javax.imageio.stream.ImageInputStream;
 import javax.imageio.stream.ImageOutputStream;
 import javax.imageio.stream.MemoryCacheImageOutputStream;
 
@@ -58,7 +61,8 @@ public class MediaSupport {
 	 * Creates a different flavor of a given image.
 	 * 
 	 * @param imageData data of the original image.
-	 * @param contentType the content type of the resulting image -- must be one of CONTENTTYPE_IMAGE_... constants
+	 * @param srcContentType the content type (MIME type) of the original image
+	 * @param destContentType the content type of the resulting image -- must be one of CONTENTTYPE_IMAGE_... constants
 	 * @param width the width of the resulting image. Specify -1 to take the width of the original image.
 	 * @param height the height of the resulting image. Specify -1 to take the height of the original image.
 	 * @param keepRatio set true, to keep the width/height ratio of the original image
@@ -66,10 +70,18 @@ public class MediaSupport {
 	 * @param jpegQuality quality to use when generating jpeg images. Value must be between 0 (lowest quality, smallest in size) and 1 (highest quality, largest in size)
 	 * @return data for resized image.
 	 */
-	public static synchronized byte[] createImageFlavor(byte[] imageData, String contentType, int width, int height, boolean keepRatio, boolean clipToFit, float jpegQuality) {
+	public static synchronized byte[] createImageFlavor(byte[] imageData, String srcContentType, String destContentType, int width, int height, boolean keepRatio, boolean clipToFit, float jpegQuality) {
 		try {
 			InputStream is = new BufferedInputStream(new ByteArrayInputStream(imageData));
-			Image src = ImageIO.read(is);
+			Image src = null;
+			Iterator<ImageReader> it = ImageIO.getImageReadersByMIMEType(srcContentType);
+			ImageReader reader = it.next();
+			ImageInputStream iis = ImageIO.createImageInputStream(is);
+			reader.setInput(iis, false, false);
+			src = reader.read(0);
+			IIOMetadata imageMetadata = reader.getImageMetadata(0);
+			
+			//Image src = ImageIO.read(is);
 			int srcWidth = src.getWidth(null);
 			int srcHeight = src.getHeight(null);
 			
@@ -126,28 +138,28 @@ public class MediaSupport {
 			ByteArrayOutputStream outStream = new ByteArrayOutputStream();
 			BufferedOutputStream out = new BufferedOutputStream(outStream);
 			
-			if (CONTENTTYPE_IMAGE_JPEG.equals(contentType)) {
+			if (CONTENTTYPE_IMAGE_JPEG.equals(destContentType)) {
 				if (jpegQuality < 0) { jpegQuality = 0; }
 				if (jpegQuality > 1) { jpegQuality = 1; }
 				// ImageIO.write(destImage, "jpg", out); <-- simple but cannot control quality
 				// http://www.universalwebservices.net/web-programming-resources/java/adjust-jpeg-image-compression-quality-when-saving-images-in-java
-				Iterator<ImageWriter> iter = ImageIO.getImageWritersByFormatName("jpeg");
+				Iterator<ImageWriter> iter = ImageIO.getImageWritersByMIMEType(CONTENTTYPE_IMAGE_JPEG);
 				ImageWriter writer = iter.next();
 				ImageWriteParam iwp = writer.getDefaultWriteParam();
 				iwp.setCompressionMode(ImageWriteParam.MODE_EXPLICIT);
 				iwp.setCompressionQuality(jpegQuality);   // a float between 0 and 1, 1 == best-quality
 				ImageOutputStream imgOut = new MemoryCacheImageOutputStream(out);
 				writer.setOutput(imgOut);
-				IIOImage image = new IIOImage(destImage, null, null);
+				IIOImage image = new IIOImage(destImage, null, imageMetadata);
 				writer.write(null, image, iwp);
 				writer.dispose();
-			} else if (CONTENTTYPE_IMAGE_GIF.equals(contentType)) {
+			} else if (CONTENTTYPE_IMAGE_GIF.equals(destContentType)) {
 				GIFEncoder encoder = new GIFEncoder(destImage);
 				encoder.Write(out);        	
-			} else if (CONTENTTYPE_IMAGE_PNG.equals(contentType)) {
+			} else if (CONTENTTYPE_IMAGE_PNG.equals(destContentType)) {
 				ImageIO.write(destImage, "png", out);
 			} else {
-				log.error("Content-Type '"+contentType+"' is not supported by MediaSupport. No image was created.");
+				log.error("Content-Type '"+destContentType+"' is not supported by MediaSupport. No image was created.");
 			}
 			out.close();
 			return outStream.toByteArray();
