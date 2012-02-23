@@ -29,6 +29,7 @@ import java.io.ByteArrayInputStream;
 import java.io.ByteArrayOutputStream;
 import java.io.InputStream;
 import java.util.Iterator;
+import java.util.Locale;
 
 import javax.imageio.IIOImage;
 import javax.imageio.ImageIO;
@@ -36,6 +37,7 @@ import javax.imageio.ImageReader;
 import javax.imageio.ImageWriteParam;
 import javax.imageio.ImageWriter;
 import javax.imageio.metadata.IIOMetadata;
+import javax.imageio.plugins.jpeg.JPEGImageWriteParam;
 import javax.imageio.stream.ImageInputStream;
 import javax.imageio.stream.ImageOutputStream;
 import javax.imageio.stream.MemoryCacheImageOutputStream;
@@ -81,7 +83,11 @@ public class MediaSupport {
 			reader.setInput(iis, false, false);
 			src = reader.read(0);
 			if (CONTENTTYPE_IMAGE_JPEG.equals(srcContentType) && CONTENTTYPE_IMAGE_JPEG.equals(destContentType)) {
-				imageMetadata = reader.getImageMetadata(0);
+				try {
+					imageMetadata = reader.getImageMetadata(0);
+				} catch (Exception e) {
+					log.warn("Reading metadata failed, continuing without them. Exception was "+e.getMessage());
+				}
 			}
 			
 			//Image src = ImageIO.read(is);
@@ -148,9 +154,10 @@ public class MediaSupport {
 				// http://www.universalwebservices.net/web-programming-resources/java/adjust-jpeg-image-compression-quality-when-saving-images-in-java
 				Iterator<ImageWriter> iter = ImageIO.getImageWritersByMIMEType(CONTENTTYPE_IMAGE_JPEG);
 				ImageWriter writer = iter.next();
-				ImageWriteParam iwp = writer.getDefaultWriteParam();
+				JPEGImageWriteParam iwp = new JPEGImageWriteParam(Locale.getDefault());
 				iwp.setCompressionMode(ImageWriteParam.MODE_EXPLICIT);
 				iwp.setCompressionQuality(jpegQuality);   // a float between 0 and 1, 1 == best-quality
+				iwp.setOptimizeHuffmanTables(true);
 				ImageOutputStream imgOut = new MemoryCacheImageOutputStream(out);
 				writer.setOutput(imgOut);
 				IIOImage image = new IIOImage(destImage, null, imageMetadata);
