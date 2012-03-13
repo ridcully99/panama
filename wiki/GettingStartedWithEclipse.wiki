@@ -13,8 +13,8 @@ To follow this guide, you'll need an Eclipse IDE for Java EE Developers (3.5 or 
 = Your First Panama Application in 10 Easy Steps =
 
   # Create a Dynamic Web Application with Eclipse.
-  # Download the latest *`panama-x.y.z.jar`* and put it into your project's `WEB-INF/lib` directory.
-  # Download the matching *`panama-x.y.z-dependencies.zip`*, and unpack it into your project's `WEB-INF/lib` directory. There should now be a list of jar Files. These are required by Panama.
+  # [http://code.google.com/p/panama/downloads/list Download] the latest *`panama-x.y.z.jar`* and put it into your project's `WEB-INF/lib` directory.
+  # [http://code.google.com/p/panama/downloads/list Download] the matching *`panama-x.y.z-dependencies.zip`*, and unpack it into your project's `WEB-INF/lib` directory. There should now be a list of jar Files. These are required by Panama.
   # Create a package named `panama.kickstart` in your project's `src` directory.
   # Create a class file named `ExampleController.java` in there. Edit it and replace all of it's content with the following and save the file:
 {{{
