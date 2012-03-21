@@ -184,6 +184,14 @@ Panama does not require any configuration to work. However there are a few optio
 || `panama.languages` || `en,de,fr` || A comma separated list of languages your application supports.<br>See chapter [#Internationalization] for details. ||
 || `panama.maxfileuploadsize` || `16` || The maximum file upload size in MByte. The default values is 1 MByte. ||
 
+e.g. to set maxfileuploadsize to 16MB:
+{{{
+<init-param>
+    <param-name>panama.maxfileuploadsize</param-name>
+    <param-value>16</param-value>
+</init-param>
+}}}
+
 == !SimpleLog ==
 
 SimpleLog requires a `simplelog.properties` file in the _src_ root directory. Actually the file may even be empty, but please see the [http://code.google.com/p/panama/source/browse/trunk/panama-kickstart/src/simplelog.properties simplelog.properties] file from _panama-kickstart_, which contains a good documentation in form of comments.
