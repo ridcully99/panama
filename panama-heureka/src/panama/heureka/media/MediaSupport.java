@@ -31,6 +31,7 @@ import java.io.InputStream;
 import java.util.Iterator;
 import java.util.Locale;
 
+import javax.imageio.IIOException;
 import javax.imageio.IIOImage;
 import javax.imageio.ImageIO;
 import javax.imageio.ImageReader;
@@ -167,9 +168,20 @@ public class MediaSupport {
 				iwp.setOptimizeHuffmanTables(true);
 				ImageOutputStream imgOut = new MemoryCacheImageOutputStream(out);
 				writer.setOutput(imgOut);
-				IIOImage image = new IIOImage(destImage, null, imageMetadata);
-				writer.write(null, image, iwp);
-				writer.dispose();
+				try {
+					IIOImage image = new IIOImage(destImage, null, imageMetadata);
+					writer.write(null, image, iwp);
+					writer.dispose();
+				} catch (IIOException e) {
+					if (imageMetadata != null) {
+						log.warn("IIOException ("+e.getMessage()+" occured when trying to write media data; trying again without imagMetadata.");
+						IIOImage image = new IIOImage(destImage, null, null);
+						writer.write(null, image, iwp);
+						writer.dispose();
+					} else {
+						throw(e);	// run out of options -- give up
+					}
+				}
 			} else if (CONTENTTYPE_IMAGE_GIF.equals(destContentType)) {
 				GIFEncoder encoder = new GIFEncoder(destImage);
 				encoder.Write(out);        	
