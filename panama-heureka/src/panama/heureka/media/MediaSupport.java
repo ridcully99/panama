@@ -174,7 +174,12 @@ public class MediaSupport {
 					writer.dispose();
 				} catch (IIOException e) {
 					if (imageMetadata != null) {
-						log.warn("IIOException ("+e.getMessage()+" occured when trying to write media data; trying again without imagMetadata.");
+						log.warn("An IIOException ("+e.getMessage()+") occured when trying to write media data; trying again without imagMetadata.");
+						writer.abort();
+						outStream = new ByteArrayOutputStream();
+						out = new BufferedOutputStream(outStream);
+						imgOut = new MemoryCacheImageOutputStream(out);
+						writer.setOutput(imgOut);
 						IIOImage image = new IIOImage(destImage, null, null);
 						writer.write(null, image, iwp);
 						writer.dispose();
