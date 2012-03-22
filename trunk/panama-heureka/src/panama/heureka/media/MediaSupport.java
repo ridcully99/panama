@@ -55,6 +55,7 @@ public class MediaSupport {
 	public final static String CONTENTTYPE_IMAGE_JPEG = "image/jpeg";
 	public final static String CONTENTTYPE_IMAGE_GIF = "image/gif";
 	public final static String CONTENTTYPE_IMAGE_PNG = "image/png";	
+	public final static String CONTENTTYPE_IMAGE_PROGRESSIVE_JPEG = "image/pjpeg";	// used by IE only; must be converted to CONTENTTYPE_IMAGE_JPEG as no ImageReaders exist for image/pjpeg!
 	
 	/** Logging */
 	protected static SimpleLogger log = new SimpleLogger(MediaSupport.class);
@@ -73,6 +74,12 @@ public class MediaSupport {
 	 * @return data for resized image.
 	 */
 	public static synchronized byte[] createImageFlavor(byte[] imageData, String srcContentType, String destContentType, int width, int height, boolean keepRatio, boolean clipToFit, float jpegQuality) {
+		if (CONTENTTYPE_IMAGE_PROGRESSIVE_JPEG.equalsIgnoreCase(srcContentType)) {
+			srcContentType = CONTENTTYPE_IMAGE_JPEG;
+		}
+		if (CONTENTTYPE_IMAGE_PROGRESSIVE_JPEG.equalsIgnoreCase(destContentType)) {
+			destContentType = CONTENTTYPE_IMAGE_JPEG;
+		}
 		try {
 			InputStream is = new BufferedInputStream(new ByteArrayInputStream(imageData));
 			Image src = null;
