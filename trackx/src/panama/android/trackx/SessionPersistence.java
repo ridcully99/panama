@@ -19,8 +19,6 @@ import java.io.IOException;
 import java.util.ArrayList;
 import java.util.List;
 
-import org.json.JSONException;
-
 import android.content.ContentValues;
 import android.content.Context;
 import android.database.Cursor;
@@ -30,7 +28,7 @@ import android.location.Location;
 import android.util.Log;
 
 /**
- * Save/Load session information internally using JSON
+ * Save/Load session information internally
  * @author ridcully
  */
 public class SessionPersistence {
@@ -70,7 +68,7 @@ public class SessionPersistence {
 		mDBHelper.close();
 	}
 	
-	public boolean save(Session session) throws JSONException, IOException {
+	public boolean save(Session session) throws IOException {
 		SQLiteDatabase db = mDBHelper.getWritableDatabase();
 		db.beginTransaction();
 		try {

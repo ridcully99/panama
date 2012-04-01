@@ -5,7 +5,10 @@
     <string name="notification_recording_started">Trackx started recording</string>
     <string name="notification_recording">Trackx</string>
     <string name="notification_text">Recording...</string>
-    
+    <string name="lbl_current_speed">Current Speed</string>
+    <string name="lbl_average_speed">Average Speed</string>
+    <string name="lbl_speed_unit_km">km/h</string>
+    <string name="lbl_speed_unit_mi">mi/h</string>
     
     <string-array name="prefs_gender_entries">
         <item>unknown</item>
@@ -28,6 +31,16 @@
     <string-array name="prefs_unit_entryValues">
         <item>km</item>
         <item>mi</item>
+    </string-array>
+
+    <string-array name="prefs_speed_entries">
+        <item>Pacce</item>
+        <item>Speed</item>
+    </string-array>
+
+    <string-array name="prefs_speed_entryValues">
+        <item>pace</item>
+        <item>speed</item>
     </string-array>
     
 </resources>

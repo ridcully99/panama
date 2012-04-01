@@ -64,8 +64,8 @@ public class TrackerService extends Service {
 	public float pathLength;
 	public long sessionStartedAtMillis;
 	public long elapsedTimeMillis;
-	public float currentPace;
-	public float averagePace;
+	public float currentSpeed;
+	public float averageSpeed;
 	public boolean isTracking = false;
 	public boolean isRecording = false;
 	public boolean trackingFoundLocation = false;	// set true at first location we get after startTracking()
@@ -146,8 +146,8 @@ public class TrackerService extends Service {
 		pathLength = 0;
 		sessionStartedAtMillis = 0;
 		elapsedTimeMillis = 0;
-		currentPace = 0;
-		averagePace = 0;
+		currentSpeed = 0;
+		averageSpeed = 0;
 	}
 	
 	/** use data from session (called after load) */
@@ -155,7 +155,7 @@ public class TrackerService extends Service {
 		pathLength = session.distance;
 		sessionStartedAtMillis = session.timestamp;
 		elapsedTimeMillis = session.time;
-		averagePace = (elapsedTimeMillis/Util.SECOND_IN_MILLIS) > 0 ? pathLength/(elapsedTimeMillis/Util.SECOND_IN_MILLIS) : 0;
+		averageSpeed = (elapsedTimeMillis/Util.SECOND_IN_MILLIS) > 0 ? pathLength/(elapsedTimeMillis/Util.SECOND_IN_MILLIS) : 0;
 		positions = session.positions;
 		currentLocation = null;
 		// notify listeners
@@ -207,7 +207,7 @@ public class TrackerService extends Service {
 		
 		public void onTimerChanged(long elapsedTimeMillis);
 		
-		public void onPaceChanged(float currentPace, float averagePace);
+		public void onSpeedChanged(float currentSpeed, float averageSpeed);
 		
 		public void onRefreshAll();
 	}	
@@ -236,10 +236,10 @@ public class TrackerService extends Service {
 			
 			if (TrackerService.this.isRecording) {
 				// always notify about pace (to get speed 0 too, even if we do not actually record the position due to too less distance...)
-				currentPace = location.getSpeed();
-				averagePace = (elapsedTimeMillis/Util.SECOND_IN_MILLIS) > 0 ? pathLength/(elapsedTimeMillis/Util.SECOND_IN_MILLIS) : 0;
+				currentSpeed = location.getSpeed();
+				averageSpeed = (elapsedTimeMillis/Util.SECOND_IN_MILLIS) > 0 ? pathLength/(elapsedTimeMillis/Util.SECOND_IN_MILLIS) : 0;
 				for (Listener l : mListeners) {
-					l.onPaceChanged(currentPace, averagePace);
+					l.onSpeedChanged(currentSpeed, averageSpeed);
 				}
 				float dist = location.distanceTo(currentLocation);
 				if (dist < MIN_DISTANCE || dist < /*currentLocation.getAccuracy()+*/location.getAccuracy()) {

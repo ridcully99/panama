@@ -55,8 +55,8 @@ public class MainActivity extends MapActivity implements TrackerService.Listener
 	private TextView mSessionStartView;
 	private TextView mDistanceView;
 	private TextView mTimerView;
-	private TextView mPaceView;
-	private TextView mAveragePaceView;
+	private TextView mSpeedView;
+	private TextView mAverageSpeedView;
 	private TextView mCaloriesView;
 	private Button mNewSessionButton;
 	private Button mStartButton;
@@ -94,15 +94,15 @@ public class MainActivity extends MapActivity implements TrackerService.Listener
 		mSessionStartView = (TextView)findViewById(R.id.sessionDateTime);
 		mDistanceView = (TextView)findViewById(R.id.distance);
 		mTimerView = (TextView)findViewById(R.id.time);
-		mPaceView = (TextView)findViewById(R.id.pace);
-		mAveragePaceView = (TextView)findViewById(R.id.averagePace);
+		mSpeedView = (TextView)findViewById(R.id.speed);
+		mAverageSpeedView = (TextView)findViewById(R.id.averageSpeed);
 		mCaloriesView = (TextView)findViewById(R.id.calories);
 		
 //		Typeface numberFont = Typeface.createFromAsset(this.getAssets(), "fonts/LEXIB___.ttf");
 //		mDistanceView.setTypeface(numberFont);
 //		mTimerView.setTypeface(numberFont);
-//		mPaceView.setTypeface(numberFont);
-//		mAveragePaceView.setTypeface(numberFont);
+//		mSpeedView.setTypeface(numberFont);
+//		mAverageSpeedView.setTypeface(numberFont);
 		
 		mNewSessionButton = (Button)findViewById(R.id.newSession);
 		mNewSessionButton.setEnabled(false);	// disabled bis wir mit Service verbunden sind.
@@ -281,7 +281,7 @@ public class MainActivity extends MapActivity implements TrackerService.Listener
 		mSaveButton.setVisibility(View.VISIBLE);
 		mService.stopRecording();
 		mService.stopTracking();	// versuchsweise mal
-		setCurrentPace(0);
+		setCurrentSpeed(0);
 
 		if (mWakeLock.isHeld()) {
 			mWakeLock.release();
@@ -338,14 +338,14 @@ public class MainActivity extends MapActivity implements TrackerService.Listener
 		mDistanceView.invalidate();		
 	}
 	
-	private void setCurrentPace(float metersPerSecond) {
-		mPaceView.setText(Util.formatSpeed(metersPerSecond));
-		mPaceView.invalidate();
+	private void setCurrentSpeed(float metersPerSecond) {
+		mSpeedView.setText(Util.formatSpeed(metersPerSecond));
+		mSpeedView.invalidate();
 	}
 
-	private void setAveragePace(float metersPerSecond) {
-		mAveragePaceView.setText(Util.formatSpeed(metersPerSecond));
-		mAveragePaceView.invalidate();
+	private void setAverageSpeed(float metersPerSecond) {
+		mAverageSpeedView.setText(Util.formatSpeed(metersPerSecond));
+		mAverageSpeedView.invalidate();
 	}
 	
 	private void setTime(long timeMillis) {
@@ -398,9 +398,9 @@ public class MainActivity extends MapActivity implements TrackerService.Listener
 	}
 	
 	@Override
-	public void onPaceChanged(float currentPace, float averagePace) {
-		setCurrentPace(currentPace);
-		setAveragePace(averagePace);
+	public void onSpeedChanged(float currentSpeed, float averageSpeed) {
+		setCurrentSpeed(currentSpeed);
+		setAverageSpeed(averageSpeed);
 	}
 	
 	@Override
@@ -412,7 +412,7 @@ public class MainActivity extends MapActivity implements TrackerService.Listener
 	@Override
 	public void onRefreshAll() {
 		onLocationChanged(null);
-		onPaceChanged(mService.currentPace, mService.averagePace);
+		onSpeedChanged(mService.currentSpeed, mService.averageSpeed);
 		onTimerChanged(mService.elapsedTimeMillis);
 		if (mService.sessionStartedAtMillis > 0) {
 			mSessionStartView.setText("Session of "+Util.formatDateShort(mService.sessionStartedAtMillis));

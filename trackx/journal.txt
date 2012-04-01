@@ -45,7 +45,7 @@
 + Styles begonnen für Buttons etc.
 + Layout Rework -- geht gut
 
-3.10.2001
+3.10.2011
 + Datenbank
 + Save
 + Load (mit rudimentärer Auswahlliste)
@@ -125,7 +125,7 @@
 31.12.2011
 + Start/Finish Icons in den Markern (Play und Stop Symbol)
 
-TODO: Bei Stop gleich Speichern
+TODO: Bei Stop gleich Speichern, dafür in History Löschmöglichkeit
 
 TODO: Speed und Pace (km/h bzw. min/km)
 
@@ -155,10 +155,7 @@ TODO: Texte aus strings.xml / I18n / L10n
 
 TODO: Optionen: 
 		- Umschalten zw. km und Meilen (auch für UnitLabels (km/h, mph) verwenden) -- Berechnungen immer metrisch, erst für Anzeige ggf. umrechnen!
-		- Gewicht, Geschlecht für Kalorienberechnung
-		- Automatische Marker alle Kilometer/Meilen?
-		
-		
+		- Automatische Marker alle Kilometer/Meilen
+				
 MAYBE: current pace rot oder grün, wenn über oder unter'm durchschnitt oder Pfeilchen rauf, Pfeilchen runter (optisch vielleicht ruhiger)
-
 MAYBE: wenn geht (oder als Option) die Karte drehen sodass Pfeil immer "nach oben" zeigt, i.e. in Laufrichtung.
