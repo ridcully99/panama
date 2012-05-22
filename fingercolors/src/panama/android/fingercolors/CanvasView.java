@@ -66,7 +66,11 @@ public class CanvasView extends View {
         super(context, attrs);
         mContext = context;
         mBitmap = Bitmap.createBitmap(1, 1, Bitmap.Config.ARGB_8888);
+        mPrevBitmap = Bitmap.createBitmap(1, 1, Bitmap.Config.ARGB_8888);
+        mUndoBackgroundBitmap = Bitmap.createBitmap(1, 1, Bitmap.Config.ARGB_8888);
         mCanvas = new Canvas(mBitmap);
+        mPrevCanvas = new Canvas(mPrevBitmap);
+        mUndoBackgroundCanvas = new Canvas(mUndoBackgroundBitmap);
         mPath = new Path();
         mBitmapPaint = new Paint();
         mBitmapPaint.setDither(true);
