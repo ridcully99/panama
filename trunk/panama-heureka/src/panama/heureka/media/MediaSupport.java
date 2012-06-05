@@ -67,8 +67,8 @@ public class MediaSupport {
 	 * @param imageData data of the original image.
 	 * @param srcContentType the content type (MIME type) of the original image
 	 * @param destContentType the content type of the resulting image -- must be one of CONTENTTYPE_IMAGE_... constants
-	 * @param width the width of the resulting image. Specify -1 to take the width of the original image.
-	 * @param height the height of the resulting image. Specify -1 to take the height of the original image.
+	 * @param width the width of the resulting image. Specify -1 to take the width of the original image, or another negative width to limit the width to that value or keep the original if it's smaller (think 'up to' ...)
+	 * @param height the height of the resulting image. Specify -1 to take the height of the original image, or another negative height to limit the height to that value or keep the original if it's smaller (think 'up to' ...)
 	 * @param keepRatio set true, to keep the width/height ratio of the original image
 	 * @param clipToFit set true, to clip the image to fit the provided width/height rectangle if necessary. When clipping the image is centered.
 	 * @param jpegQuality quality to use when generating jpeg images. Value must be between 0 (lowest quality, smallest in size) and 1 (highest quality, largest in size)
@@ -107,8 +107,8 @@ public class MediaSupport {
 			int clipY = 0;
 			int clipW = srcWidth;
 			int clipH = srcHeight;
-			int destWidth = width == -1 ? srcWidth : width;
-			int destHeight = height == -1 ? srcHeight : height;
+			int destWidth = width == -1 ? srcWidth : (width >= 0 ? width : Math.min(srcWidth, -width));
+			int destHeight = height == -1 ? srcHeight : (height >= 0 ? height : Math.min(srcHeight, -height));
 			if (keepRatio) {
 				double destRatio = (double)destWidth / (double)destHeight;
 				double srcRatio = (double)srcWidth / (double)srcHeight;
