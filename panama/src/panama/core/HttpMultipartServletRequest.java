@@ -39,6 +39,7 @@ import org.apache.commons.fileupload.FileUploadException;
 import org.apache.commons.fileupload.disk.DiskFileItemFactory;
 import org.apache.commons.fileupload.servlet.ServletFileUpload;
 import org.apache.commons.fileupload.servlet.ServletRequestContext;
+import org.apache.commons.lang.StringUtils;
 import org.grlea.log.SimpleLogger;
 
 /**
@@ -89,12 +90,16 @@ public class HttpMultipartServletRequest implements HttpServletRequest {
 						}
 					} else {
 						// process uploaded file
-						List values = (List)fileItems.get(fieldName);
-						if (values == null) {
-							values = new ArrayList();
-							fileItems.put(fieldName, values);
+						// As we also get items when no file was selected in file-input field, we check if the file has a name.
+						// (size is 0 but this could also be an empty file, thus we check the name)
+						if (!StringUtils.isEmpty(item.getName())) {
+							List values = (List)fileItems.get(fieldName);
+							if (values == null) {
+								values = new ArrayList();
+								fileItems.put(fieldName, values);
+							}
+							values.add(item);
 						}
-						values.add(item);
 					}
 				}
 			}
