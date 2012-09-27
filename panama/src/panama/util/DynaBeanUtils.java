@@ -1,17 +1,17 @@
 /*
- *  Copyright 2004-2010 Robert Brandner (robert.brandner@gmail.com) 
- *  
- *  Licensed under the Apache License, Version 2.0 (the "License"); 
- *  you may not use this file except in compliance with the License. 
- *  You may obtain a copy of the License at 
- *  
- *  http://www.apache.org/licenses/LICENSE-2.0 
- *  
- *  Unless required by applicable law or agreed to in writing, software 
- *  distributed under the License is distributed on an "AS IS" BASIS, 
- *  WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied. 
- *  See the License for the specific language governing permissions and 
- *  limitations under the License. 
+ *  Copyright 2004-2010 Robert Brandner (robert.brandner@gmail.com)
+ *
+ *  Licensed under the Apache License, Version 2.0 (the "License");
+ *  you may not use this file except in compliance with the License.
+ *  You may obtain a copy of the License at
+ *
+ *  http://www.apache.org/licenses/LICENSE-2.0
+ *
+ *  Unless required by applicable law or agreed to in writing, software
+ *  distributed under the License is distributed on an "AS IS" BASIS,
+ *  WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
+ *  See the License for the specific language governing permissions and
+ *  limitations under the License.
  */
 package panama.util;
 
@@ -27,16 +27,16 @@ import panama.exceptions.WrongValueTypeException;
 
 /**
  * A collection of static methods for dynamic bean access.
- * 
+ *
  * @author Ridcully
  */
 public class DynaBeanUtils {
 
 	/**
 	 * Gets value of property of this object (using reflection)
-	 * 
+	 *
 	 * If propertyName contains '.' get property for first part of name and call getProperty of this property with rest of propertyName
-	 * 
+	 *
 	 * @param propertyName (simple or linked by dots (eg. user.name))
 	 * @return the value of the named property
 	 * @throws PropertyNotFoundException If no getter for propertyName is found
@@ -47,7 +47,7 @@ public class DynaBeanUtils {
 		Object value = null;
 
 		String subProperty = null;
-				
+
 		if (propertyName.indexOf(".") != -1) {
 			subProperty = propertyName.substring(propertyName.indexOf(".")+1);
 			propertyName = propertyName.substring(0, propertyName.indexOf("."));
@@ -57,31 +57,45 @@ public class DynaBeanUtils {
 			Method getterMethod = c.getMethod(getterName);
 			value = getterMethod.invoke(bean);
 			if (subProperty != null && value != null) {
-				value = getProperty(value, subProperty); 
+				value = getProperty(value, subProperty);
 			}
 		}
 		catch (Exception e) {
-			throw new PropertyNotFoundException(bean.getClass(), propertyName);
+			// try with isName if we have a primitive boolean
+			if (getPropertyClass(bean, propertyName) == Boolean.TYPE) {
+				getterName = isName(propertyName);
+				try {
+					Method getterMethod = c.getMethod(getterName);
+					value = getterMethod.invoke(bean);
+					if (subProperty != null && value != null) {
+						value = getProperty(value, subProperty);
+					}
+				} catch (Exception e2) {
+					throw new PropertyNotFoundException(bean.getClass(), propertyName);
+				}
+			} else {
+				throw new PropertyNotFoundException(bean.getClass(), propertyName);
+			}
 		}
 		return value;
-	}		
-	
+	}
+
 	/**
 	 * Sets a property of this object to a given value (using reflection)
-	 * 
+	 *
 	 * If propertyName contains '.' get property for first part of name and call setProperty of this property with rest of propertyName
-	 * 
+	 *
 	 * @param propertyName (simple or linked by dots (eg. user.name))
 	 * @param value The value (may also be an Array)
 	 * @throws PropertyNotFoundException if no getter or setter for propertyName is found
-	 * @throws WrongValueTypeException if class of value does not match class of property 
+	 * @throws WrongValueTypeException if class of value does not match class of property
 	 */
 	public static void setProperty(Object bean, String propertyName, Object value) throws PropertyNotFoundException, WrongValueTypeException {
 
 		Class<?> c = bean.getClass();
 
 		String subProperty = null;
-		
+
 		if (propertyName.indexOf(".") != -1) {
 			subProperty = propertyName.substring(propertyName.indexOf(".")+1);
 			propertyName = propertyName.substring(0, propertyName.indexOf("."));
@@ -129,33 +143,36 @@ public class DynaBeanUtils {
 	public static Class<?> getPropertyClass(Object bean, String propertyName) throws PropertyNotFoundException {
 		return getPropertyClass(bean.getClass(), propertyName);
 	}
-		
+
 	public static Class<?> getPropertyClass(Class<?> clazz, String propertyName) throws PropertyNotFoundException {
 
 		String originalPropertyName = propertyName;
 		String subProperty = null;
-				
+
 		if (propertyName.indexOf(".") != -1) {
 			subProperty = propertyName.substring(propertyName.indexOf(".")+1);
 			propertyName = propertyName.substring(0, propertyName.indexOf("."));
 		}
 		String getterName = getterName(propertyName);
 		try {
-			Method getterMethod = clazz.getMethod(getterName);
-			if (getterMethod != null) {
-				Class<?> type = getterMethod.getReturnType();
-				if (subProperty != null) {
-					type = getPropertyClass(type, subProperty);
-				}
-				return type;
-			} else {
-				throw new PropertyNotFoundException(clazz.getClass(), originalPropertyName);
+			Method getterMethod = null;
+			try {
+				getterMethod = clazz.getMethod(getterName);
+			} catch (NoSuchMethodException e) {
+				getterMethod = clazz.getMethod(isName(propertyName));	// also might throw exception but this is caught from the outer catch
+				// if not a boolean, isXY is not a valid 'getter'
+				if (getterMethod.getReturnType() != Boolean.TYPE) throw new PropertyNotFoundException(clazz.getClass(), originalPropertyName);
 			}
+			Class<?> type = getterMethod.getReturnType();
+			if (subProperty != null) {
+				type = getPropertyClass(type, subProperty);
+			}
+			return type;
 		}
 		catch (Exception e) {
 			throw new PropertyNotFoundException(clazz.getClass(), propertyName);
 		}
-	} 	
+	}
 
 	/**
 	 * Returns the names of all properties of this class.
@@ -177,8 +194,8 @@ public class DynaBeanUtils {
 	public static String[] getPropertyNames(Object bean, boolean includeSubProperties) {
 		return getPropertyNames(bean.getClass(), includeSubProperties);
 	}
-	
-	private static String[] getPropertyNames(Class<?> clazz, boolean includeSubProperties) {	
+
+	private static String[] getPropertyNames(Class<?> clazz, boolean includeSubProperties) {
 		Method[] methods = clazz.getMethods();
 		Set<String> properties = new HashSet<String>();
 		for (int i=0; i<methods.length; i++) {
@@ -187,8 +204,15 @@ public class DynaBeanUtils {
 				String propertyName = propertyName(m.getName());
 				String getterName = getterName(propertyName);
 				try {	// check if there is a getter-method.
-					Method getter = clazz.getMethod(getterName);
-					Class<?> type = getter.getReturnType();
+					Method getterMethod = null;
+					try {
+						getterMethod = clazz.getMethod(getterName);
+					} catch (NoSuchMethodException e) {
+						getterMethod = clazz.getMethod(isName(propertyName));	// also might throw exception but this is caught from the outer catch
+						// if not a boolean, isXY is not a valid 'getter'
+						if (getterMethod.getReturnType() != Boolean.TYPE) throw new PropertyNotFoundException(clazz.getClass(), propertyName);
+					}
+					Class<?> type = getterMethod.getReturnType();
 					if (type == m.getParameterTypes()[0]) {
 						properties.add(propertyName);
 						if (includeSubProperties) {
@@ -204,7 +228,7 @@ public class DynaBeanUtils {
 		properties.toArray(result);
 		return result;
 	}
-	
+
 	/**
 	 * Creates the getter name for a property.
 	 * @param propertyName
@@ -216,6 +240,16 @@ public class DynaBeanUtils {
 	}
 
 	/**
+	 * Creates the 'is' name for a boolean property.
+	 * @param propertyName
+	 * @return name of is method.
+	 */
+	private static String isName(String propertyName) {
+		String firstLetter = propertyName.substring(0, 1);
+		return "is" + firstLetter.toUpperCase() + propertyName.substring(1);
+	}
+
+	/**
 	 * Creates the setter name for a property
 	 * @param propertyName
 	 * @return name of setter method.
@@ -223,8 +257,8 @@ public class DynaBeanUtils {
 	private static String setterName(String propertyName) {
 		String firstLetter = propertyName.substring(0, 1);
 		return "set" + firstLetter.toUpperCase() + propertyName.substring(1);
-	} 
-	
+	}
+
 	/**
 	 * Extracts the property name from a getter/setter method name.
 	 * @param method
@@ -257,7 +291,7 @@ public class DynaBeanUtils {
 			}
 		}
 	}
-	
+
 	/**
 	 * checks whether the method is annotated as javax.persistence.Version
 	 * @param method
