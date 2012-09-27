@@ -1,17 +1,17 @@
 /*
- *  Copyright 2004-2010 Robert Brandner (robert.brandner@gmail.com) 
- *  
- *  Licensed under the Apache License, Version 2.0 (the "License"); 
- *  you may not use this file except in compliance with the License. 
- *  You may obtain a copy of the License at 
- *  
- *  http://www.apache.org/licenses/LICENSE-2.0 
- *  
- *  Unless required by applicable law or agreed to in writing, software 
- *  distributed under the License is distributed on an "AS IS" BASIS, 
- *  WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied. 
- *  See the License for the specific language governing permissions and 
- *  limitations under the License. 
+ *  Copyright 2004-2010 Robert Brandner (robert.brandner@gmail.com)
+ *
+ *  Licensed under the Apache License, Version 2.0 (the "License");
+ *  you may not use this file except in compliance with the License.
+ *  You may obtain a copy of the License at
+ *
+ *  http://www.apache.org/licenses/LICENSE-2.0
+ *
+ *  Unless required by applicable law or agreed to in writing, software
+ *  distributed under the License is distributed on an "AS IS" BASIS,
+ *  WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
+ *  See the License for the specific language governing permissions and
+ *  limitations under the License.
  */
 package panama.core;
 
@@ -53,8 +53,8 @@ public class HttpMultipartServletRequest implements HttpServletRequest {
 	protected Map fileItems = new HashMap();
 	protected static SimpleLogger log = new SimpleLogger(HttpMultipartServletRequest.class);
 
-	private ServletFileUpload fileUpload = new ServletFileUpload();	
-	
+	private ServletFileUpload fileUpload = new ServletFileUpload();
+
 	/**
 	 * Extracts files from MultipartRequests.
 	 * Files larger than sizeThreshold are stored in temporary files in System.getProperty("java.io.tmpdir")
@@ -73,29 +73,29 @@ public class HttpMultipartServletRequest implements HttpServletRequest {
 			// Process the uploaded items
 			if (items != null) {
 				for (Iterator it = items.iterator(); it.hasNext(); ) {
-				    FileItem item = (FileItem)it.next();
-			    	String fieldName = item.getFieldName();
-				    if (item.isFormField()) {
-				    	// process form field
-				    	List values = (List)parameters.get(fieldName);
-				    	if (values == null) {
-				    		values = new ArrayList();
-				    		parameters.put(fieldName, values);
-				    	}
-				    	try {
+					FileItem item = (FileItem)it.next();
+					String fieldName = item.getFieldName();
+					if (item.isFormField()) {
+						// process form field
+						List values = (List)parameters.get(fieldName);
+						if (values == null) {
+							values = new ArrayList();
+							parameters.put(fieldName, values);
+						}
+						try {
 							values.add(item.getString(request.getCharacterEncoding()));
 						} catch (UnsupportedEncodingException e) {
 							values.add(item.getString());
 						}
-				    } else {
-				    	// process uploaded file
-				    	List values = (List)fileItems.get(fieldName);
-				    	if (values == null) {
-				    		values = new ArrayList();
-				    		fileItems.put(fieldName, values);
-				    	}				    	
-				    	values.add(item);
-				    }
+					} else {
+						// process uploaded file
+						List values = (List)fileItems.get(fieldName);
+						if (values == null) {
+							values = new ArrayList();
+							fileItems.put(fieldName, values);
+						}
+						values.add(item);
+					}
 				}
 			}
 			listsToArrays(parameters);
@@ -135,7 +135,7 @@ public class HttpMultipartServletRequest implements HttpServletRequest {
 	 * with the execution of this method.
 	 * @param name - a String specifying the name of the parameter
 	 * @return a String representing the single value of the parameter
-	 */	
+	 */
 	public String getParameter(String name) {
 		String[] values = (String[])parameters.get(name);
 		return values != null ? (String)values[0] : null;
@@ -148,7 +148,7 @@ public class HttpMultipartServletRequest implements HttpServletRequest {
 	 * @return an Enumeration of String objects, each String containing the
 	 * name of a request parameter; or an empty Enumeration if the request
 	 * has no parameters
-	 */	
+	 */
 	public Enumeration getParameterNames() {
 		return Collections.enumeration(parameters.keySet());
 	}
@@ -163,7 +163,7 @@ public class HttpMultipartServletRequest implements HttpServletRequest {
 	 * is requested
 	 * @return an array of <code>String</code> objects containing the
 	 * parameter's values
-	 */	
+	 */
 	public String[] getParameterValues(String name) {
 		return (String[])parameters.get(name);
 	}
@@ -176,7 +176,7 @@ public class HttpMultipartServletRequest implements HttpServletRequest {
 	 * names as keys and parameter values as map values. The keys in the
 	 * parameter map are of type String. The values in the parameter map are
 	 * of type Object array.
-	 */	
+	 */
 	public Map getParameterMap() {
 		return Collections.unmodifiableMap(parameters);
 	}
@@ -192,33 +192,32 @@ public class HttpMultipartServletRequest implements HttpServletRequest {
 
 	/**
 	 * Like getParameterNames but for <code>FileItem</code>s.
-	 */	
+	 */
 	public Enumeration getFileItemNames() {
 		return Collections.enumeration(fileItems.keySet());
 	}
 
 	/**
 	 * Like getParameterValues but for <code>FileItem</code>s.
-	 */	
+	 */
 	public FileItem[] getFileItemValues(String name) {
-		return (FileItem[])parameters.get(name);
-
+		return (FileItem[])fileItems.get(name);
 	}
 
 	/**
 	 * Like getParameterMap but for <code>FileItem</code>s.
-	 */	
+	 */
 	public Map getFileItemMap() {
 		return Collections.unmodifiableMap(fileItems);
-	}	
-		
+	}
+
 	/**
 	 * Perhaps could return request.getReader()?
 	 */
 	public BufferedReader getReader() throws IOException {
-	    throw new IllegalStateException("Cannot get Reader for multipart/form-data type request");		
-	}	
-	
+		throw new IllegalStateException("Cannot get Reader for multipart/form-data type request");
+	}
+
 	// ========================================================================
 	// Direct Proxy of HttpServletRequest Methods
 	// ========================================================================
@@ -271,7 +270,7 @@ public class HttpMultipartServletRequest implements HttpServletRequest {
 		return request.getHeaderNames();
 	}
 
-	
+
 	/**
 	 * Calls same method on the underlying HttpServletRequest.
 	 * Refer to Servlet API for information about this method.
@@ -496,7 +495,7 @@ public class HttpMultipartServletRequest implements HttpServletRequest {
 	public ServletInputStream getInputStream() throws IOException {
 		return request.getInputStream();
 	}
-	
+
 	/**
 	 * Calls same method on the underlying HttpServletRequest.
 	 * Refer to Servlet API for information about this method.
@@ -586,7 +585,7 @@ public class HttpMultipartServletRequest implements HttpServletRequest {
 			throws java.io.UnsupportedEncodingException {
 		request.setCharacterEncoding(encoding);
 	}
-	
+
 	/**
 	 * Helper function to convert the values of the map which are all lists to arrays.
 	 * @param map
@@ -599,7 +598,7 @@ public class HttpMultipartServletRequest implements HttpServletRequest {
 		}
 		return map;
 	}
-	
+
 	/**
 	 * Helper function to convert a list to a string array.
 	 * @param list a list of strings
@@ -610,7 +609,7 @@ public class HttpMultipartServletRequest implements HttpServletRequest {
 		list.toArray(result);
 		return result;
 	}
-	
+
 	/**
 	 * Helper function to convert the values of the map which are all lists to arrays.
 	 * @param map
@@ -623,7 +622,7 @@ public class HttpMultipartServletRequest implements HttpServletRequest {
 		}
 		return map;
 	}
-	
+
 	/**
 	 * Helper function to convert a list to a FileItem array.
 	 * @param list a list of <code>FileItem</code>s
@@ -653,5 +652,5 @@ public class HttpMultipartServletRequest implements HttpServletRequest {
 	public int getRemotePort() {
 		// TODO Auto-generated method stub
 		return 0;
-	}	
+	}
 }
