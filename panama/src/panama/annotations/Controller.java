@@ -1,5 +1,5 @@
 /**
- * 
+ *
  */
 package panama.annotations;
 
@@ -17,4 +17,5 @@ import java.lang.annotation.Target;
 public @interface Controller {
 	String alias() default "";
 	String defaultAction() default "";
+	boolean isDefaultController() default false;
 }

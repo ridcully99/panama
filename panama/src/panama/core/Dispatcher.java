@@ -16,7 +16,6 @@
 package panama.core;
 
 import java.io.IOException;
-import java.io.InputStream;
 import java.lang.reflect.InvocationTargetException;
 import java.lang.reflect.Method;
 import java.util.Arrays;
@@ -85,12 +84,15 @@ public class Dispatcher implements Filter {
 	private final static int CAN_HANDLE_REQUEST_NO = 0;
 	private final static int CAN_HANDLE_REQUEST_YES = 1;
 	private final static int CAN_HANDLE_REQUEST_REDIRECT = 2;
+	private final static int CAN_HANDLE_REQUEST_REDIRECT_TO_DEFAULT_CONTROLLER = 3;
 
 	/** Simply! Logging */
 	protected static SimpleLogger log = new SimpleLogger(Dispatcher.class);
 
 	/** Mapping controller alias or FQCN to Class itself; filled in init(), later on only read from */
 	private Map<String, Class<? extends BaseController>> controllerClasses = new HashMap<String, Class<? extends BaseController>>();
+	/** Key for default controller class (if specified) in controllerClasses -- value is crafted in a way never to collide with a normal alias or FQCN */
+	private final static String DEFAULT_CONTROLLER_KEY = "/default/controller/class/";
 
 	/** Mapping Controller-FQCN#actionName to Method; ; filled in init(), later on only read from */
 	private Map<String, Method> actionMethods = new HashMap<String, Method>();
@@ -187,6 +189,16 @@ public class Dispatcher implements Filter {
 				httpRes.sendRedirect(httpRes.encodeRedirectURL(url));
 				return;
 				}
+			case CAN_HANDLE_REQUEST_REDIRECT_TO_DEFAULT_CONTROLLER:
+				{
+				Class<?> controllerClass = controllerClasses.get(DEFAULT_CONTROLLER_KEY);
+				Controller annotation = controllerClass.getAnnotation(Controller.class);
+				String ctrlName = annotation != null && !StringUtils.isEmpty(annotation.alias()) ? annotation.alias() : controllerClass.getName();
+				String url = ctrlName + "/";	// relative url; by appending the '/' this targets the default action for the controller; otherwise we'd get another redirect that adds just the / (see above)
+				HttpServletResponse httpRes = (HttpServletResponse)res;
+				httpRes.sendRedirect(httpRes.encodeRedirectURL(url));
+				return;
+				}
 			default:
 				filterChain.doFilter(req, res);	// pass along
 		}
@@ -209,6 +221,9 @@ public class Dispatcher implements Filter {
 			return CAN_HANDLE_REQUEST_NO;
 		}
 		String path = ((HttpServletRequest)req).getServletPath();
+		if ((path == null || path.length() == 0 || path.equals("/")) && controllerClasses.containsKey(DEFAULT_CONTROLLER_KEY)) {
+			return CAN_HANDLE_REQUEST_REDIRECT_TO_DEFAULT_CONTROLLER;
+		}
 		int result = CAN_HANDLE_REQUEST_NO;
 		String[] ca = extractControllerAndActionNames(path);
 		String ctrlName = ca[0];
@@ -302,6 +317,10 @@ public class Dispatcher implements Filter {
 			}
 			controllerClasses.put(n, c);
 			log.debug(c+" -> "+c);
+			if (c.getAnnotation(Controller.class).isDefaultController()) {
+				controllerClasses.put(DEFAULT_CONTROLLER_KEY, c);
+				log.debug(DEFAULT_CONTROLLER_KEY+ "-> "+c);
+			}
 			collectActions(c);
 			String alias = c.getAnnotation(Controller.class).alias();
 			if 	(StringUtils.isNotEmpty(alias)) {
