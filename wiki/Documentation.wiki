@@ -35,7 +35,7 @@ By setting the optional annotation property `isDefaultController=true`, you can 
 
 *Caution*: In order to make this work as intended, make sure you have neither a `welcome-file-list` in your `web.xml`, nor any of the default welcome-files (like `index.html`, `index.jsp`) in your web-content folder. Otherwise, the web-server will automatically add the name of the welcome-file to the URL and so that file will be shown.
 
-*Caution*: You will also want to specify a _`defaultAction`_ for the controller (see below).
+*Caution*: You will also want to specify a `defaultAction` for the controller (see below).
 
 == Actions ==
 
