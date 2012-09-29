@@ -29,6 +29,14 @@ Controllers are classes that provide a set of action methods. Which and how many
 
 To be recognized as a controller by Panama, a class must be derived from the `BaseController` class and must be annotated with the `@Controller` annotation. This annotation has an optional `alias` property that allows you to give your controller class a nice short name, which can also be used in the URL. If you do not provide an alias, you have to specify the fully qualified class name of your controller in the URL (which might look a bit odd). Note, that even if your controller has an alias, you can also use the fully qualified class name instead. 
 
+=== Default Controller ===
+
+By setting the optional annotation property `isDefaultController=true`, you can make a controller the default controller of your project. In this case -- if an URL contains nothing but the servlet-context, a redirect to the same URL with the controller's name or alias is issued.
+
+*Caution*: In order to make this work as intended, make sure you have neither a welcome-file-list in your web.xml, nor any of the default welcome-files (like index.html, index.jsp) in your web-content folder. Otherwise, the web-server will automatically add the name of the welcome-file to the URL and so that file will be shown.
+
+*Caution*: You will also want to specify a _defaultAction_ for the controller (see below).
+
 == Actions ==
 
 Actions are methods of a controller class. To be recognized as an action by Panama, a method must have the signature `public Target actionName()` and must be annotated with the `@Action` annotation. This annotation has an optional `alias` property that allows you to give your action a name that differs from the method name.
