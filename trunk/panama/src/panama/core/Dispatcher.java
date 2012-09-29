@@ -1,21 +1,22 @@
 /*
- *  Copyright 2004-2010 Robert Brandner (robert.brandner@gmail.com) 
- *  
- *  Licensed under the Apache License, Version 2.0 (the "License"); 
- *  you may not use this file except in compliance with the License. 
- *  You may obtain a copy of the License at 
- *  
- *  http://www.apache.org/licenses/LICENSE-2.0 
- *  
- *  Unless required by applicable law or agreed to in writing, software 
- *  distributed under the License is distributed on an "AS IS" BASIS, 
- *  WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied. 
- *  See the License for the specific language governing permissions and 
- *  limitations under the License. 
+ *  Copyright 2004-2010 Robert Brandner (robert.brandner@gmail.com)
+ *
+ *  Licensed under the Apache License, Version 2.0 (the "License");
+ *  you may not use this file except in compliance with the License.
+ *  You may obtain a copy of the License at
+ *
+ *  http://www.apache.org/licenses/LICENSE-2.0
+ *
+ *  Unless required by applicable law or agreed to in writing, software
+ *  distributed under the License is distributed on an "AS IS" BASIS,
+ *  WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
+ *  See the License for the specific language governing permissions and
+ *  limitations under the License.
  */
 package panama.core;
 
 import java.io.IOException;
+import java.io.InputStream;
 import java.lang.reflect.InvocationTargetException;
 import java.lang.reflect.Method;
 import java.util.Arrays;
@@ -58,55 +59,55 @@ import com.avaje.ebeaninternal.server.lib.ShutdownManager;
 
 /**
  * The main dispatcher, implemented as a filter.
- * 
+ *
  * @author Robert
  */
 public class Dispatcher implements Filter {
 
 	private static final long serialVersionUID = 1L;
-	
+
 	public final static String PREFIX = "panama";
 
 	/* key for app name (i.e. filtername) in application context */
 	public final static String APP_NAME_KEY = PREFIX+"_application_name";
-	
+
 	public final static String PARAM_LANGUAGES = PREFIX+".languages";
 	public final static String PARAM_MAXFILEUPLOADSIZE = PREFIX+".maxfileuploadsize";
 
 	/* keys for objects put in request context */
 	public final static String CONTEXT_KEY = "context";
 	public final static String ACTION_INVOCATION_MODE_KEY = PREFIX+"action_invocation_mode";
-	
+
 	/* values for ACTION_INVOCATION_MODE_KEY */
 	public final static String ACTION_INVOCATION_PROGRAMATICALLY = "programatically";
 	public final static String ACTION_INVOCATION_BY_URL = "by_url";
-	
+
 	private final static int CAN_HANDLE_REQUEST_NO = 0;
 	private final static int CAN_HANDLE_REQUEST_YES = 1;
 	private final static int CAN_HANDLE_REQUEST_REDIRECT = 2;
-	
+
 	/** Simply! Logging */
 	protected static SimpleLogger log = new SimpleLogger(Dispatcher.class);
 
 	/** Mapping controller alias or FQCN to Class itself; filled in init(), later on only read from */
 	private Map<String, Class<? extends BaseController>> controllerClasses = new HashMap<String, Class<? extends BaseController>>();
-	
+
 	/** Mapping Controller-FQCN#actionName to Method; ; filled in init(), later on only read from */
 	private Map<String, Method> actionMethods = new HashMap<String, Method>();
 
 	/** Configuration (from FilterConfig.InitParameters) */
 	private Map<String, String> initParams = new HashMap<String, String>();
-	
+
 	/** Application context (set in init() method) */
 	private ServletContext applicationContext = null;
-	
+
 	/** Multilanguage support */
 	protected List<String> supportedLanguages = null;
-	
+
 	/** Velocity */
 	private VelocityEngine velocityEngine;
 	private ViewToolManager velocityToolManager;
-	
+
 	/** Startup time */
 	private Date startupAt = new Date();
 
@@ -115,22 +116,26 @@ public class Dispatcher implements Filter {
 	 * This is called synchronized by the servlet container.
 	 */
 	public void init(FilterConfig filterConfig) {
-		System.out.println(Version.LOGO_ASCIIART);		
+		System.out.println(Version.LOGO_ASCIIART);
 		applicationContext = filterConfig.getServletContext();
 		applicationContext.setAttribute(APP_NAME_KEY, filterConfig.getFilterName());
-		
+
 		@SuppressWarnings("rawtypes")
 		Enumeration names = filterConfig.getInitParameterNames();
 		while(names.hasMoreElements()) {
 			String key = (String)names.nextElement();
 			initParams.put(key, filterConfig.getInitParameter(key));
 		}
-		
+
 		/* init velocity */
 		try {
 			ClassLoader cl = this.getClass().getClassLoader();
 			Properties velocityProperties = new Properties();
-			velocityProperties.load(cl.getResourceAsStream("velocity.properties"));
+			try {
+				velocityProperties.load(cl.getResourceAsStream("velocity.properties"));
+			} catch (Exception e) {
+				log.warn("Error reading velocity.properties, using internal defaults instead");
+			}
 			velocityEngine = new VelocityEngine(velocityProperties);
 			/* init velocity tool manager -- automatically finds all default-tools, the framework's tools as defined in tools.xml and all tools of the web-app specified in tools.xml at classpath-root. */
 			velocityToolManager = new ViewToolManager(applicationContext, false, false);
@@ -140,7 +145,7 @@ public class Dispatcher implements Filter {
 			log.fatal("velocity init failed!");
 			log.fatalException(e);
 		}
-		
+
 		String languages = getInitParam(PARAM_LANGUAGES);
 		String[] supported;
 		if (languages == null) {
@@ -148,11 +153,11 @@ public class Dispatcher implements Filter {
 		} else {
 			supported = languages.split("\\s*,\\s*");
 			if (supported == null || supported.length == 0) {
-				supported = new String[]{"en"};	
+				supported = new String[]{"en"};
 			}
 		}
 		supportedLanguages = Arrays.asList(supported);
-		
+
 		try {
 			collectControllers();
 		} catch (Exception e) {
@@ -170,7 +175,7 @@ public class Dispatcher implements Filter {
 				handleRequest(httpReq, httpRes);
 				return;
 				}
-			case CAN_HANDLE_REQUEST_REDIRECT: 
+			case CAN_HANDLE_REQUEST_REDIRECT:
 				{
 				HttpServletRequest httpReq = (HttpServletRequest)req;
 				HttpServletResponse httpRes = (HttpServletResponse)res;
@@ -185,7 +190,7 @@ public class Dispatcher implements Filter {
 			default:
 				filterChain.doFilter(req, res);	// pass along
 		}
-	}	
+	}
 
 	/**
 	 * Checks if there is a controller and action to handle the path.
@@ -194,7 +199,7 @@ public class Dispatcher implements Filter {
 	 * - must be HttpServletRequest and HttpServletResponse
 	 * - Request-URL must specify existing Controller
 	 * - Request-URL must specify an action or specified controller must have a default action
-	 * 
+	 *
 	 * @param req
 	 * @param res
 	 * @return wether we can handle this request, a redirect is required or it should be passed along the filter chain.
@@ -226,13 +231,13 @@ public class Dispatcher implements Filter {
 			}
 		}
 		return result;
-	}	
-	
+	}
+
 	/**
 	 * This is the main dispatching method, handling all requests.
 	 * It parses request, extracts controller and action information,
 	 * invokes action and forwards to rendering the template.
-	 */	
+	 */
 	public void handleRequest(HttpServletRequest req, HttpServletResponse res) {
 
 		Context ctx = null;
@@ -266,11 +271,11 @@ public class Dispatcher implements Filter {
 			} catch (IOException e1) {
 				log.fatalException(e);
 			}
-		} finally {	
+		} finally {
 			Context.destroyInstance();
 		}
 	}
-	
+
 	/**
 	 * Scan WEB-INF/lib and WEB-INF/classes for Controller classes and puts all in controllerClasses map.
 	 * @throws IOException
@@ -286,7 +291,7 @@ public class Dispatcher implements Filter {
 		adb.scanArchives(WarUrlFinder.findWebInfLibClasspaths(applicationContext));
 
 		Set<String> ctrls = adb.getAnnotationIndex().get(Controller.class.getName());
-		
+
 		for (String n : ctrls) {
 			Class<? extends BaseController> c = null;
 			try {
@@ -314,20 +319,20 @@ public class Dispatcher implements Filter {
 				log.debug(alias+" -> "+n);
 			}
 		}
-	}	
-	
+	}
+
 	/**
 	 * Collect all actions of specified controller and put them in actionMethods map.
 	 * Uses classname and method-name for key. If alias is provided a second entry using alias in the key is made.
 	 * If controller has a default action specified use empty string for method part of key.
-	 *  
+	 *
 	 * @param controllerName
 	 * @param clazz
 	 */
 	private void collectActions(Class<? extends BaseController> clazz) {
 		String defaultActionName = getDefaultActionName(clazz);
 		String defaultActionKey = clazz.getName()+"#";
-		
+
 		for (Method m : clazz.getMethods()) {
 			if (m.isAnnotationPresent(Action.class) && m.getParameterTypes().length == 0) {
 				Class<?> returnType = m.getReturnType();
@@ -347,7 +352,7 @@ public class Dispatcher implements Filter {
 								log.warn("Action alias '"+alias+"' in "+clazz.getName()+" contains illegal characters. Ignoring alias.");
 							} else {
 								key = clazz.getName()+"#"+alias;
-								actionMethods.put(key, m);	
+								actionMethods.put(key, m);
 								log.debug(key+" -> "+m.getName());
 								if (alias.equals(defaultActionName)) {
 									actionMethods.put(defaultActionKey, m);
@@ -370,7 +375,7 @@ public class Dispatcher implements Filter {
 
 	/**
 	 * Creates a new instance for the controller specified by nameOrAlias
-	 * 
+	 *
 	 * @param nameOrAlias FQCN or alias of a controller class.
 	 * @return Controller object or null
 	 */
@@ -387,8 +392,8 @@ public class Dispatcher implements Filter {
 			}
 		}
 		return ctrl;
-	}	
-	
+	}
+
 	/**
 	 * Executes action derived from specified path.
 	 * @see #handleAction(Context, String)
@@ -398,29 +403,29 @@ public class Dispatcher implements Filter {
 	 * 			in request context using the ACTION_INVOKATION_MODE_KEY. This may come handy for those who
 	 * 			need to know if an action was invoked by an url or programatically
 	 * @return The target returned by the action or some error target in case of an error.
-	 * @throws IOException 
+	 * @throws IOException
 	 */
 	protected Target handleAction(Context ctx, String path, String invocationMode) throws IOException {
-	
+
 		/* put invokation mode in request context */
 		ctx.put(ACTION_INVOCATION_MODE_KEY, invocationMode);
-		
+
 		String[] ca = extractControllerAndActionNames(path);
 		String ctrlName = ca[0];
 		String actionName = ca[1];
-		
+
 		/* create new instance of controller for specified ctrlName */
 		BaseController ctrl = getController(ctrlName);
-		
+
 		TestTimer timer = new TestTimer("execute");
 		try {
 			return executeAction(ctx, ctrl, actionName);
 		} catch (NoSuchActionException nme) {
-			log.warn("no such action: \""+ctrl.getClass().getName()+"/"+actionName+"\"");			
+			log.warn("no such action: \""+ctrl.getClass().getName()+"/"+actionName+"\"");
 			ctx.getResponse().sendError(HttpServletResponse.SC_NOT_FOUND);
 			return null;
 		} catch (AuthorizationException ae) {
-			log.warn("no authorization for action: \""+ctrl.getClass().getName()+"/"+actionName+"\"");			
+			log.warn("no authorization for action: \""+ctrl.getClass().getName()+"/"+actionName+"\"");
 			ctx.getResponse().sendError(HttpServletResponse.SC_FORBIDDEN);
 			return null;
 		} catch (Exception e1) {
@@ -429,13 +434,13 @@ public class Dispatcher implements Filter {
 			log.fatalException(e1);
 			ctx.getResponse().sendError(HttpServletResponse.SC_INTERNAL_SERVER_ERROR);
 			return null;
-		}	
+		}
 		finally {
 			timer.done();
 		}
 	}
 
-	/** 
+	/**
 	 * Extract controller and action from servlet-path
 	 * @return String Array containing ctrlName and actionName (both may be null)
 	 */
@@ -465,8 +470,8 @@ public class Dispatcher implements Filter {
 	 * @param ctx A context
 	 * @param path A path to an action. See description for details.
 	 * @return The target returned by the action or some error target in case of an error.
-	 * @throws IOException 
-	 */	
+	 * @throws IOException
+	 */
 	public Target handleAction(Context ctx, String path) throws IOException {
 		return handleAction(ctx, path, ACTION_INVOCATION_PROGRAMATICALLY);
 	}
@@ -476,9 +481,9 @@ public class Dispatcher implements Filter {
 			actionName = getDefaultActionName(ctrl.getClass());
 		}
 		try {
-			/* allow pre-processing */						
-			ctrl.beforeAction(actionName);				
-			
+			/* allow pre-processing */
+			ctrl.beforeAction(actionName);
+
 			/* find and invoke action */
 			Target target = null;
 			StringBuffer actionKey = new StringBuffer(ctrl.getClass().getName()).append("#").append(actionName);
@@ -520,7 +525,7 @@ public class Dispatcher implements Filter {
 			log.error("could not invoke method '"+method.getName()+"'");
 			log.errorException(e);
 		}
-		return new NullTarget();		
+		return new NullTarget();
 	}
 
 	/**
@@ -530,7 +535,7 @@ public class Dispatcher implements Filter {
 	public ServletContext getApplicationContext() {
 		return applicationContext;
 	}
-	
+
 	/**
 	 * Gets date/time when Application was started. Useful to calculate up-time.
 	 * @return startup date/time
@@ -538,15 +543,15 @@ public class Dispatcher implements Filter {
 	public Date getStartupAt() {
 		return startupAt;
 	}
-	
+
 	/**
 	 * Gets velocity engine
 	 * @return The engine
 	 */
 	public VelocityEngine getVelocityEngine() {
 		return velocityEngine;
-	}	
-	
+	}
+
 	/**
 	 * Gets velocity tool manager
 	 * @return The toolmanager
@@ -554,7 +559,7 @@ public class Dispatcher implements Filter {
 	public ViewToolManager getVelocityToolManager() {
 		return velocityToolManager;
 	}
-	
+
 	/**
 	 * Gets value of init-parameter specified in filter declaration in web.xml
 	 * @param key the parameter key
@@ -563,7 +568,7 @@ public class Dispatcher implements Filter {
 	public String getInitParam(String key) {
 		return initParams.get(key);
 	}
-	
+
 	/**
 	 * Gets value of init-parameter specified in filter declaration in web.xml
 	 * @param key the parameter key
@@ -573,14 +578,14 @@ public class Dispatcher implements Filter {
 	public String getInitParam(String key, String defaultValue) {
 		String s = getInitParam(key);
 		return s == null ? defaultValue : s;
-	}	
-	
+	}
+
 	@Override
 	public void destroy() {
 		System.out.println("Good Bye and Good Luck. "+applicationContext.getAttribute(APP_NAME_KEY)+" was up for "+getFormattedUptime()+".");
 		ShutdownManager.shutdown();	// Automatic shutdown of Ebean sometimes throws NPE when invoked too late, so we do it here explicitly.
 	}
-	
+
 	/**
 	 * Finds best fitting locale from supported and accepted locales.
 	 * @param supported ISO languages codes of locales accepted by the application
