@@ -112,7 +112,9 @@ input.encoding = UTF-8
 output.encoding = UTF-8
 }}}
 
-Please see the `velocity.properties` of the _panama-examples_ project for more options and explanations and of course the [http://velocity.apache.org/engine/releases/velocity-1.6/developer-guide.html#Velocity_Configuration_Keys_and_Values official documentation].
+Please see the `velocity.properties` of the _panama-examples_ project for more options and explanations and of course the [http://velocity.apache.org/engine/releases/velocity-1.7/developer-guide.html#Velocity_Configuration_Keys_and_Values official documentation].
+
+If no `velocity.properties` file is found, Panama uses a reasonable [http://code.google.com/p/panama/source/browse/trunk/panama/src/panama-default-velocity.properties set of default properties]. 
 
 == Pre-Set Variables ==
 
