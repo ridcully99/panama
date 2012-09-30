@@ -1,17 +1,17 @@
 /*
- *  Copyright 2004-2010 Robert Brandner (robert.brandner@gmail.com) 
- *  
- *  Licensed under the Apache License, Version 2.0 (the "License"); 
- *  you may not use this file except in compliance with the License. 
- *  You may obtain a copy of the License at 
- *  
- *  http://www.apache.org/licenses/LICENSE-2.0 
- *  
- *  Unless required by applicable law or agreed to in writing, software 
- *  distributed under the License is distributed on an "AS IS" BASIS, 
- *  WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied. 
- *  See the License for the specific language governing permissions and 
- *  limitations under the License. 
+ *  Copyright 2004-2010 Robert Brandner (robert.brandner@gmail.com)
+ *
+ *  Licensed under the Apache License, Version 2.0 (the "License");
+ *  you may not use this file except in compliance with the License.
+ *  You may obtain a copy of the License at
+ *
+ *  http://www.apache.org/licenses/LICENSE-2.0
+ *
+ *  Unless required by applicable law or agreed to in writing, software
+ *  distributed under the License is distributed on an "AS IS" BASIS,
+ *  WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
+ *  See the License for the specific language governing permissions and
+ *  limitations under the License.
  */
 package panama.core;
 
@@ -26,29 +26,31 @@ public class Version {
 	// a: Version
 	// b: Revision (increases when cool new features are added)
 	// c: Minor	(increases when updates or fixes are made - even numbers mark stable releases)
-	
-	public final static String VERSION = "3.3.9 alpha";
-	
-	public final static String LOGO_ASCIIART = 
+
+	public final static String VERSION = "3.4.0 alpha";
+
+	public final static String LOGO_ASCIIART =
 	" ______ _______ _______ _______ _______ _______ \n"+
 	"|   __ \\   _   |    |  |   _   |   |   |   _   |\n"+
 	"|    __/       |       |       |       |       |\n"+
 	"|___|  |___|___|__|____|___|___|__|_|__|___|___|\n"+
 	"\n"+
 	"Lightweight Web-Application Framework "+VERSION+"\n";
-		
+
 
 	/* 	History
 	 * ---------------------------------------------------------------------------------
-     * 3.3.9    2012-02-10 3.3.9 begonnen -- kleine Bereinigungen bei Sichtbarkeit und Klassensicherheit, noch keine neuen Features
+	 * 3.4.0a	2012-09-30 upgrade to velocity 1.7
+	 * 3.3.9    2012-09-2x implemented a few issues #25,#30,#31...
+	 * 3.3.9    2012-02-10 3.3.9 begonnen -- kleine Bereinigungen bei Sichtbarkeit und Klassensicherheit, noch keine neuen Features
 	 * 3.3.8    2012-01-31 Optimized PersistentBean#findOrCreate(), no casts necessary anymore; updated to Ebean v2.7.4
-	 * 3.3.8    2012-01-29 BaseController logger now references BaseController.class instead of Dispatcher.class, reduced number of BaseController#redirectToAction() methods keeping only those with parameter names and values as alternating list of arguments.  
+	 * 3.3.8    2012-01-29 BaseController logger now references BaseController.class instead of Dispatcher.class, reduced number of BaseController#redirectToAction() methods keeping only those with parameter names and values as alternating list of arguments.
 	 * 3.3.7    2012-01-24 Fixed bug in QueryListModel (issue #26)
 	 * 3.3.6	2011-11-18 Added a few convinience methods (see issue #22, #23)
 	 * 3.3.5    2011-08-15 Added source of simple-log instead of the package, as it isn't maintained anymore since years and I don't want to lose it.
 	 * 3.3.4    2011-06-24 Fixed issue #11 (fluid validator adding), #13 (shortening id field length of PersistentBean)
 	 * 3.3.3    2011-04-28 Explicity destroying/removing value of Context-ThreadLocal at the end of handleRequest (obviously it's a memory leak otherwise)
-	 * 3.3.2    2011-04-25 Read parameter map from request lazily (See Issue #10) 
+	 * 3.3.2    2011-04-25 Read parameter map from request lazily (See Issue #10)
 	 * 3.3.1    2011-04-13 Fixed a problem when tomcat restores tables in session scope after restart and query is gone.
 	 * 3.3.0    2011-04-01 Reduced allowed URLs to controller[/action], checking for illegal aliases; update to Ebean 7.2.3 and adaptions to Filters to work with it.
 	 * 3.2.6	2011-03-23 Fixed massive bug with ThreadLocal context (Gott sei Dank gefunden!)
@@ -78,16 +80,15 @@ public class Version {
 	 * 1.9.6  - 2008-06-03 pandora.showerrors Config-Parameter (allows to not show exceptions in production environment)
 	 * 1.9.5  - 2008-05-21 Changed signature of ValidatorException constructor to use a list for additional parameters
 	 * 1.9.4  - 2008-05-15 Fixed MessageTool flaw
-	 * 1.9.3  - 2008-04-?? Create context in synchronized way and also the Hibernate session if required 
+	 * 1.9.3  - 2008-04-?? Create context in synchronized way and also the Hibernate session if required
 	 * 1.9.1  - 2006-12-10 Switched common Exceptions (ForceTarget...) to RuntimeExceptions for cleaner source-code, switched to Java 5
 	 * 1.7.11 - 2006-11-09 Additional addAction methods and a GenericPandoraAction class
-	 * 1.7.10 - 2006-10-17 Multi-Language support via PolyglotFilter 
+	 * 1.7.10 - 2006-10-17 Multi-Language support via PolyglotFilter
 	 * 1.7.02 - 2006-10-06 New href() method in PandorasBox Tool - for encodeURL() in templates
 	 * 1.7.01 - 2006-08-31 EasyCache added (wrapper for WhirlyCache)
 	 * 1.6.23 - 2006-08-22 renamed FastDBTable to FastCriteriaTable and fixed behavior that getRows returned only rows of current page.
 	 * 1.6.22 - 2006-08-19 DefaultTable sorting of String properties is now case-insensitive
 	 */
-	
+
 }
 
-	
