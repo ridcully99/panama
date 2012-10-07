@@ -27,7 +27,7 @@ public class Version {
 	// b: Revision (increases when cool new features are added)
 	// c: Minor	(increases when updates or fixes are made - even numbers mark stable releases)
 
-	public final static String VERSION = "3.4.0 alpha";
+	public final static String VERSION = "3.4.0";
 
 	public final static String LOGO_ASCIIART =
 	" ______ _______ _______ _______ _______ _______ \n"+
@@ -40,6 +40,7 @@ public class Version {
 
 	/* 	History
 	 * ---------------------------------------------------------------------------------
+	 * 3.4.0    2012-10-07 updated some libraries, pushed open issues to version 3.5
 	 * 3.4.0a	2012-09-30 upgrade to velocity 1.7
 	 * 3.3.9    2012-09-2x implemented a few issues #25,#30,#31...
 	 * 3.3.9    2012-02-10 3.3.9 begonnen -- kleine Bereinigungen bei Sichtbarkeit und Klassensicherheit, noch keine neuen Features
