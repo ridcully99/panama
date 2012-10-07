@@ -1,0 +1,32 @@
+<?xml version="1.0"?>
+<!DOCTYPE hibernate-mapping PUBLIC
+        "-//Hibernate/Hibernate Mapping DTD//EN"
+        "http://hibernate.sourceforge.net/hibernate-mapping-3.0.dtd">
+
+<hibernate-mapping>
+	
+	<!-- ================================================================= -->
+	<!-- = Entry                                                         = -->
+	<!-- ================================================================= -->
+
+    <class name="panama.tests.entities.PolyglotEntry" table="polyglotentry">
+
+		<cache usage="read-write" />
+
+        <id name="id" type="string" column="id">
+            <generator class="assigned"/>
+        </id>	
+		<timestamp name="timeStamp" column="tstamp" />
+
+		<property name="message" type="string" />
+		<property name="name" type="string" />
+		<property name="email" type="string" />
+	
+		<filter name="PolyglotFilter" condition="((id like :languagePattern) or (id like '%|**'))" />
+    </class>
+
+		<filter-def name="PolyglotFilter">
+	  	   <filter-param name="languagePattern" type="string" />
+	    </filter-def>		
+					
+</hibernate-mapping>
