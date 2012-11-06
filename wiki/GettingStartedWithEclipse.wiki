@@ -16,7 +16,7 @@ To follow this guide, you'll need an Eclipse IDE for Java EE Developers (3.5 or 
   # [http://code.google.com/p/panama/downloads/list Download] the latest *`panama-x.y.z.jar`* and put it into your project's `WEB-INF/lib` directory.
   # [http://code.google.com/p/panama/downloads/list Download] the matching *`panama-x.y.z-dependencies.zip`*, and unpack it into your project's `WEB-INF/lib` directory. There should now be a list of jar Files. These are required by Panama.
   # Create a package named `panama.kickstart` in your project's `src` directory.
-  # Create a class file named `ExampleController.java` in there. Edit it and replace all of it's content with the following and save the file:
+  # Create a class file named `ExampleController.java` in there and edit it to look like this:
 {{{
 package panama.kickstart;
 
@@ -34,7 +34,7 @@ public class ExampleController extends BaseController {
     }
 }
 }}}
-  # Create a text-file in the same package and name it `example.vm`. Edit it, put the following text there and save it.
+  # Create a text-file named `example.vm` in the same package and edit it to look like this:
 {{{
 <html>
     <head><title>example</title></head>
@@ -43,8 +43,11 @@ public class ExampleController extends BaseController {
     </body>
 </html>
 }}}
-  # Edit your project's `WEB-INF/web.xml` and replace everything after `</display-name>` all the way down to `</web-app>` with the following snippet:
+  # Edit your project's `WEB-INF/web.xml` to look like this:
 {{{
+<?xml version="1.0" encoding="UTF-8"?>
+<web-app xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xmlns="http://java.sun.com/xml/ns/javaee" xmlns:web="http://java.sun.com/xml/ns/javaee/web-app_2_5.xsd" xsi:schemaLocation="http://java.sun.com/xml/ns/javaee http://java.sun.com/xml/ns/javaee/web-app_2_5.xsd" id="WebApp_ID" version="2.5">
+<display-name>your project's name</display-name>
   <filter>
     <filter-name>panama</filter-name>
     <filter-class>panama.core.Dispatcher</filter-class>
@@ -53,9 +56,6 @@ public class ExampleController extends BaseController {
     <filter-name>panama</filter-name>
     <url-pattern>/*</url-pattern>
   </filter-mapping>
-  <welcome-file-list>
-    <welcome-file>index.html</welcome-file>
-  </welcome-file-list>
 </web-app>
 }}}
   # Publish your application onto your application server.
