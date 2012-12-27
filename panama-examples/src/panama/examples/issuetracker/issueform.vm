@@ -5,18 +5,34 @@
 	</head>
 	<body>
 		#set($examplename="Issue Tracker")
-		#parse("/panama/examples/exampleheader.vm")		
+		#parse("/panama/examples/exampleheader.vm")
 		<form action="save" method="post">
 		<input type="hidden" name="id" value="$formdata.id" />
 		<table>
 			<tr>
-				<td>Title</td>
-				<td><input name="title" value="$esc.javascript($formdata.title)"></td>
+				<td>Title *</td>
+				<td>
+					<input name="title" value="$esc.javascript($formdata.title)">
+					$!formdata.errors.title.message
+				</td>
 			</tr>
 			<tr>
 				<td>Description</td>
 				<td><input name="description" value="$esc.javascript($formdata.description)"></td>
 			</tr>
+			<tr>
+				<td>Foos</td>
+				<td>
+					<select name="tags" multiple>
+					#foreach($_f in $alltags)
+						#set($_sel = "")
+						#if ($formdata.tags.contains($_f.id))
+							#set($_sel = 'selected="selected"')
+						#end
+					<option $_sel value="$_f.id">$_f.name</option>
+					#end
+					</select>
+				</td>
 			<tr>
 				<td></td>
 				<td><input type="submit" name="ok" value="OK" /><input type="submit" name="cancel" value="Cancel" />
