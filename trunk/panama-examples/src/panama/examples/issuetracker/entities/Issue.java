@@ -1,17 +1,17 @@
 /*
- *  Copyright 2004-2010 Robert Brandner (robert.brandner@gmail.com) 
- *  
- *  Licensed under the Apache License, Version 2.0 (the "License"); 
- *  you may not use this file except in compliance with the License. 
- *  You may obtain a copy of the License at 
- *  
- *  http://www.apache.org/licenses/LICENSE-2.0 
- *  
- *  Unless required by applicable law or agreed to in writing, software 
- *  distributed under the License is distributed on an "AS IS" BASIS, 
- *  WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied. 
- *  See the License for the specific language governing permissions and 
- *  limitations under the License. 
+ *  Copyright 2004-2010 Robert Brandner (robert.brandner@gmail.com)
+ *
+ *  Licensed under the Apache License, Version 2.0 (the "License");
+ *  you may not use this file except in compliance with the License.
+ *  You may obtain a copy of the License at
+ *
+ *  http://www.apache.org/licenses/LICENSE-2.0
+ *
+ *  Unless required by applicable law or agreed to in writing, software
+ *  distributed under the License is distributed on an "AS IS" BASIS,
+ *  WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
+ *  See the License for the specific language governing permissions and
+ *  limitations under the License.
  */
 package panama.examples.issuetracker.entities;
 
@@ -43,16 +43,16 @@ public class Issue extends PersistentBean {
 	private String state;
 	@ManyToMany(cascade=CascadeType.ALL)
 	@JoinTable(
-		      name="issue_foo",
-		      joinColumns={@JoinColumn(name="issue_id", referencedColumnName="id")},
-		      inverseJoinColumns={@JoinColumn(name="foo_id", referencedColumnName="id")})
-	private Set<Foo> foos;
-	
-	public Set<Foo> getFoos() {
-		return foos;
+			name="issue_tag",
+			joinColumns={@JoinColumn(name="issue_id", referencedColumnName="id")},
+			inverseJoinColumns={@JoinColumn(name="tag_id", referencedColumnName="id")})
+	private Set<Tag> tags;
+
+	public Set<Tag> getTags() {
+		return tags;
 	}
-	public void setFoos(Set<Foo> foos) {
-		this.foos = foos;
+	public void setTags(Set<Tag> foos) {
+		this.tags = foos;
 	}
 	public String getTitle() {
 		return title;
