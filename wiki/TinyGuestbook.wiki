@@ -6,47 +6,47 @@
 @Controller(alias="tinyguestbook", defaultAction="list")
 public class TinyGuestbookController extends BaseController {
 
-  private static List<Entry> entries = new ArrayList<Entry>();
-  private static ListModel model = new SimpleListModel(new ArrayList<Entry>());
+    private static List<Entry> entries = new ArrayList<Entry>();
+    private static ListModel model = new SimpleListModel(new ArrayList<Entry>());
 
-  private final static Form form = new Form(Entry.class);
+    private final static Form form = new Form(Entry.class);
 
-  public TinyGuestbookController() {
-    registerTable(new DefaultTable("guestbookentries", model).setSortBy("date", Table.SORT_DESC));
-  }
-
-  @Action
-  public Target list() {
-    return render("guestbook.vm");
-  }
-
-  @Action(alias="add")
-  public Target addEntry() {
-    FormData fd = new FormData(form).withDataFromRequest(context);
-    Entry entry = new Entry();
-    fd.applyTo(entry);
-    entry.setDate(new Date());
-    entries.add(entry);
-    return redirectToAction("list");
-  }
-
-  class Entry {
-    public String message;
-    public Date date;
-
-    public String getMessage() {
-      return message;
+    public TinyGuestbookController() {
+        registerTable(new DefaultTable("guestbookentries", model).setSortBy("date", Table.SORT_DESC));
     }
-    public void setMessage(String message) {
-      this.message = message;
+
+    @Action
+    public Target list() {
+        return render("guestbook.vm");
     }
-    public Date getDate() {
-      return date;
+
+    @Action(alias="add")
+    public Target addEntry() {
+        FormData fd = new FormData(form).withDataFromRequest(context);
+        Entry entry = new Entry();
+        fd.applyTo(entry);
+        entry.setDate(new Date());
+        entries.add(entry);
+        return redirectToAction("list");
     }
-    public void setDate(Date date) {
-      this.date = date;
+
+    class Entry {
+        public String message;
+        public Date date;
+
+        public String getMessage() {
+            return message;
+        }
+        public void setMessage(String message) {
+            this.message = message;
+        }
+        public Date getDate() {
+            return date;
+        }
+        public void setDate(Date date) {
+            this.date = date;
+        }
     }
-  }
 }
 }}}
 
@@ -54,28 +54,28 @@ public class TinyGuestbookController extends BaseController {
 {{{
 <html>
 <head>
-  <title>Panama Examples - Tiny Guestbook</title>
+    <title>Panama Examples - Tiny Guestbook</title>
 </head>
 <body>
-  <h3>Your comment</h3>
-  <form name="fm" method="POST" action="add">
-    Add your comment here:<br />
-    <textarea name="text">Your comment goes here.</textarea><br />
-    <input type="submit" value="Submit" />
-  </form>
-  <h3>Previous comments</h3>
-  <table>
-    <tr>
-      <th>Date</th>
-      <th>Comment</th>
-    </tr>
-    #foreach($entry in $guestbookentries.rows)
-    <tr>
-      <td>$entry.date</td>
-      <td>$entry.text</td>
-    </tr>
-    #end
-  </table>
+    <h3>Your comment</h3>
+    <form name="fm" method="POST" action="add">
+        Add your comment here:<br />
+        <textarea name="text">Your comment goes here.</textarea><br />
+        <input type="submit" value="Submit" />
+    </form>
+    <h3>Previous comments</h3>
+    <table>
+        <tr>
+            <th>Date</th>
+            <th>Comment</th>
+        </tr>
+        #foreach($entry in $guestbookentries.rows)
+        <tr>
+            <td>$entry.date</td>
+            <td>$entry.text</td>
+        </tr>
+        #end
+    </table>
 </body>
 </html>
 }}}
