@@ -1,0 +1,29 @@
+<html>
+<head>
+	<title>Panama Examples - Tiny Guestbook</title>
+	<link rel="stylesheet" href="../simple.css" type="text/css">
+</head>
+<body>
+	#set($examplename="Tiny Guestbook")
+	#parse("/panama/examples/exampleheader.vm")
+
+	<h3>Your comment</h3>
+	<form name="fm" method="POST" action="add">
+		<textarea name="text"></textarea><br />
+		<input type="submit" value="Submit" />
+	</form>
+	<h3>Previous comments</h3>
+	<table>
+		<tr>
+			<th>Date</th>
+			<th>Comment</th>
+		</tr>
+		#foreach($entry in $tinyguestbookentries.rows)
+		<tr>
+			<td>$entry.date</td>
+			<td>$entry.text</td>
+		</tr>
+		#end
+	</table>
+</body>
+</html>

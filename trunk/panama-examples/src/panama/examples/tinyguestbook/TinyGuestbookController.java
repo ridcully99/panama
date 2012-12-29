@@ -1,5 +1,5 @@
 /*
- *  Copyright 2004-2010 Robert Brandner (robert.brandner@gmail.com)
+ *  Copyright 2004-2012 Robert Brandner (robert.brandner@gmail.com)
  *
  *  Licensed under the Apache License, Version 2.0 (the "License");
  *  you may not use this file except in compliance with the License.
@@ -13,7 +13,7 @@
  *  See the License for the specific language governing permissions and
  *  limitations under the License.
  */
-package panama.examples.guestbook;
+package panama.examples.tinyguestbook;
 
 import java.util.ArrayList;
 import java.util.Date;
@@ -30,18 +30,16 @@ import panama.core.Target;
 import panama.form.Form;
 import panama.form.FormData;
 
-@Controller(alias="guestbook", defaultAction="list")
-public class GuestbookController extends BaseController {
+@Controller(alias="tinyguestbook", defaultAction="list")
+public class TinyGuestbookController extends BaseController {
 
-	/* create ListModel backed by a simple list. As this should be shared by all users, we make it static */
 	private static List<GuestbookEntry> entries = new ArrayList<GuestbookEntry>();
 	private static ListModel model = new SimpleListModel(entries);
 
-	/* create form model based on GuestbookEntry class. This may be done static as long as the form is not changed later (make it final to ensure this) */
-	private final static Form form = new Form(GuestbookEntry.class, Form.EXCLUDE_PROPERTIES, "date");
+	private final static Form form = new Form(GuestbookEntry.class);
 
-	public GuestbookController() {
-		registerTable(new DefaultTable("guestbookentries", model).setSortBy("date", Table.SORT_DESC));
+	public TinyGuestbookController() {
+		registerTable(new DefaultTable("tinyguestbookentries", model).setSortBy("date", Table.SORT_DESC));
 	}
 
 	@Action
@@ -51,8 +49,8 @@ public class GuestbookController extends BaseController {
 
 	@Action(alias="add")
 	public Target addEntry() {
+		FormData fd = new FormData(form).withDataFromRequest(context);
 		GuestbookEntry entry = new GuestbookEntry();
-		FormData fd = new FormData(form).withDataFromRequest(context);	// get input values according to form model
 		fd.applyTo(entry);
 		entry.setDate(new Date());
 		entries.add(entry);

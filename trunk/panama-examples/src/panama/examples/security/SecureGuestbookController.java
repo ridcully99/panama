@@ -80,7 +80,7 @@ public class SecureGuestbookController extends BaseController {
 			context.session.put("logged-in", true);
 			return redirectToAction("list");
 		} else {
-			context.put("loginfailed", true);	// flag used in form to show error message
+			context.put("loginfailed", true);	// flag used in form to show error text
 			return render("loginform.vm");
 		}
 	}
