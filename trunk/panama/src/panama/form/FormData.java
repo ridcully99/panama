@@ -1,5 +1,5 @@
 /*
- *  Copyright 2004-2010 Robert Brandner (robert.brandner@gmail.com)
+ *  Copyright 2004-2012 Robert Brandner (robert.brandner@gmail.com)
  *
  *  Licensed under the Apache License, Version 2.0 (the "License");
  *  you may not use this file except in compliance with the License.
@@ -134,6 +134,27 @@ public class FormData {
 		}
 	}
 
+	/**
+	 * Fill with the parameters of current request as inputs (normal parameters and file items).
+	 * Calls {@link #setInput(Map)} and {@link #setInput(Object)} so see there for details.
+	 * @param context
+	 * @return the FormData object itself, for usage like FormData fd = new FormData(form).withDataFromRequest(context);
+	 */
+	public FormData withDataFromRequest(Context context) {
+		setInput(context.getParameterMap());
+		setInput(context.getFileItemMap());
+		return this;
+	}
+
+	/**
+	 * Fill with the values of specified bean as inputs.
+	 * @param bean
+	 * @return the FormData object itself.
+	 */
+	public FormData withDataFromBean(Object bean) {
+		setInput(bean);
+		return this;
+	}
 	/**
 	 * Sets the input value for one field
 	 *
