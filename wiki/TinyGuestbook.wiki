@@ -1,5 +1,7 @@
 #summary Working example of a tiny guestbook application in 90 lines of code.
 
+A working example of a guestbook. Entries consist of a message and a date and - for simplicity's sake - are kept in a static list instead of a database. The template shows an input form for entering a message, and a list of previous messages, sorted by date.
+
 
 == Controller ==
 {{{
