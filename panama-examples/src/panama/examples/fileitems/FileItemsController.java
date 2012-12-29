@@ -42,12 +42,10 @@ import panama.heureka.media.MediaSupport;
 @Controller(alias="fileitems", defaultAction="view")
 public class FileItemsController extends BaseController {
 
-	private static Form form;
-	static {
-		form = new Form();
-		form.addField(new StringField("msg"));
-		form.addField(new FileItemField("attachment"));
-	}
+	private final static Form form = new Form(
+			new StringField("msg"),
+			new FileItemField("attachment")
+	);
 
 	@Action
 	public Target view() {
@@ -57,10 +55,7 @@ public class FileItemsController extends BaseController {
 	@Action
 	public Target save() throws MagicParseException, MagicMatchNotFoundException, MagicException {
 		if (context.getParameter("submit") != null) {
-			FormData fd = new FormData(form);
-			fd.setInput(context.getParameterMap());
-			fd.setInput(context.getFileItemMap());
-			FileItem[] items = fd.getFileItems("attachment");
+			FormData fd = new FormData(form).withDataFromRequest(context);
 			context.put("msg", fd.getString("msg"));
 			context.put("attachment", fd.getFileItem("attachment"));
 			context.put("showresults", Boolean.TRUE);

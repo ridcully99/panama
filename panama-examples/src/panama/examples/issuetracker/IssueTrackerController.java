@@ -15,7 +15,6 @@
  */
 package panama.examples.issuetracker;
 
-import java.util.Arrays;
 import java.util.List;
 import java.util.Set;
 
@@ -25,12 +24,10 @@ import panama.collections.QueryListModel;
 import panama.collections.QueryTable;
 import panama.collections.Table;
 import panama.core.BaseController;
-import panama.core.PlainTextTarget;
 import panama.core.Target;
-import panama.examples.issuetracker.entities.Tag;
 import panama.examples.issuetracker.entities.Issue;
+import panama.examples.issuetracker.entities.Tag;
 import panama.exceptions.NoSuchFieldException;
-import panama.filter.Filter;
 import panama.form.Form;
 import panama.form.FormData;
 import panama.form.PersistentBeanField;
@@ -38,7 +35,6 @@ import panama.form.ValidatorFactory;
 import panama.persistence.PersistentBean;
 
 import com.avaje.ebean.Ebean;
-import com.avaje.ebean.Query;
 
 /**
  * @author ridcully
@@ -50,10 +46,8 @@ public class IssueTrackerController extends BaseController {
 
 	private Table table;
 
-	private final static Form form;
+	private final static Form form = new Form(Issue.class, Form.EXCLUDE_PROPERTIES, "createdAt");
 	static {
-		form = new Form();
-		form.addFields(Issue.class, Form.EXCLUDE_PROPERTIES, "createdAt");
 		form.getField("title").addValidator(ValidatorFactory.getNotEmptyValidator());
 		form.addField(new PersistentBeanField("tags", Tag.class));
 	}
@@ -67,27 +61,11 @@ public class IssueTrackerController extends BaseController {
 		return render("issuelist.vm");
 	}
 
-	/**
-	 * This action shows, how you can use Panama's filter framework to create
-	 * Ebean expressions ready to use with Ebean queries.
-	 * @return a nice ;-) text
-	 */
-	@Action
-	public Target filter() {
-		Filter f = Filter.and(
-						Filter.anyEq("bla", "title", "description"),
-						Filter.allEq("bla", "title", "description"));
-		Query q = Ebean.createQuery(Issue.class);
-		q.where(f.asExpression(q, null)).findList();
-		return new PlainTextTarget("nice ;-)");
-	}
-
 	@Action
 	public Target edit() {
 		String id = context.getParameter("id");
 		Issue e = (Issue)PersistentBean.findOrCreate(Issue.class, id);
-		FormData fd = new FormData(form);
-		fd.setInput(e);
+		FormData fd = new FormData(form).withDataFromBean(e);
 		fd.setInput("tags", e.getTags().toArray(new Tag[0]));
 		return showForm(fd);
 	}
@@ -102,8 +80,7 @@ public class IssueTrackerController extends BaseController {
 	@Action
 	public Target save() {
 		if (context.getParameter("ok") != null) {
-			FormData fd = new FormData(form);
-			fd.setInput(context.getParameterMap());
+			FormData fd = new FormData(form).withDataFromRequest(context);
 			String id = fd.getString("id");
 			Issue e = (Issue)PersistentBean.findOrCreate(Issue.class, id);
 			fd.applyTo(e, Form.EXCLUDE_PROPERTIES, "tags");
