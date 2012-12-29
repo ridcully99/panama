@@ -8,13 +8,13 @@ A working example of a guestbook. Entries consist of a message and a date and - 
 @Controller(alias="tinyguestbook", defaultAction="list")
 public class TinyGuestbookController extends BaseController {
 
-    private static List<Entry> entries = new ArrayList<Entry>();
-    private static ListModel model = new SimpleListModel(new ArrayList<Entry>());
+    private static List<GuestbookEntry> entries = new ArrayList<GuestbookEntry>();
+    private static ListModel model = new SimpleListModel(entries);
 
-    private final static Form form = new Form(Entry.class);
+    private final static Form form = new Form(GuestbookEntry.class);
 
     public TinyGuestbookController() {
-        registerTable(new DefaultTable("guestbookentries", model).setSortBy("date", Table.SORT_DESC));
+        registerTable(new DefaultTable("tinyguestbookentries", model).setSortBy("date", Table.SORT_DESC));
     }
 
     @Action
@@ -25,29 +25,33 @@ public class TinyGuestbookController extends BaseController {
     @Action(alias="add")
     public Target addEntry() {
         FormData fd = new FormData(form).withDataFromRequest(context);
-        Entry entry = new Entry();
+        GuestbookEntry entry = new GuestbookEntry();
         fd.applyTo(entry);
         entry.setDate(new Date());
         entries.add(entry);
         return redirectToAction("list");
     }
+}
+}}}
 
-    class Entry {
-        public String message;
-        public Date date;
+== Model ==
 
-        public String getMessage() {
-            return message;
-        }
-        public void setMessage(String message) {
-            this.message = message;
-        }
-        public Date getDate() {
-            return date;
-        }
-        public void setDate(Date date) {
-            this.date = date;
-        }
+{{{
+public class GuestbookEntry {
+    public String text;
+    public Date date;
+
+    public String getText() {
+        return text;
+    }
+    public void setText(String message) {
+        this.text = message;
+    }
+    public Date getDate() {
+        return date;
+    }
+    public void setDate(Date date) {
+        this.date = date;
     }
 }
 }}}
@@ -61,8 +65,7 @@ public class TinyGuestbookController extends BaseController {
 <body>
     <h3>Your comment</h3>
     <form name="fm" method="POST" action="add">
-        Add your comment here:<br />
-        <textarea name="text">Your comment goes here.</textarea><br />
+        <textarea name="text"></textarea><br />
         <input type="submit" value="Submit" />
     </form>
     <h3>Previous comments</h3>
@@ -71,7 +74,7 @@ public class TinyGuestbookController extends BaseController {
             <th>Date</th>
             <th>Comment</th>
         </tr>
-        #foreach($entry in $guestbookentries.rows)
+        #foreach($entry in $tinyguestbookentries.rows)
         <tr>
             <td>$entry.date</td>
             <td>$entry.text</td>
