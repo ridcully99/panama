@@ -24,7 +24,6 @@ import java.util.Map;
 
 import org.grlea.log.SimpleLogger;
 
-import panama.core.Context;
 import panama.persistence.PersistentBean;
 import panama.util.DynaBeanUtils;
 
