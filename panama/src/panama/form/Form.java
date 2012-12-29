@@ -1,17 +1,17 @@
 /*
- *  Copyright 2004-2010 Robert Brandner (robert.brandner@gmail.com) 
- *  
- *  Licensed under the Apache License, Version 2.0 (the "License"); 
- *  you may not use this file except in compliance with the License. 
- *  You may obtain a copy of the License at 
- *  
- *  http://www.apache.org/licenses/LICENSE-2.0 
- *  
- *  Unless required by applicable law or agreed to in writing, software 
- *  distributed under the License is distributed on an "AS IS" BASIS, 
- *  WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied. 
- *  See the License for the specific language governing permissions and 
- *  limitations under the License. 
+ *  Copyright 2004-2012 Robert Brandner (robert.brandner@gmail.com)
+ *
+ *  Licensed under the Apache License, Version 2.0 (the "License");
+ *  you may not use this file except in compliance with the License.
+ *  You may obtain a copy of the License at
+ *
+ *  http://www.apache.org/licenses/LICENSE-2.0
+ *
+ *  Unless required by applicable law or agreed to in writing, software
+ *  distributed under the License is distributed on an "AS IS" BASIS,
+ *  WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
+ *  See the License for the specific language governing permissions and
+ *  limitations under the License.
  */
 package panama.form;
 
@@ -24,6 +24,7 @@ import java.util.Map;
 
 import org.grlea.log.SimpleLogger;
 
+import panama.core.Context;
 import panama.persistence.PersistentBean;
 import panama.util.DynaBeanUtils;
 
@@ -33,17 +34,35 @@ import panama.util.DynaBeanUtils;
  * This class defines a set of Fields.
  *
  * @author Robert
- * 
+ *
  */
 public class Form {
 
 	public final static int INCLUDE_PROPERTIES = 1;
 	public final static int EXCLUDE_PROPERTIES = 2;
-	
-	protected static SimpleLogger log = new SimpleLogger(Form.class);	
-	
+
+	protected static SimpleLogger log = new SimpleLogger(Form.class);
+
 	protected Map<String, Field> fields = new HashMap<String, Field>();
-	
+
+	public Form(Field... fields) {
+		for (Field f : fields) {
+			addField(f);
+		}
+	}
+
+	public Form(Class<?> clazz) {
+		this(clazz, EXCLUDE_PROPERTIES);
+	}
+
+	public Form(Class<?> clazz, String... properties) {
+		this(clazz, INCLUDE_PROPERTIES, properties);
+	}
+
+	public Form(Class<?> clazz, int method, String... properties) {
+		addFields(clazz, method, properties);
+	}
+
 	public Field addField(Field field) {
 		fields.put(field.getName(), field);
 		return field;
@@ -52,7 +71,7 @@ public class Form {
 	public Map<String, Field> getFields() {
 		return fields;
 	}
-	
+
 	/**
 	 * Gets Field for specified name.
 	 * @param name
@@ -61,7 +80,7 @@ public class Form {
 	public Field getField(String name) {
 		return (Field)fields.get(name);
 	}
-	
+
 	/**
 	 * Adds fields of correct type for all properties of the specified class.
 	 * @see #addFields(Class, int, String...)
@@ -79,11 +98,11 @@ public class Form {
 	 */
 	public void addFields(Class<?> clazz, String... properties) {
 		addFields(clazz, INCLUDE_PROPERTIES, properties);
-	}	
-		
+	}
+
 	/**
 	 * Adds fields of correct type for all specified properties of the specified class.
-	 *  
+	 *
 	 * Supports all Field-Types of the package panama.form.
 	 * For other property-values a basic Field is created.
 	 *
@@ -93,7 +112,7 @@ public class Form {
 	 * @param clazz A class
 	 * @param method what to do with properties: INCLUDE_PROPERTIES: add fields for specified properties, EXCLUDE_PROPERTIES: add fields for all _but_ the specified properties.
 	 * @param properties names of properties to be included or excluded
-	 */	
+	 */
 	public void addFields(Class<?> clazz, int method, String... properties) {
 		try {
 			Object bean = clazz.newInstance();
@@ -117,7 +136,7 @@ public class Form {
 				Object valueInstance;
 				try {
 					valueInstance = valueClass.newInstance();
-				} catch (Exception e) { 
+				} catch (Exception e) {
 					valueInstance = null;
 				}
 				Field field = null;
