@@ -2,6 +2,7 @@
 
 A working example of a guestbook. Entries consist of a message and a date and - for simplicity's sake - are kept in a static list instead of a database. The template shows an input form for entering a message, and a list of previous messages, sorted by date.
 
+http://panama.googlecode.com/svn/trunk/panama-examples/src/panama/examples/tinyguestbook/screenshot.png
 
 == Controller ==
 {{{
