@@ -271,9 +271,22 @@ In line (3) we fetch the first name, entered into the HTML form; nothing special
 
 In line (4) we fetch the birthday, entered into the HTML form; here the input is automatically converted to a `Date` object, using the pattern we provided when creating the `DateField`. If this goes wrong, `getDate()` returns `null` and the error is remembered within our form data's `errors` structure. This is explained in depth in the section about [#Input_Validation] below.
 
+Starting with version 3.4.2 lines (1) and (2) can be combined by using `FormData fd = new FormData(myForm).withDataFromRequest(context);`
+
 === Java => HTML ===
 
-TODO
+If you want to edit an existing set of data you'll want so somehow prefill the HTML form that's shown to the user. For this, you create a `FormData` object and provide input values in Java and then put it into the context so it can be accessed from within your HTML template.
+
+{{{
+@Action
+public Target edit() {
+    FormData fd = new FormData(myForm);
+    fd.setInput("firstName", "Ridcully");
+    fd.setInput("birthday", new Date());
+    context.put("formdata", fd);
+    return render("template.vm");
+}
+}}}
 
 == Input Validation ==
 
