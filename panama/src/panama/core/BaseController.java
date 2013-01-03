@@ -32,6 +32,7 @@ import panama.collections.Table;
 import panama.collections.Tree;
 import panama.exceptions.AuthorizationException;
 import panama.exceptions.ForceTargetException;
+import panama.exceptions.HttpErrorException;
 import panama.exceptions.NoSuchActionException;
 import panama.util.TableController;
 import panama.util.TreeController;
@@ -176,9 +177,9 @@ public class BaseController {
 	 * @return The resulting Target of the executed action
 	 * @throws ForceTargetException
 	 * @throws NoSuchActionException
-	 * @throws AuthorizationException
+	 * @throws HttpErrorException
 	 */
-	public Target executeAction(String actionName, String... optionalParamsAndValues) throws ForceTargetException, NoSuchActionException, AuthorizationException {
+	public Target executeAction(String actionName, String... optionalParamsAndValues) throws ForceTargetException, NoSuchActionException, HttpErrorException {
 		@SuppressWarnings("rawtypes")
 		Map originalParameters = context.getParameterMap();
 		try {

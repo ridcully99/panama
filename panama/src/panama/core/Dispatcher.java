@@ -48,8 +48,8 @@ import org.scannotation.WarUrlFinder;
 
 import panama.annotations.Action;
 import panama.annotations.Controller;
-import panama.exceptions.AuthorizationException;
 import panama.exceptions.ForceTargetException;
+import panama.exceptions.HttpErrorException;
 import panama.exceptions.NoSuchActionException;
 import panama.util.TestTimer;
 
@@ -443,14 +443,14 @@ public class Dispatcher implements Filter {
 			log.warn("no such action: \""+ctrl.getClass().getName()+"/"+actionName+"\"");
 			ctx.getResponse().sendError(HttpServletResponse.SC_NOT_FOUND);
 			return null;
-		} catch (AuthorizationException ae) {
-			log.warn("no authorization for action: \""+ctrl.getClass().getName()+"/"+actionName+"\"");
-			ctx.getResponse().sendError(HttpServletResponse.SC_FORBIDDEN);
+		} catch (HttpErrorException hee) {
+			log.warn("HttpErrorException "+hee.getStatusCode()+" :\""+ctrl.getClass().getName()+"/"+actionName+"\"");
+			ctx.getResponse().sendError(hee.getStatusCode());
 			return null;
-		} catch (Exception e1) {
+		} catch (Exception e) {
 			String msg = "error doing action \""+actionName+"\"";
 			log.fatal(msg);
-			log.fatalException(e1);
+			log.fatalException(e);
 			ctx.getResponse().sendError(HttpServletResponse.SC_INTERNAL_SERVER_ERROR);
 			return null;
 		}
