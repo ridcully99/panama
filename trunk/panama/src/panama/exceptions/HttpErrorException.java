@@ -1,5 +1,5 @@
 /*
- *  Copyright 2004-2012 Robert Brandner (robert.brandner@gmail.com) 
+ *  Copyright 2004-2013 Robert Brandner (robert.brandner@gmail.com) 
  *  
  *  Licensed under the Apache License, Version 2.0 (the "License"); 
  *  you may not use this file except in compliance with the License. 
@@ -15,15 +15,22 @@
  */
 package panama.exceptions;
 
-import javax.servlet.http.HttpServletResponse;
-
 /**
- * @author Ridcully
- *
+ * An exception representing a http error. Sent back via response.sendError()
+ * @author robert.brandner
  */
-public class AuthorizationException extends HttpErrorException {
+public class HttpErrorException extends RuntimeException {
 
-	public AuthorizationException() {
-		super(HttpServletResponse.SC_FORBIDDEN);
+	private int statusCode;
+	
+	/**
+	 * @param statusCode one of the status codes of http://docs.oracle.com/javaee/6/api/javax/servlet/http/HttpServletResponse.html
+	 */
+	public HttpErrorException(int statusCode) {
+		this.statusCode = statusCode;
+	}
+	
+	public int getStatusCode() {
+		return statusCode;
 	}
 }

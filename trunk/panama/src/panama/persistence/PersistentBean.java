@@ -100,6 +100,26 @@ public class PersistentBean implements Serializable {
 	}
 	
 	/**
+	 * Tries to fetch an object of type of class the method is called upon, with specified id from database (using Ebean). 
+	 * If no such object is found, a new one is created and it's id property set to the specified id.
+	 * This newly created object is _not_ saved to the database.
+	 * You can detect wether an object is new or came from the database by checking it's timeStamp property,
+	 * which is null for unsaved objects and not null for saved ones.
+	 * 
+	 * Finding current class in static method is taken from here:
+	 * http://stackoverflow.com/questions/936684/getting-the-class-name-from-a-static-method-in-java#answer-2971457
+	 * 
+	 * @param beanType
+	 * @param id
+	 * @return an object of class beanType; never null.
+	 */
+	@SuppressWarnings("unchecked")
+	public static <T extends PersistentBean> T findOrCreate(String id) {
+		Class<?> beanType = (Class<?>)Thread.currentThread().getStackTrace()[1].getClass();
+		return findOrCreate((Class<T>)beanType, id);
+	}
+	
+	/**
 	 * equals - based on id 
 	 */
 	public boolean equals(Object other) {
