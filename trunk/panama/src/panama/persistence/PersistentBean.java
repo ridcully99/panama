@@ -107,7 +107,7 @@ public class PersistentBean implements Serializable {
 	 * which is null for unsaved objects and not null for saved ones.
 	 * 
 	 * Finding current class in static method is taken from here:
-	 * http://stackoverflow.com/questions/936684/getting-the-class-name-from-a-static-method-in-java#answer-2971457
+	 * http://www.rgagnon.com/javadetails/java-0402.html
 	 * 
 	 * @param beanType
 	 * @param id
@@ -115,8 +115,14 @@ public class PersistentBean implements Serializable {
 	 */
 	@SuppressWarnings("unchecked")
 	public static <T extends PersistentBean> T findOrCreate(String id) {
-		Class<?> beanType = (Class<?>)Thread.currentThread().getStackTrace()[1].getClass();
-		return findOrCreate((Class<T>)beanType, id);
+		Class<T> beanType = (Class<T>)new CurrentClassGetter().getCurrentClass();
+		return findOrCreate(beanType, id);
+	}
+
+	private static class CurrentClassGetter extends SecurityManager {
+		public Class<?> getCurrentClass() {
+			return getClassContext()[1];
+		}
 	}
 	
 	/**
@@ -134,4 +140,5 @@ public class PersistentBean implements Serializable {
 	public int hashCode() {
 		return id.hashCode();
 	} 
+	
 }
