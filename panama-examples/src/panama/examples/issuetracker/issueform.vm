@@ -6,22 +6,25 @@
 	<body>
 		#set($examplename="Issue Tracker")
 		#parse("/panama/examples/exampleheader.vm")
+		<h3>Edit Issue</h3>
 		<form action="save" method="post">
 		<input type="hidden" name="id" value="$formdata.id" />
 		<table>
 			<tr>
-				<td>Title *</td>
+				<td style="width:10em">Title *</td>
 				<td>
-					<input name="title" value="$esc.javascript($formdata.title)">
+					<input type="text" name="title" value="$esc.javascript($formdata.title)">
 					$!formdata.errors.title.message
 				</td>
 			</tr>
 			<tr>
 				<td>Description</td>
-				<td><input name="description" value="$esc.javascript($formdata.description)"></td>
+				<td>
+					<textarea name="description">$esc.javascript($formdata.description)</textarea>
+				</td>
 			</tr>
 			<tr>
-				<td>Foos</td>
+				<td>Tags</td>
 				<td>
 					<select name="tags" multiple>
 					#foreach($_f in $alltags)
@@ -32,6 +35,7 @@
 					<option $_sel value="$_f.id">$_f.name</option>
 					#end
 					</select>
+					Hold Ctrl-key for multi-selection
 				</td>
 			<tr>
 				<td></td>

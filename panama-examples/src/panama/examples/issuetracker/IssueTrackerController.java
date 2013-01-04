@@ -64,7 +64,7 @@ public class IssueTrackerController extends BaseController {
 	@Action
 	public Target edit() {
 		String id = context.getParameter("id");
-		Issue e = (Issue)PersistentBean.findOrCreate(Issue.class, id);
+		Issue e = PersistentBean.findOrCreate(Issue.class, id);
 		FormData fd = new FormData(form).withDataFromBean(e);
 		fd.setInput("tags", e.getTags().toArray(new Tag[0]));
 		return showForm(fd);
@@ -82,7 +82,7 @@ public class IssueTrackerController extends BaseController {
 		if (context.getParameter("ok") != null) {
 			FormData fd = new FormData(form).withDataFromRequest(context);
 			String id = fd.getString("id");
-			Issue e = (Issue)PersistentBean.findOrCreate(Issue.class, id);
+			Issue e = PersistentBean.findOrCreate(Issue.class, id);
 			fd.applyTo(e, Form.EXCLUDE_PROPERTIES, "tags");
 			if (fd.hasErrors()) {
 				return showForm(fd);

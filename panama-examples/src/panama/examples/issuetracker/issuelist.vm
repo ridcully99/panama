@@ -6,28 +6,30 @@
 	<body>
 		#set($examplename="Issue Tracker")
 		#parse("/panama/examples/exampleheader.vm")
-		<div style="float:left"><a href="edit">Create Issue...</a></div>
-		<div style="float:right">
+		<div style="float:left"><input type="button" onclick="location.href='edit';" value="Create Issue..."/></div>
+		<div style="float:right; white-space:nowrap">
 			<form method="post" action="$issuetable.searchLink('title','description')">
-				<input type="text" name="q" value="$!issuetable.filters.searchfilter" />
+				<input type="text" name="q" style="width:12em" value="$!issuetable.filters.searchfilter" />
 				<input type="submit" name="search" value="Search" />
 			</form>
 		</div>
 		<table>
 			<tr>
-				<th><a href="$issuetable.sortLink("id")">ID</a></th>
 				<th><a href="$issuetable.sortLink("createdAt")">created at</a></th>
 				<th><a href="$issuetable.sortLink("title")">Title</a></th>
-				<th># of Tags</th>
+				<th>Tags</th>
 				<th></th>
 			</tr>
 			#foreach($issue in $issuetable.rows)
 			<tr>
-				<td>$issue.id</td>
-				<td>$issue.createdAt</td>
+				<td class="narrow">$date.format('medium', $issue.createdAt)</td>
 				<td>$!issue.title</td>
-				<td>$issue.tags.size()</td>
-				<td><a href="edit?id=$issue.id">edit</a> | <a href="delete?id=$issue.id">delete</a></td>
+				<td class="narrow">
+					#foreach($_t in $issue.tags)
+					$!_t.name&nbsp;
+					#end
+				</td>
+				<td class="narrow"><a href="edit?id=$issue.id">edit</a> | <a href="delete?id=$issue.id">delete</a></td>
 			</tr>
 			#end
 		</table>
