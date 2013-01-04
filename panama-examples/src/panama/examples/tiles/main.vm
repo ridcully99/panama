@@ -5,19 +5,17 @@
 </head>
 <body>
 	#set($examplename="Tiles")
-	#parse("/panama/examples/exampleheader.vm")	
+	#parse("/panama/examples/exampleheader.vm")
 	$tiles.embed("tilesexample", "header")
 	$tiles.embed("tilesexample", "hello")
 	$tiles.embed("tilesexample", "hello", {"name":"Panama"})
 	<table>
 	#foreach($r in [1,2,3,4,5,6,7,8])
-	  <tr>
-	  #foreach($c in ['a','b','c','d','e','f','g','h'])
-	    <td>
-			$tiles.embed("tilesexample", "hello", {"name":"$r$c"})	      
-	    </td>
-	  #end
-	  </tr>
+	<tr>
+	#foreach($c in ['a','b','c','d','e','f','g','h'])
+		$tiles.embed("tilesexample", "hello", {"name":"$r$c"})
+	#end
+	</tr>
 	#end
 	</table>
 </body>

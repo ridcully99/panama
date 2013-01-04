@@ -11,9 +11,11 @@
 	#if($!loginfailed)
 	<p style="color:red">Login failed, please use the credentials shown above.</p>
 	#end
-	<input type="text" name="username" /><br />
-	<input type="password" name="password"><br />
-    <input type="submit" value="Login" />
-  </form>
+	<table>
+		<tr><td class="narrow">Username</td><td><input type="text" name="username" /></td></tr>
+		<tr><td>Password</td><td><input type="password" name="password"></td></tr>
+	</table>
+	<input type="submit" value="Login" />
+</form>
 </body>
 </html>
