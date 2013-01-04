@@ -1,0 +1,26 @@
+<html>
+<head>
+	<title>Panama Examples - FileItems</title>
+	<link rel="stylesheet" href="../simple.css" type="text/css">
+</head>
+<body>
+#set($examplename="FileItems")
+#parse("/panama/examples/exampleheader.vm")
+
+<form name="fm" method="POST" action="save" enctype="multipart/form-data">
+	Message:
+	<p>
+	<textarea name="msg">Your comment goes here.</textarea>
+	</p>
+	Attachment:
+	<p><input type="file" name="attachment" multiple="multiple"></input></p>
+	<input type="submit" value="Submit" name="submit" />
+</form>
+<p></p>
+#if($!showresults)
+<p><strong>Your input was:</strong></p>
+<p>Message: $!msg</p>
+<p>Attachment (Name): $!attachment.name</p>
+#end
+</body>
+</html>

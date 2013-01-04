@@ -6,18 +6,13 @@
 <body>
 	<div class="examplesheader">Panama Examples</div>
 	<fieldset>
-		<legend>Basic</legend>
-		<h4><a href="../guestbook">Guestbook</a></h4>
-		<p>A short and simple guestbook shows you the basics of Panama.</p>
+		<legend>Some examples</legend>
 		<h4><a href="../tinyguestbook">Tiny Guestbook</a></h4>
-		<p>An even tinier version of the guestbook as featured in the project's wiki.</p>
+		<p>A tiny guestbook as featured in the project's wiki.</p>
 		<h4><a href="../fileitems">File Items</a></h4>
 		<p>Shows how to handle file uploads with FileItemField class.</p>
-	</fieldset>
-	<fieldset>
-		<legend>Advanced</legend>
 		<h4><a href="../i18n">Internationalization</a></h4>
-		<h4><a href="../secureguestbook">Security</a></h4>
+		<h4><a href="../secureguestbook">Secure Guestbook</a></h4>
 		<p>This example shows some security related features of Panama.</p>
 		<ul>
 			<li>The token mechanism to prevent your applications from cross site scripting (and double submits).</li>
