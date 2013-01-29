@@ -137,6 +137,7 @@ public class Dispatcher implements Filter {
 				velocityProperties.load(cl.getResourceAsStream("velocity.properties"));
 			} catch (Exception e) {
 				log.warn("Error reading velocity.properties, using internal defaults instead");
+				velocityProperties.load(cl.getResourceAsStream("default-fallback-velocity.properties"));
 			}
 			velocityEngine = new VelocityEngine(velocityProperties);
 			/* init velocity tool manager -- automatically finds all default-tools, the framework's tools as defined in tools.xml and all tools of the web-app specified in tools.xml at classpath-root. */
