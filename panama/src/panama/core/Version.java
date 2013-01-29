@@ -40,6 +40,7 @@ public class Version {
 
 	/* 	History
 	 * ---------------------------------------------------------------------------------
+	 * 3.4.2    2013-01-29 Didn't find velocity templates when no velocity.properties in project --> added default-fallback-velocity.properties that are used in that case
 	 * 3.4.2    2012-12-27 Changed handling of FormData.applyTo() methods regarding unknown property names a bit
 	 *                     Bugfix in PersistentBeanField // IssueTracker Example verbessert hinsichtlich many-to-many, PersistentBeanField, showForm-Pattern
 	 *                     FormData#withDataFrom... Methoden; Form constructors mit Argumenten
