@@ -44,9 +44,9 @@ public class TilesExampleController extends BaseController {
 			name = "World";
 		}
 		context.put("name", name);
-		context.put("red", (int)(Math.random()*255d));
-		context.put("green", (int)(Math.random()*255d));
-		context.put("blue", (int)(Math.random()*255d));
+		context.put("red", (int)(128+Math.random()*127d));
+		context.put("green", (int)(128+Math.random()*127d));
+		context.put("blue", (int)(128+Math.random()*127d));
 		return render("hello.vm");
 	}
 }
