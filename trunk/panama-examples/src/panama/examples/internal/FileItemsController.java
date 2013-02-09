@@ -39,7 +39,7 @@ import panama.heureka.media.MediaSupport;
  * @author ridcully
  *
  */
-@Controller(alias="fileitems", defaultAction="view")
+@Controller(alias="fileitems_internal", defaultAction="view")
 public class FileItemsController extends BaseController {
 
 	private final static Form form = new Form(

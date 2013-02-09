@@ -53,6 +53,7 @@ public class IssueTrackerController extends BaseController {
 	}
 
 	public IssueTrackerController() {
+		createTagsIfNeeded();
 		table = registerTable(new QueryTable("issuetable", new QueryListModel(Ebean.createQuery(Issue.class))));
 	}
 
@@ -105,5 +106,20 @@ public class IssueTrackerController extends BaseController {
 			int is = Ebean.delete(Issue.class, id);
 		}
 		return redirectToAction("list");
+	}
+
+	/**
+	 * Lazily create tags in the demo-database if they do not already exist.
+	 * Database is created for us by Ebean here (see ebean.properties#ebean.ddl.run)
+	 */
+	private void createTagsIfNeeded() {
+		int count = Ebean.find(Tag.class).findRowCount();
+		if (count == 0) {
+			for (String name : new String[] {"Bashful", "Doc", "Dopey", "Grumpy", "Happy", "Sleepy", "Sneezy"}) {
+				Tag t = new Tag();
+				t.setName(name);
+				Ebean.save(t);
+			}
+		}
 	}
 }

@@ -24,10 +24,9 @@
 	<h4><a href="../tilesexample">Tiles</a></h4>
 	<p>Using the <a href="http://code.google.com/p/panama/wiki/Documentation#Tiles" target="_blank">tiles tool</a> you can compose one HTML page from the results of different actions, kind like portlets.</p>
 	<hr />
-	<div style="float:right">Database required - please see the <a href="http://code.google.com/p/panama/wiki/GettingStarted#Examples_using_database" target="_blank">wiki-page</a> for details.</div>
-	<h4><a href="../issues">Issue Tracker</a></h4>
+	<h4><a href="../issues">Issue Tracker (with database)</a></h4>
 	<p>This example of an issue tracker shows how to write database applications with Panama using the tightly integrated Ebean ORM persistence layer.</p>
-	<p><em>Database required - please see the <a href="http://code.google.com/p/panama/wiki/GettingStarted#Examples_using_database" target="_blank">wiki-page</a> for details.</p>
+	<p><strong>Note:</strong> For sake of simplicity we use an embedded H2 database for this example. Thus everytime you startup the web-application you'll start with a new, empty database.</p>
 	<hr />
 </body>
 </html>
