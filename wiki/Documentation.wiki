@@ -1,6 +1,5 @@
 #summary The Documentation.
 #labels Featured
-
 #sidebar DocumentationTOC
 
 = Table of Contents =
