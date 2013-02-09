@@ -21,4 +21,4 @@
   * [Documentation#Internationalization Internationalization]
   * [Documentation#Tiles Tiles]
   * [Documentation#Persistence Persistence]
-    [Documentation#Ebean_ORM_with_JNDI Ebean ORM with JNDI]
+    * [Documentation#Ebean_ORM_with_JNDI Ebean ORM with JNDI]
