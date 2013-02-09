@@ -5,23 +5,29 @@
 </head>
 <body>
 	<div class="examplesheader">Panama Examples</div>
-	<fieldset>
-		<legend>Some examples</legend>
-		<h4><a href="../tinyguestbook">Tiny Guestbook</a></h4>
-		<p>A tiny guestbook as featured in the project's wiki.</p>
-		<h4><a href="../fileitems">File Items</a></h4>
-		<p>Shows how to handle file uploads with FileItemField class.</p>
-		<h4><a href="../i18n">Internationalization</a></h4>
-		<h4><a href="../secureguestbook">Secure Guestbook</a></h4>
-		<p>This example shows some security related features of Panama.</p>
-		<ul>
-			<li>The token mechanism to prevent your applications from cross site scripting (and double submits).</li>
-			<li>An easy way to implement a login to access (parts of) your application using the beforeAction() method.</li>
+	<h4><a href="../tinyguestbook">Tiny Guestbook</a></h4>
+	<p>A tiny guestbook as featured in the project's wiki.</p>
+	<hr />
+	<h4><a href="../fileitems">File Items</a></h4>
+	<p>Shows how to handle file uploads with FileItemField class.</p>
+	<hr />
+	<h4><a href="../i18n">Internationalization</a></h4>
+	<hr />
+	<h4><a href="../secureguestbook">Secure Guestbook</a></h4>
+	<p>This example shows some security related features of Panama.</p>
+	<ul>
+		<li>The token mechanism to prevent your applications from cross site scripting (and double submits).</li>
+		<li>An easy way to implement a login to access (parts of) your application using the beforeAction() method.</li>
 
-		</ul>
-		<h4><a href="../tilesexample">Tiles</a></h4>
-		<h4><a href="../issues">Issue Tracker</a><sup>[1]</sup></h4>
-	</fieldset>
-	<p style="font-size:90%">[1] Database required. Please see <a href="http://code.google.com/p/panama/wiki/GettingStarted" target="_blank">Getting Started</a> for details.</p>
+	</ul>
+	<hr />
+	<h4><a href="../tilesexample">Tiles</a></h4>
+	<p>Using the <a href="http://code.google.com/p/panama/wiki/Documentation#Tiles" target="_blank">tiles tool</a> you can compose one HTML page from the results of different actions, kind like portlets.</p>
+	<hr />
+	<div style="float:right">Database required - please see the <a href="http://code.google.com/p/panama/wiki/GettingStarted#Examples_using_database" target="_blank">wiki-page</a> for details.</div>
+	<h4><a href="../issues">Issue Tracker</a></h4>
+	<p>This example of an issue tracker shows how to write database applications with Panama using the tightly integrated Ebean ORM persistence layer.</p>
+	<p><em>Database required - please see the <a href="http://code.google.com/p/panama/wiki/GettingStarted#Examples_using_database" target="_blank">wiki-page</a> for details.</p>
+	<hr />
 </body>
 </html>
