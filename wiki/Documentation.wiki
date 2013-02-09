@@ -1,6 +1,8 @@
 #summary The Documentation.
 #labels Featured
 
+#sidebar DocumentationTOC
+
 = Table of Contents =
 
 <wiki:toc max_depth="2" />
