@@ -2,9 +2,9 @@
 #labels Featured
 #sidebar DocumentationTOC
 
+<wiki:comment>
 = Table of Contents =
 
-<wiki:comment>
 <wiki:toc max_depth="2" />
 </wiki:comment>
 
