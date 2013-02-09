@@ -40,6 +40,8 @@ By setting the optional annotation property `isDefaultController=true`, you can 
 
 *Caution*: You will also want to specify a `defaultAction` for the controller (see below).
 
+*Caution*: Do not make more than one controller a default controller. This will lead to unpredictable behaviour.
+
 == Actions ==
 
 Actions are methods of a controller class. To be recognized as an action by Panama, a method must have the signature `public Target actionName()` and must be annotated with the `@Action` annotation. This annotation has an optional `alias` property that allows you to give your action a name that differs from the method name.
@@ -49,6 +51,10 @@ Actions are methods of a controller class. To be recognized as an action by Pana
 Per Controller you may specify one of the actions to be the default action. The default action will be invoked if an URL only specifies a controller but no action. You specify the name of the default action using the optional `defaultAction` attribute of the `@Controller` annotation.
 
 *Caution:* The aliases for controllers and actions must not contain any slashes (/). Aliases containing slashes are ignored and a warning is logged at startup. The controllers resp. actions can still be accessed via their real name (FQCN for controllers, method name for the actions).
+
+== Targets ==
+
+Targets are objects returned by Actions and tell Panama what to do next. Most of the time the `TemplateTarget` will be used,  but there’s also `RedirectTarget`, `PlainTextTarget` and even `JSONTarget (useful for responding to AJAX requests). And you can easily provide your own Targets as well, just extend the abstract `Target` class and implement the `go()` method.
 
 ==Context==
 
@@ -94,10 +100,6 @@ $context.application.list
 }}}
 
 *Caution:* Panama automatically puts the controller object itself into the `context` by it's FQCN and it's alias if one is specified. So instead of putting stuff into the context you also can provide public methods in your controller and invoke them from within your templates. Thus, make sure you do not give your controller an alias name that matches any of the velocity tools you intend to use in templates rendered by that controller, because putting the controller object into request context using that alias would "shadow" the tool.
-
-== Targets ==
-
-Targets are objects returned by Actions and tell Panama what to do next. Most of the time the `TemplateTarget` will be used,  but there’s also `RedirectTarget`, `PlainTextTarget` and even `JSONTarget (useful for responding to AJAX requests). And you can easily provide your own Targets as well, just extend the abstract `Target` class and implement the `go()` method.
 
 ----
 
