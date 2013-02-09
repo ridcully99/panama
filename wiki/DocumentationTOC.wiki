@@ -1,17 +1,15 @@
 #summary Table of Contents of Documentation
 
-* [Documentation#Introduction Introduction]
-* [Documentation#Main_Coding_Parts Main Coding Parts]
-** [Documentation#Controllers Controllers]
-** [Documentation#Actions Actions]
-** [Documentation#Targets Targets]
-** [Documentation#Context Context]
-* [Documentation#Templates Templates]
-* [Documentation#Configuration Configuration]
-* [Documentation#Forms Forms]
-* [Documentation#Internationalization Internationalization]
-* [Documentation#Tiles Tiles]
-* [Documentation#Persistence Persistence]
-
-
+  * [Documentation#Introduction Introduction]
+  * [Documentation#Main_Coding_Parts Main Coding Parts]
+    * [Documentation#Controllers Controllers]
+    * [Documentation#Actions Actions]
+    * [Documentation#Targets Targets]
+  * [Documentation#Context Context]
+  * [Documentation#Templates Templates]
+  * [Documentation#Configuration Configuration]
+  * [Documentation#Forms Forms]
+  * [Documentation#Internationalization Internationalization]
+  * [Documentation#Tiles Tiles]
+  * [Documentation#Persistence Persistence]
 
