@@ -5,11 +5,10 @@
     * [Documentation#Controllers Controllers]
     * [Documentation#Actions Actions]
     * [Documentation#Targets Targets]
-  * [Documentation#Context Context]
+    * [Documentation#Context Context]
   * [Documentation#Templates Templates]
   * [Documentation#Configuration Configuration]
   * [Documentation#Forms Forms]
   * [Documentation#Internationalization Internationalization]
   * [Documentation#Tiles Tiles]
   * [Documentation#Persistence Persistence]
-
