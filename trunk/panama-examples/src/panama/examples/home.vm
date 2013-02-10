@@ -26,7 +26,7 @@
 	<hr />
 	<h4><a href="../issues">Issue Tracker (with database)</a></h4>
 	<p>This example of an issue tracker shows how to write database applications with Panama using the tightly integrated Ebean ORM persistence layer.</p>
-	<p><strong>Note:</strong> For sake of simplicity we use an embedded H2 database for this example. Thus everytime you startup the web-application you'll start with a new, empty database.</p>
+	<div class="note"><strong>Note:</strong> For sake of simplicity we use an embedded H2 database for this example. Ebean is so configured to create the database anew, everytime the web-application is started, so don't be surprised when earlier entries are gone after a restart.</div>
 	<hr />
 </body>
 </html>
