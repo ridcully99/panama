@@ -261,16 +261,16 @@ Now let's implement the action to handle the input.
 {{{
 @Action
 public Target save() {
-  FormData fd = new FormData(myForm);            // 1
-  fd.setInput(context.getParameterMap());        // 2
-  String firstName = fd.getString("firstName");  // 3
-  Date birthday = fd.getDate("birthday");        // 4
+  FormData fd = new FormData(myForm)                   // 1
+                       .withDataFromRequest(context);  // 2
+  String firstName = fd.getString("firstName");        // 3
+  Date birthday = fd.getDate("birthday");              // 4
 }
 }}}
 
 In line (1) we create an instance of `FormData` based on our form.
 
-In line (2) we provide our form data with some input. Here we take all the input coming from the HTML form using a convenient method provided by `Context`.
+In line (2) we fill our form data object with data from the request.
 
 In line (3) we fetch the first name, entered into the HTML form; nothing special here.
 
