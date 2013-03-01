@@ -1,3 +1,0 @@
-<td style="background-color:rgb($red, $green, $blue)">
-	<p>Hello $name!</p>
-</td>
