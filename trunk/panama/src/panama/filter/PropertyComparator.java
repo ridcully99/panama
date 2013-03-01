@@ -1,17 +1,17 @@
 /*
- *  Copyright 2004-2012 Robert Brandner (robert.brandner@gmail.com) 
- *  
- *  Licensed under the Apache License, Version 2.0 (the "License"); 
- *  you may not use this file except in compliance with the License. 
- *  You may obtain a copy of the License at 
- *  
- *  http://www.apache.org/licenses/LICENSE-2.0 
- *  
- *  Unless required by applicable law or agreed to in writing, software 
- *  distributed under the License is distributed on an "AS IS" BASIS, 
- *  WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied. 
- *  See the License for the specific language governing permissions and 
- *  limitations under the License. 
+ *  Copyright 2004-2012 Robert Brandner (robert.brandner@gmail.com)
+ *
+ *  Licensed under the Apache License, Version 2.0 (the "License");
+ *  you may not use this file except in compliance with the License.
+ *  You may obtain a copy of the License at
+ *
+ *  http://www.apache.org/licenses/LICENSE-2.0
+ *
+ *  Unless required by applicable law or agreed to in writing, software
+ *  distributed under the License is distributed on an "AS IS" BASIS,
+ *  WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
+ *  See the License for the specific language governing permissions and
+ *  limitations under the License.
  */
 package panama.filter;
 
@@ -31,7 +31,7 @@ import com.avaje.ebean.Query;
  * A Filter that checks if all, any or none of the specified properties match the specified pattern.
  * The comparation is done exactly and is on String basis (toString() is used on all properties).
  * This class is the base class for other Filters with more enhanced matching methods (RegExp, Search, ...)
- * 
+ *
  * @author Ridcully
  */
 public class PropertyComparator extends Filter {
@@ -43,14 +43,6 @@ public class PropertyComparator extends Filter {
 	public final static int ANY_PROPERTIES = 2;
 	public final static int NO_PROPERTIES = 3;
 
-	/**
-	 * Allowed values for typeHints (used in asExpression() method)
-	 */
-	public final static String TYPE_STRING = "string";
-	public final static String TYPE_DATE = "date";
-	public final static String TYPE_NUMBER = "number";
-	public final static String TYPE_OTHER = "other";
-	
 	protected List<String> properties;
 	protected String pattern;
 	protected int mode;
@@ -65,7 +57,7 @@ public class PropertyComparator extends Filter {
 		this.pattern = pattern == null || pattern.equals("") ? null : pattern;
 		this.mode = mode >= ALL_PROPERTIES && mode <= NO_PROPERTIES ? mode : ANY_PROPERTIES;
 	}
-	
+
 	/**
 	 * Tests specified properties
 	 */
@@ -93,11 +85,11 @@ public class PropertyComparator extends Filter {
 		}
 		return (all && mode == ALL_PROPERTIES) || (any && mode == ANY_PROPERTIES) || ((!any) && mode == NO_PROPERTIES);
 	}
-	
+
 	public String toString() {
 		return pattern;
 	}
-	
+
 	/**
 	 * Tests one property - this method may be overwritten by extending classes.
 	 * @param name
@@ -109,10 +101,10 @@ public class PropertyComparator extends Filter {
 	}
 
 	/**
-	 * Creates representation of the Comparator for use with Ebean's Expression model. 
+	 * Creates representation of the Comparator for use with Ebean's Expression model.
 	 * Used by QueryListModel.
 	 * This method uses the forProperty() method and joins the results of that method
-	 * depending on this.mode. 
+	 * depending on this.mode.
 	 * @param filterExtensions an optional Map of FilterExtensions to tweak the default behaviour of the filter for each property separately.
 	 * @return Some sort of Expression representing the Filter.
 	 */
@@ -120,8 +112,8 @@ public class PropertyComparator extends Filter {
 	public Expression asExpression(Query<?> query, Map<String, FilterExtension> filterExtensions) {
 		Expression result = null;
 		if (getMode() == ALL_PROPERTIES) {
-			result = Ebean.getExpressionFactory().conjunction(query); 
-		} else { // for NO_PROPERTIES we do a disjunction and at the end negate it -> NOT (A or B or C) 
+			result = Ebean.getExpressionFactory().conjunction(query);
+		} else { // for NO_PROPERTIES we do a disjunction and at the end negate it -> NOT (A or B or C)
 			result = Ebean.getExpressionFactory().disjunction(query);
 		}
 		for (String property : getProperties()) {
@@ -136,7 +128,7 @@ public class PropertyComparator extends Filter {
 		}
 		return result;
 	}
-	
+
 	/**
 	 * Expression for one Property
 	 * @param name
@@ -145,7 +137,7 @@ public class PropertyComparator extends Filter {
 	protected Expression forProperty(String name) {
 		return Ebean.getExpressionFactory().eq(name, pattern);
 	}
-	
+
 	public int getMode() {
 		return mode;
 	}
