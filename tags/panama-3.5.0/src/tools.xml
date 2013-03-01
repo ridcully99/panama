@@ -1,0 +1,16 @@
+<!-- 
+	All of the framework's tools.
+	These are automatically added to ViewToolManager instance in Dispatcher#init()
+-->
+<tools>
+    <toolbox scope="request">
+		<tool class="panama.tools.TileTool" />
+    </toolbox>
+
+    <toolbox scope="session">
+    </toolbox>
+
+    <toolbox scope="application">
+    	<tool class="panama.tools.NullTool" />	<!-- this is the NullTool from http://wiki.apache.org/velocity/NullTool -->
+    </toolbox>
+</tools>
