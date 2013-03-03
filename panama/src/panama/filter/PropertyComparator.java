@@ -17,7 +17,6 @@ package panama.filter;
 
 import java.util.Arrays;
 import java.util.List;
-import java.util.Map;
 
 import panama.util.DynaBeanUtils;
 
@@ -35,6 +34,8 @@ import com.avaje.ebean.Query;
  * @author Ridcully
  */
 public class PropertyComparator extends Filter {
+
+	private static final long serialVersionUID = 1L;
 
 	/**
 	 * Allowed values for propertiesMode parameter of constructors.
@@ -62,7 +63,7 @@ public class PropertyComparator extends Filter {
 	 * Tests specified properties
 	 */
 	@Override
-	public boolean match(Object object, Map<String, FilterExtension> filterExtensions) {
+	public boolean match(Object object) {
 		if (object == null || properties == null || pattern == null) {
 			return true;
 		}
@@ -72,7 +73,7 @@ public class PropertyComparator extends Filter {
 			boolean match = false;
 			try {
 				Object value = DynaBeanUtils.getProperty(object, name);
-				FilterExtension extension = filterExtensions != null ? (FilterExtension)filterExtensions.get(name) : null;
+				FilterExtension extension = extensions.get(name);
 				match = extension == null ? matchProperty(name, value) : extension.matchProperty(name, value, pattern);
 				all = all && match;
 				any = any || match;
@@ -109,7 +110,7 @@ public class PropertyComparator extends Filter {
 	 * @return Some sort of Expression representing the Filter.
 	 */
 	@Override
-	public Expression asExpression(Query<?> query, Map<String, FilterExtension> filterExtensions) {
+	public Expression asExpression(Query<?> query) {
 		Expression result = null;
 		if (getMode() == ALL_PROPERTIES) {
 			result = Ebean.getExpressionFactory().conjunction(query);
@@ -117,7 +118,7 @@ public class PropertyComparator extends Filter {
 			result = Ebean.getExpressionFactory().disjunction(query);
 		}
 		for (String property : getProperties()) {
-			FilterExtension extension = filterExtensions != null ? filterExtensions.get(property) : null;
+			FilterExtension extension = extensions.get(property);
 			Expression exp = extension == null ? forProperty(property) : extension.forProperty(property, pattern);
 			if (exp != null) {
 				((Junction<?>)result).add(exp);
