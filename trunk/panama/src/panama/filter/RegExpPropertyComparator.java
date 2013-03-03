@@ -1,17 +1,17 @@
 /*
- *  Copyright 2004-2012 Robert Brandner (robert.brandner@gmail.com) 
- *  
- *  Licensed under the Apache License, Version 2.0 (the "License"); 
- *  you may not use this file except in compliance with the License. 
- *  You may obtain a copy of the License at 
- *  
- *  http://www.apache.org/licenses/LICENSE-2.0 
- *  
- *  Unless required by applicable law or agreed to in writing, software 
- *  distributed under the License is distributed on an "AS IS" BASIS, 
- *  WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied. 
- *  See the License for the specific language governing permissions and 
- *  limitations under the License. 
+ *  Copyright 2004-2012 Robert Brandner (robert.brandner@gmail.com)
+ *
+ *  Licensed under the Apache License, Version 2.0 (the "License");
+ *  you may not use this file except in compliance with the License.
+ *  You may obtain a copy of the License at
+ *
+ *  http://www.apache.org/licenses/LICENSE-2.0
+ *
+ *  Unless required by applicable law or agreed to in writing, software
+ *  distributed under the License is distributed on an "AS IS" BASIS,
+ *  WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
+ *  See the License for the specific language governing permissions and
+ *  limitations under the License.
  */
 package panama.filter;
 
@@ -30,8 +30,10 @@ import com.avaje.ebean.Expression;
  */
 public class RegExpPropertyComparator extends PropertyComparator {
 
+	private static final long serialVersionUID = 1L;
+
 	protected Pattern regExpPattern;
-	
+
 	/**
 	 */
 	public RegExpPropertyComparator(String pattern, int mode, String... properties) {
@@ -44,8 +46,8 @@ public class RegExpPropertyComparator extends PropertyComparator {
 		super(pattern, mode, properties);
 		regExpPattern = Pattern.compile(pattern, flags);
 	}
-	
-	
+
+
 	/**
 	 * Tests if value matches the regular expression pattern specified in the constructor.
 	 * @param name
@@ -60,7 +62,7 @@ public class RegExpPropertyComparator extends PropertyComparator {
 		}
 		return matches;
 	}
-	
+
 	/**
 	 * Expression for one Property.
 	 * Note, that the pattern itself must contain SQL wildcards like % or _ here, whereas the {@link SearchPropertyComparator} automatically encloses the pattern with % wildcards.
@@ -69,5 +71,5 @@ public class RegExpPropertyComparator extends PropertyComparator {
 	 */
 	protected Expression forProperty(String name) {
 		return Ebean.getExpressionFactory().ilike(name, pattern);
-	}	
+	}
 }

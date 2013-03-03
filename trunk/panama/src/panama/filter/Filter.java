@@ -17,7 +17,10 @@ package panama.filter;
 
 import java.io.Serializable;
 import java.util.Collection;
+import java.util.HashMap;
 import java.util.Map;
+
+import panama.collections.QueryTable;
 
 import com.avaje.ebean.Ebean;
 import com.avaje.ebean.Expression;
@@ -33,6 +36,8 @@ public class Filter implements Serializable {
 
 	protected static final long serialVersionUID = 1L;
 
+	protected Map<String, FilterExtension> extensions = new HashMap<String, FilterExtension>();
+
 	/**
 	 * This method applies the Filter onto the specified object. The method in this base class
 	 * simply returns true, classes extending this class will return more useful values.
@@ -41,18 +46,6 @@ public class Filter implements Serializable {
 	 * @return wether the specified object matches the filter.
 	 */
 	public boolean match(Object object) {
-		return match(object, null);
-	}
-
-	/**
-	 * This method applies the Filter onto the specified object. The method in this base class
-	 * simply returns true, classes extending this class will return more useful values.
-	 *
-	 * @param object
-	 * @param filterExtensions a Map<propertyName, FilterExtension> for additional stuff
-	 * @return wether the specified object matches the filter.
-	 */
-	public boolean match(Object object, Map<String, FilterExtension> filterExtensions) {
 		return true;
 	}
 
@@ -63,10 +56,20 @@ public class Filter implements Serializable {
 	 * @param filterExtensions A Map<propertyName, FilterExtension> with optional stuff for special filter treatments
 	 * @return an Expression representing the Filter.
 	 */
-	public Expression asExpression(Query<?> query, Map<String, FilterExtension> filterExtensions) {
+	public Expression asExpression(Query<?> query) {
 		return Ebean.getExpressionFactory().raw("1=1");
 	}
 
+	/**
+	 * Sets an FilterExtension to modify the way the filter handles the specified property.
+	 * E.g. you can set the IntegerFilterExtension for Integer properties.
+	 *
+	 * @param propertyName
+	 * @param extension
+	 */
+	public void setExtension(String propertyName, FilterExtension extension) {
+		extensions.put(propertyName, extension);
+	}
 
 	/**
 	 * Gets a string representation of the filter.
@@ -85,6 +88,10 @@ public class Filter implements Serializable {
 		return new SearchPropertyComparator(pattern, PropertyComparator.ANY_PROPERTIES, propertyNames);
 	}
 
+	public static Filter eq(String pattern, String propertyName) {
+		return new PropertyComparator(pattern, PropertyComparator.ALL_PROPERTIES, propertyName);
+	}
+
 	public static Filter anyEq(String pattern, String... propertyNames) {
 		return new PropertyComparator(pattern, PropertyComparator.ANY_PROPERTIES, propertyNames);
 	}
@@ -95,6 +102,16 @@ public class Filter implements Serializable {
 
 	public static Filter allEq(String pattern, String... propertyNames) {
 		return new PropertyComparator(pattern, PropertyComparator.ALL_PROPERTIES, propertyNames);
+	}
+
+	/**
+	 *
+	 * @param pattern pattern to match, must contain regexp-expressions or SQL-wildcards if used with {@link QueryTable}
+	 * @param propertyName
+	 * @return
+	 */
+	public static Filter matches(String pattern, String propertyName) {
+		return new PropertyComparator(pattern, PropertyComparator.ALL_PROPERTIES, propertyName);
 	}
 
 	public static Filter anyMatches(String pattern, String... propertyNames) {

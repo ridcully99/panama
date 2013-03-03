@@ -1,17 +1,17 @@
 /*
- *  Copyright 2004-2012 Robert Brandner (robert.brandner@gmail.com) 
- *  
- *  Licensed under the Apache License, Version 2.0 (the "License"); 
- *  you may not use this file except in compliance with the License. 
- *  You may obtain a copy of the License at 
- *  
- *  http://www.apache.org/licenses/LICENSE-2.0 
- *  
- *  Unless required by applicable law or agreed to in writing, software 
- *  distributed under the License is distributed on an "AS IS" BASIS, 
- *  WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied. 
- *  See the License for the specific language governing permissions and 
- *  limitations under the License. 
+ *  Copyright 2004-2012 Robert Brandner (robert.brandner@gmail.com)
+ *
+ *  Licensed under the Apache License, Version 2.0 (the "License");
+ *  you may not use this file except in compliance with the License.
+ *  You may obtain a copy of the License at
+ *
+ *  http://www.apache.org/licenses/LICENSE-2.0
+ *
+ *  Unless required by applicable law or agreed to in writing, software
+ *  distributed under the License is distributed on an "AS IS" BASIS,
+ *  WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
+ *  See the License for the specific language governing permissions and
+ *  limitations under the License.
  */
 package panama.collections;
 
@@ -43,25 +43,26 @@ import panama.util.TableController;
  * Table implementing paging and sorting and filtering.
  * @author Ridcully
  */
-public class DefaultTable implements Table, Comparator, Serializable {
-	
+public class DefaultTable implements Table, Comparator<Object>, Serializable {
+
+	private static final long serialVersionUID = 1L;
+
 	/* Logging */
-	protected static SimpleLogger log = new SimpleLogger(DefaultTable.class);	
-	
+	protected static SimpleLogger log = new SimpleLogger(DefaultTable.class);
+
 	protected final String key;
-	/* model should be transient so registerTable can detect that the session was restored, 
-	 * and take the model from the inital table; 
-	 * at least for QueryTable this is mandatory as it's query is transient too 
-	 * and would be null otherwise after a restored session 
+	/* model should be transient so registerTable can detect that the session was restored,
+	 * and take the model from the inital table;
+	 * at least for QueryTable this is mandatory as it's query is transient too
+	 * and would be null otherwise after a restored session
 	 */
 	protected transient ListModel model = null;
 	protected Set selected = new HashSet();
 	protected Map<String, Filter> filters = new HashMap<String, Filter>();
-	protected Map<String, Map<String, FilterExtension>> filterExtensions = new HashMap<String, Map<String, FilterExtension>>();
 	protected String cacheCode = new VMID().toString();		/* a unique identifier */
 	private String isSorted = cacheCode + "_isSorted";		/* another one */
 	private String isFiltered = cacheCode + "_isFiltered";	/* and another one */
-	
+
 	protected String sortBy = null;
 	protected String sortDirection = Table.SORT_ASC;
 	protected String getterName = null;
@@ -69,20 +70,20 @@ public class DefaultTable implements Table, Comparator, Serializable {
 	protected int currentPage = 1;
 	protected int entriesPerPage = 10;
 	protected boolean pagingEnabled = true;	// can be set to false to avoid paging and show all rows
-	
+
 	public DefaultTable(String key) {
 		this.key = key;
 	}
-	
+
 	public DefaultTable(String key, ListModel model) {
 		this.key = key;
 		setModel(model);
-	}	
-	
+	}
+
 	public String getKey() {
 		return key;
 	}
-	
+
 	public ListModel getModel() {
 		return model;
 	}
@@ -120,10 +121,10 @@ public class DefaultTable implements Table, Comparator, Serializable {
 		}
 		return rows;
 	}
-	
+
 	/**
 	 * @see panama.collections.Table#getRows()
-	 */	
+	 */
 	public List getRows() {
 		try {
 			List rows = fetchRows();
@@ -156,12 +157,12 @@ public class DefaultTable implements Table, Comparator, Serializable {
 			log.error("getRows() failed: "+e.getMessage());
 			log.errorException(e);
 			return null;
-		}		
+		}
 	}
 
 	/**
 	 * @see panama.collections.Table#getPageRows()
-	 */	
+	 */
 	public List getPageRows() {
 		List rows = getRows();
 		if (rows == null) { return null; }
@@ -185,7 +186,7 @@ public class DefaultTable implements Table, Comparator, Serializable {
 		List rows = getRows();
 		return rows != null ? rows.size() : 0;
 	}
-	
+
 	/**
 	 * Sorts the specified list.
 	 * @param rows
@@ -197,7 +198,7 @@ public class DefaultTable implements Table, Comparator, Serializable {
 		/*
 		 * find a getter method - this is just a speed up,
 		 * under certain circumstances it will be necessary to find another one
-		 * while sorting. 
+		 * while sorting.
 		 * @see #compare()
 		 */
 		Class clazz = rows.get(0).getClass();
@@ -208,7 +209,7 @@ public class DefaultTable implements Table, Comparator, Serializable {
 		}
 		Collections.sort(rows, this);
 	}
-	
+
 	/**
 	 * The compare method for sorting our rows,
 	 * @see java.util.Comparator#compare(java.lang.Object, java.lang.Object)
@@ -220,19 +221,19 @@ public class DefaultTable implements Table, Comparator, Serializable {
 			if (sortDirection == Table.SORT_DESC) {	// no equals() needed here
 				return p2 == null ? (p1 == null ? 0 : -1 ) : (p1 == null ? 1 : p2.compareTo(p1));
 			} else {
-				return p1 == null ? (p2 == null ? 0 : -1 ) : (p2 == null ? 1 : p1.compareTo(p2));				
+				return p1 == null ? (p2 == null ? 0 : -1 ) : (p2 == null ? 1 : p1.compareTo(p2));
 			}
 		} catch (Exception e) {
 			return 0; 	// do not sort if any errors occur
 		}
 	}
-	
+
 	/**
 	 * Tries to get a value from specified object.
 	 * If the sortByGetter is null DynaBeanUtils.getProperty() is used, Otherwise the predefined sortByGetter
 	 * is used.
 	 * This happens if the object is not from exactly the same class as the one the sortByGetter is created from.
-	 * At last, if the value is instanceof String it is converted to lowercase for case-insensitive sorting 
+	 * At last, if the value is instanceof String it is converted to lowercase for case-insensitive sorting
 	 * @param o
 	 * @return the value of the property specified by sortBy of the specified object.
 	 */
@@ -253,14 +254,14 @@ public class DefaultTable implements Table, Comparator, Serializable {
 		}
 		return v;
 	}
-	
+
 	/**
 	 * @see panama.collections.Table#getSortBy()
 	 */
 	public String getSortBy() {
 		return sortBy;
 	}
-	
+
 	/**
 	 * @see panama.collections.Table#setSortBy(java.lang.String)
 	 */
@@ -275,14 +276,14 @@ public class DefaultTable implements Table, Comparator, Serializable {
 		}
 		return this;
 	}
-	
+
 	/**
 	 * @see panama.collections.Table#getSortDirection()
 	 */
 	public String getSortDirection() {
 		return sortDirection;
 	}
-		
+
 	/**
 	 * @see panama.collections.Table#setSortDirection(java.lang.String)
 	 */
@@ -296,8 +297,8 @@ public class DefaultTable implements Table, Comparator, Serializable {
 		setSortDirection(sortDirection);
 		return this;
 	}
-	
-	
+
+
 	/**
 	 * @see panama.collections.Table#getCurrentPage()
 	 */
@@ -323,7 +324,7 @@ public class DefaultTable implements Table, Comparator, Serializable {
 	 */
 	public int getEntriesPerPage() {
 		if (getPagingEnabled()) {
-			return entriesPerPage;			
+			return entriesPerPage;
 		} else {
 			return Integer.MAX_VALUE;
 		}
@@ -346,7 +347,7 @@ public class DefaultTable implements Table, Comparator, Serializable {
 	public int getPageCount() {
 		if (getEntriesPerPage() == 0) { return 1; }
 		int rowCount = getRowCount();	//List rows = getRows();
-		if (rowCount == 0) { return 1; }		
+		if (rowCount == 0) { return 1; }
 		/* next line: *1.0 to convert to double, otherwise division would be made on int basis */
 		return new Double(Math.ceil((rowCount*1.0) / getEntriesPerPage())).intValue();
 	}
@@ -355,7 +356,7 @@ public class DefaultTable implements Table, Comparator, Serializable {
 		this.pagingEnabled = pagingEnabled;
 		return this;
 	}
-		
+
 	public boolean getPagingEnabled() {
 		return pagingEnabled;
 	}
@@ -365,29 +366,13 @@ public class DefaultTable implements Table, Comparator, Serializable {
 	}
 
 	/**
-	 * Gets the tables Map of Filters. 
+	 * Gets the tables Map of Filters.
 	 * @return A Map of Filters
 	 */
 	public Map<String, Filter> getFilters() {
 		return filters;
 	}
 
-	/**
-	 * Gets the tables Map of FilterExtensions. 
-	 * @return A Map of Map<propertyName, FilterExtension>
-	 */
-	public Map<String, Map<String, FilterExtension>> getFilterExtensions() {
-		return filterExtensions;
-	}	
-	
-	public Table putFilterExtension(String filterKey, String propertyName, FilterExtension extension) {
-		if (!filterExtensions.containsKey(filterKey)) {
-			filterExtensions.put(filterKey, new HashMap<String, FilterExtension>());
-		}
-		filterExtensions.get(filterKey).put(propertyName, extension);
-		return this;
-	}
-	
 	/**
 	 * Applies all filters onto the specified rows. The original list is not changed by this method.
 	 * It is probably faster to iterate over the rows for every filter as with some luck
@@ -400,30 +385,29 @@ public class DefaultTable implements Table, Comparator, Serializable {
 		for (Map.Entry<String, Filter> e : getFilters().entrySet()) {
 			String k = e.getKey();
 			Filter f = e.getValue();
-			Map<String, FilterExtension> extensions = filterExtensions.get(k);
 			for (Iterator it = result.iterator(); it.hasNext(); ) {
-				if (!f.match(it.next(), extensions)) {
+				if (!f.match(it.next())) {
 					it.remove();
 				}
 			}
 		}
 		return result;
 	}
-	
+
 	/**
 	 * @see panama.collections.Table#sortLink(java.lang.String)
 	 */
 	public String sortLink(String property) {
 		return "../"+TableController.class.getName()+"/sort?tableid="+key+"&property="+property;
 	}
-	
+
 	/**
 	 * @see panama.collections.Table#pageLink(int)
 	 */
 	public String pageLink(int page) {
 		return "../"+TableController.class.getName()+"/turnto?tableid="+key+"&page="+page;
 	}
-	
+
 	/**
 	 * @see panama.collections.Table#eppLink(int)
 	 */
@@ -443,16 +427,16 @@ public class DefaultTable implements Table, Comparator, Serializable {
 					b.append(",");
 				}
 				b.append(p);
-				first = false; 
+				first = false;
 			}
 		}
 		return b.toString();
 	}
-	
+
 	/**
 	 * @see panama.collections.Table#pagingEnabledLink(boolean)
 	 */
 	public String pagingEnabledLink(boolean enabled) {
-		return "../"+TableController.class.getName()+"/setpagingenabled?tableid="+key+"&enabled="+enabled;		
-	}	
+		return "../"+TableController.class.getName()+"/setpagingenabled?tableid="+key+"&enabled="+enabled;
+	}
 }
