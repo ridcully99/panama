@@ -231,6 +231,13 @@ myForm.addField(new DateField("birthday", false, "yyyy-MM-dd"));
 }}}
 Usually this is done within a `static` block in your controller class, as this is only a definition of the form and as long as it isn't changed during run time, only one instance is needed and can be shared by all instances of your controller.
 
+*Note* The `Form` class has some other constructors too, e.g. `new Form(Foo.class)` would create a form with `Field`s for all properties of class `Foo` or `Form(Field... fields)` which allows for a cleaner and shorter version of the above:
+{{{
+Form myForm = new Form(
+    new StringField("firstname"),
+    new DateField("birthday", false, "yyyy-MM-dd"));
+}}}
+
 == Fields ==
 
 Panama provides `Field` classes for all kinds of input: There's `StringField`, `IntegerField`, `BooleanField` and even a `DateField`. Please see the [http://panama.googlecode.com/svn/trunk/panama/doc/panama/form/package-summary.html JavaDoc] for a complete list. And you can easily create and use your own `Field` classes as well, if needed.
@@ -278,6 +285,10 @@ In line (4) we fetch the birthday, entered into the HTML form; here the input is
 
 Starting with version 3.4.2 lines (1) and (2) can be combined by using `FormData fd = new FormData(myForm).withDataFromRequest(context);`
 
+== Input Validation ==
+
+TODO
+
 === Java => HTML ===
 
 If you want to edit an existing set of data you'll want so somehow prefill the HTML form that's shown to the user. For this, you create a `FormData` object and provide input values in Java and then put it into the context so it can be accessed from within your HTML template.
@@ -292,10 +303,6 @@ public Target edit() {
     return render("template.vm");
 }
 }}}
-
-== Input Validation ==
-
-TODO
 
 ----
 
