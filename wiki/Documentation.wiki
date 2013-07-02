@@ -54,7 +54,7 @@ Per Controller you may specify one of the actions to be the default action. The 
 
 == Targets ==
 
-Targets are objects returned by Actions and tell Panama what to do next. Most of the time the `TemplateTarget` will be used,  but there’s also `RedirectTarget`, `PlainTextTarget` and even `JSONTarget (useful for responding to AJAX requests). And you can easily provide your own Targets as well, just extend the abstract `Target` class and implement the `go()` method.
+Targets are objects returned by Actions and tell Panama what to do next. Most of the time the `TemplateTarget` will be used,  but there’s also `RedirectTarget`, `PlainTextTarget` and even `JSONTarget` (useful for responding to AJAX requests). And you can easily provide your own Targets as well, just extend the abstract `Target` class and implement the `go()` method.
 
 ==Context==
 
