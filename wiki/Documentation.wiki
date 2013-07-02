@@ -285,10 +285,6 @@ In line (4) we fetch the birthday, entered into the HTML form; here the input is
 
 Starting with version 3.4.2 lines (1) and (2) can be combined by using `FormData fd = new FormData(myForm).withDataFromRequest(context);`
 
-== Input Validation ==
-
-TODO
-
 === Java => HTML ===
 
 If you want to edit an existing set of data you'll want so somehow prefill the HTML form that's shown to the user. For this, you create a `FormData` object and provide input values in Java and then put it into the context so it can be accessed from within your HTML template.
@@ -303,6 +299,10 @@ public Target edit() {
     return render("template.vm");
 }
 }}}
+
+== Input Validation ==
+
+TODO
 
 ----
 
