@@ -194,47 +194,52 @@ public class FormData {
 	// ----------------------------------------------------------------------------
 
 	/**
-	 * Applies current input-data to the specified bean.
-	 * The field names must match the property names for this method to work as expected.
-	 * If wrong property-types are encountered, or fields are missing for property-names a message is logged at warn-level.
-	 * @param bean The bean, the current input-data will be applied to.
-	 */
-	public void applyTo(Object bean) {
-		applyTo(bean, Form.EXCLUDE_PROPERTIES);
-	}
-
-	/**
 	 * Applies current input-data to the specified properties of the specified bean.
 	 * The field names must match the property names for this method to work as expected.
 	 * If wrong property-types are encountered, or fields are missing for property-names a message is logged at warn-level.
 	 * @param bean The bean, the input should be applied to.
-	 * @param properties the properties to be set
+	 * @param propertiesToSet the properties to be set; a null value addresses _all_ properties
 	 */
-	public void applyTo(Object bean, String... properties) {
-		applyTo(bean, Form.INCLUDE_PROPERTIES, properties);
+	public void applyTo(Object bean, String... propertiesToSet) {
+		applyTo(bean, propertiesToSet, null);
 	}
 
 	/**
-	 * Applies current input-data to the specified or all but the properties of the specified bean.
+	 * Applies current input-data to the properties of the specified bean, except for the properties specified to be excluded.
 	 * The field names must match the property names for this method to work as expected.
 	 * If wrong property-types are encountered, or fields are missing for property-names a message is logged at warn-level.
-	 * Properties annotated as javax.persistence.Version are NOT set!
-	 *
 	 * @param bean The bean, the input should be applied to.
-	 * @param properties the properties to be set or to be skipped, depending on method
-	 * @param method wether to set the specified or all _but_ the specified properties. Value should be one of Form.INCLUDE_PROPERTIES or Form.EXCLUDE_PROPERTIES
+	 * @param propertiesToExclude the properties to be set; a null value addresses _all_ properties
 	 */
-	public void applyTo(Object bean, int method, String... properties) {
+	public void applyToExcept(Object bean, String... propertiesToExclude) {
+		applyTo(bean, null, propertiesToExclude);
+	}
+	
+	/**
+	 * Applies current input-data to the specified properties of the specified bean.
+	 * 
+	 * Normally you wouldn't use this method, but {@link applyTo(Class, String...)} or {@link applyToExcluding(Class, String...)}
+	 * 
+	 * The field names must match the property names for this method to work as expected.
+	 * If wrong property-types are encountered, or fields are missing for property-names a message is logged at warn-level.
+	 * @param bean The bean, the input should be applied to.
+	 * @param propertiesToSet the properties to be set; a null value addresses _all_ properties
+	 * @param propertiesToSkip the properties to be skipped; a null value addresses _no_ property
+	 */
+	protected void applyTo(Object bean, String[] propertiesToSet, String[] propertiesToSkip) {
 		List<String> allProperties = Arrays.asList(DynaBeanUtils.getPropertyNames(bean));
-		List<String> props = Arrays.asList(properties == null ? new String[0] : properties);
-		if (method == Form.EXCLUDE_PROPERTIES) {
-			List<String> hlp = new ArrayList<String>(allProperties);	// must create a real list here, the 'asList' arrays do not support the removeAll method
-			hlp.removeAll(props);
-			props = hlp;
+		List<String> props = new ArrayList<String>();
+		if (propertiesToSet == null || propertiesToSet.length == 0) {
+			props.addAll(allProperties);
+		} else {
+			props.addAll(Arrays.asList(propertiesToSet));
+		}
+		if (propertiesToSkip != null && propertiesToSkip.length > 0) {
+			props.removeAll(Arrays.asList(propertiesToSkip));
 		}
 		for (String propertyName : props) {
 			if (!allProperties.contains(propertyName)) {
-				log.warn("Class "+bean.getClass()+" does not contain the specified property "+propertyName+"; skipping this property.");
+				log.warn("Skipping property "+propertyName+" as class "+bean.getClass()+" does not have such a property.");
 				continue;
 			}
 			try {
@@ -251,7 +256,7 @@ public class FormData {
 			} catch (Exception e) {
 				/* NOP - continue; the error is already added to the errors-list. */
 			}
-		}
+		}		
 	}
 
 	// ----------------------------------------------------------------------------
