@@ -33,7 +33,7 @@ import panama.form.FileItemField;
 import panama.form.Form;
 import panama.form.FormData;
 import panama.form.StringField;
-import panama.heureka.media.MediaSupport;
+//import panama.heureka.media.MediaSupport;
 
 /**
  * @author ridcully
@@ -52,30 +52,30 @@ public class FileItemsController extends BaseController {
 		return render("fileitems_view.vm");
 	}
 
-	@Action
-	public Target save() throws MagicParseException, MagicMatchNotFoundException, MagicException {
-		if (context.getParameter("submit") != null) {
-			FormData fd = new FormData(form).withDataFromRequest(context);
-			context.put("msg", fd.getString("msg"));
-			context.put("attachment", fd.getFileItem("attachment"));
-			context.put("showresults", Boolean.TRUE);
-			FileItem it = fd.getFileItem("attachment");
-			byte[] originalData = it.get();
-			String srcMimeType = Magic.getMagicMatch(originalData).getMimeType();
-			byte[] data = MediaSupport.createImageFlavor(it.get(), srcMimeType, MediaSupport.CONTENTTYPE_IMAGE_JPEG, 180, 180, true, false, 0.75f);
-
-			OutputStream out;
-			context.getResponse().setContentType(MediaSupport.CONTENTTYPE_IMAGE_JPEG);
-			context.getResponse().setContentLength(data.length);
-			try {
-				out = context.getResponse().getOutputStream();
-				out.write(data);
-				out.close();
-			} catch (IOException e) {
-				e.printStackTrace();
-			}
-		}
-		return null;
-		//return view();
-	}
+//	@Action
+//	public Target save() throws MagicParseException, MagicMatchNotFoundException, MagicException {
+//		if (context.getParameter("submit") != null) {
+//			FormData fd = new FormData(form).withDataFromRequest(context);
+//			context.put("msg", fd.getString("msg"));
+//			context.put("attachment", fd.getFileItem("attachment"));
+//			context.put("showresults", Boolean.TRUE);
+//			FileItem it = fd.getFileItem("attachment");
+//			byte[] originalData = it.get();
+//			String srcMimeType = Magic.getMagicMatch(originalData).getMimeType();
+//			byte[] data = MediaSupport.createImageFlavor(it.get(), srcMimeType, MediaSupport.CONTENTTYPE_IMAGE_JPEG, 180, 180, true, false, 0.75f);
+//
+//			OutputStream out;
+//			context.getResponse().setContentType(MediaSupport.CONTENTTYPE_IMAGE_JPEG);
+//			context.getResponse().setContentLength(data.length);
+//			try {
+//				out = context.getResponse().getOutputStream();
+//				out.write(data);
+//				out.close();
+//			} catch (IOException e) {
+//				e.printStackTrace();
+//			}
+//		}
+//		return null;
+//		//return view();
+//	}
 }

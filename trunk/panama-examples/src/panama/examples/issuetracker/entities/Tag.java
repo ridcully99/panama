@@ -32,8 +32,10 @@ public class Tag extends PersistentBean {
 
 	private String name;
 
-	@ManyToMany(mappedBy="tags", cascade=CascadeType.ALL)
-	private Set<Issue> issues;
+//  !! BUG in Ebean 2.7.7 breaks this bidirectional many-to-many relation!
+
+//	@ManyToMany(mappedBy="tags", cascade=CascadeType.ALL)
+//	private Set<Issue> issues;
 
 	public String getName() {
 		return name;
@@ -43,11 +45,11 @@ public class Tag extends PersistentBean {
 		this.name = name;
 	}
 
-	public Set<Issue> getIssues() {
-		return issues;
-	}
-
-	public void setIssues(Set<Issue> issues) {
-		this.issues = issues;
-	}
+//	public Set<Issue> getIssues() {
+//		return issues;
+//	}
+//
+//	public void setIssues(Set<Issue> issues) {
+//		this.issues = issues;
+//	}
 }

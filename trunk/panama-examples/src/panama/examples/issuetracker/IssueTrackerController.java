@@ -46,7 +46,7 @@ public class IssueTrackerController extends BaseController {
 
 	private Table table;
 
-	private final static Form form = new Form(Issue.class, Form.EXCLUDE_PROPERTIES, "createdAt");
+	private final static Form form = new Form(Issue.class).without("createdAt");
 	static {
 		form.getField("title").addValidator(ValidatorFactory.getNotEmptyValidator());
 		form.addField(new PersistentBeanField("tags", Tag.class));
@@ -84,7 +84,7 @@ public class IssueTrackerController extends BaseController {
 			FormData fd = new FormData(form).withDataFromRequest(context);
 			String id = fd.getString("id");
 			Issue e = PersistentBean.findOrCreate(Issue.class, id);
-			fd.applyTo(e, Form.EXCLUDE_PROPERTIES, "tags");
+			fd.applyToExcept(e, "tags");
 			if (fd.hasErrors()) {
 				return showForm(fd);
 			}
@@ -103,6 +103,8 @@ public class IssueTrackerController extends BaseController {
 	public Target delete() {
 		String id = context.getParameter("id");
 		if (id != null) {
+			Issue e = Ebean.find(Issue.class, id);
+			Ebean.deleteManyToManyAssociations(e, "tags");
 			int is = Ebean.delete(Issue.class, id);
 		}
 		return redirectToAction("list");

@@ -52,8 +52,7 @@ public class SecureGuestbookController extends BaseController {
 	private final static Form form;
 	static {
 		/* create form model based on GuestbookEntry class. This may be done static as long as the form is not changed later (make it final to ensure this) */
-		form = new Form();
-		form.addFields(GuestbookEntry.class, Form.EXCLUDE_PROPERTIES, "date");
+		form = new Form(GuestbookEntry.class).without("date");
 		form.addField(new StringField("token"));
 	}
 

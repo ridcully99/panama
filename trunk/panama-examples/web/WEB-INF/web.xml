@@ -3,10 +3,10 @@
 	xmlns="http://java.sun.com/xml/ns/javaee" xmlns:web="http://java.sun.com/xml/ns/javaee/web-app_2_5.xsd"
 	xsi:schemaLocation="http://java.sun.com/xml/ns/javaee http://java.sun.com/xml/ns/javaee/web-app_2_5.xsd"
 	id="WebApp_ID" version="2.5">
-	<display-name>panama-examples</display-name>
+	<display-name>display-name</display-name>
 
 	<filter>
-		<filter-name>PanamaExamples</filter-name>
+		<filter-name>Panama</filter-name>
 		<filter-class>panama.core.Dispatcher</filter-class>
 		<init-param>
 			<param-name>panama.languages</param-name>
@@ -19,7 +19,7 @@
 	</filter>
 
 	<filter-mapping>
-		<filter-name>PanamaExamples</filter-name>
+		<filter-name>Panama</filter-name>
 		<url-pattern>/*</url-pattern>
 	</filter-mapping>
 
