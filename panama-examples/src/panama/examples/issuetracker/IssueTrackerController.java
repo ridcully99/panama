@@ -84,7 +84,7 @@ public class IssueTrackerController extends BaseController {
 			FormData fd = new FormData(form).withDataFromRequest(context);
 			String id = fd.getString("id");
 			Issue e = PersistentBean.findOrCreate(Issue.class, id);
-			fd.applyToExcept(e, "tags");
+			fd.applyToWithout(e, "tags");
 			if (fd.hasErrors()) {
 				return showForm(fd);
 			}
