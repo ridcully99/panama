@@ -48,3 +48,8 @@ fieldset {
 textarea, input[type=text], input[type=password], select {
 	width:100%;
 }
+
+div.note {
+	background:#ddd;
+	border-left:6px solid #aaa;
+	padding: 4px;
