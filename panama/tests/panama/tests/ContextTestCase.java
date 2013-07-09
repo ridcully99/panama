@@ -48,4 +48,7 @@ public class ContextTestCase extends TestCase {
 		Context.destroyInstance();
 	}
 	
+	public void testEmpty() {
+		// prevents JUnit Test Runner from creating a warning
+	}
 }

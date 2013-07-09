@@ -120,7 +120,7 @@ public class Dispatcher implements Filter {
 	public void init(FilterConfig filterConfig) {
 		System.out.println(Version.LOGO_ASCIIART);
 		applicationContext = filterConfig.getServletContext();
-		applicationContext.setAttribute(APP_NAME_KEY, filterConfig.getFilterName());
+		applicationContext.setAttribute(APP_NAME_KEY, applicationContext.getContextPath());
 
 		@SuppressWarnings("rawtypes")
 		Enumeration names = filterConfig.getInitParameterNames();

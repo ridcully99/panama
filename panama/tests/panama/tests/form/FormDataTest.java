@@ -44,7 +44,7 @@ public class FormDataTest extends TestCase {
 		TestBean src = makeTestBean();
 		fd.setInput(src);
 		TestBean target = new TestBean();
-		fd.applyTo(target, Form.EXCLUDE_PROPERTIES, "prst");
+		fd.applyToExcept(target, "prst");
 		assertEquals(src.getBln(), target.getBln());
 	}
 	
@@ -57,7 +57,7 @@ public class FormDataTest extends TestCase {
 		src.setLngs(new Long[] {42L, 4711L});
 		fd.setInput(src);
 		TestBean target = new TestBean();
-		fd.applyTo(target, Form.EXCLUDE_PROPERTIES, "prst");
+		fd.applyToExcept(target, "prst");
 		assertEquals(2, target.getStrngs().length);
 		assertEquals(2, target.getLngs().length);
 	}	
@@ -69,7 +69,7 @@ public class FormDataTest extends TestCase {
 		TestBean src = new TestBean();
 		fd.setInput(src);
 		TestBean target = new TestBean();
-		fd.applyTo(target, Form.EXCLUDE_PROPERTIES, "prst");
+		fd.applyToExcept(target, "prst");
 		assertEquals(src.getBln(), target.getBln());
 	}
 	
