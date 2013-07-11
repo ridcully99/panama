@@ -328,7 +328,7 @@ In your code, use the `Context#getLocalizedString()` methods provided by the `Co
 
 == How Panama selects the language to use ==
 
-By default, Panama matches the user's preferred languages (as set in her browser) and the languages your application supports (see [#Configuration] below). Alternatively, you can explicitly use the `Context#putLocale()` method to set the language to use, e.g. if you allow the user to explicitly select a language in your application. The locale is stored in session scope. 
+By default, Panama matches the user's preferred languages (as set in her browser) and the languages your application supports (see [#Configuration] below). Alternatively, you can explicitly use the `Context#setLocale()` method to set the language to use, e.g. if you allow the user to explicitly select a language in your application. The locale is stored in session scope. 
 
 If no resources property file exists for the selected language, the standard fallback procedure to the default resources happens.
 
