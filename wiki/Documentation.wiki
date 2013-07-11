@@ -332,6 +332,8 @@ By default, Panama matches the user's preferred languages (as set in her browser
 
 If no resources property file exists for the selected language, the standard fallback procedure to the default resources happens.
 
+*See also* InternationalizationPitfalls
+
 *See also* the [http://code.google.com/p/panama/source/browse/#svn%2Ftrunk%2Fpanama-examples%2Fsrc%2Fpanama%2Fexamples%2Fi18n Internationalization example] in the panama-examples project.
 
 ----
@@ -353,6 +355,7 @@ $tiles.embed("controller", "action", {"param1":"value"})
 The optional parameter map extends or the alters the original request parameters while invoking the action. Afterwards the parameters are restored to the original values.
 
 *See also* InternationalizationPitfalls
+
 *See also* the [http://code.google.com/p/panama/source/browse/#svn%2Ftrunk%2Fpanama-examples%2Fsrc%2Fpanama%2Fexamples%2Ftiles Tiles example] in the panama-examples project.
 
 ----
