@@ -1,0 +1,25 @@
+#summary Pitfalls and how to avoid them
+
+Internationalization is based on Java's Resourc eBundles. One thing to keep in mind is, how `ResourceBundle.getBundle(String bundleName, Locale locale)` determines the actual resource file to use. 
+
+To find the correct, locale-specific, resource bundle, getBundle builds variations of the bundle name until it finds the name of a class that can be loaded. The series of names looks like this:
+
+{{{
+bundleName + "_" + localeLanguage + "_" + localeCountry + "_" + localeVariant 
+bundleName + "_" + localeLanguage + "_" + localeCountry 
+bundleName + "_" + localeLanguage 
+bundleName + "_" + defaultLanguage + "_" + defaultCountry + "_" + defaultVariant 
+bundleName + "_" + defaultLanguage + "_" + defaultCountry 
+bundleName + "_" + defaultLanguage 
+bundleName
+}}}
+
+where `localeLanguage`, `localeCountry` and `localeVariant` are taken from the locale specified in the `getBundle` call. `defaultLanguage`, `defaultCountry` and `defaultVariant` are taken from the default locale.
+
+Now suppose you have a `resources_de.properties` file for german texts and a default file `resources.properties` for english texts.
+
+If you select _`de`_ as Locale, we end up with the correct file, namely `resources_de.properties` resulting from the 3rd rule from above.
+
+On the other hand, if you select _`en`_ as Locale *and* your default language is `de`, you _not_ get the file `resources.properties`, but again, end up with `resources_de.properties`, because rule #6 hits _before_ rule #7 is reached.
+
+Thus, you should always have an explicit resource file for every language you support, _plus_ a default file.
