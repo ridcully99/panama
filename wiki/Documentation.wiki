@@ -295,6 +295,11 @@ public Target edit() {
     FormData fd = new FormData(myForm);
     fd.setInput("firstName", "Ridcully");
     fd.setInput("birthday", new Date());
+    return showForm(fd);
+}
+
+// private method that will come handy when we're using validation.
+private Target showForm(FormData fd) {
     context.put("formdata", fd);
     return render("template.vm");
 }
@@ -302,7 +307,48 @@ public Target edit() {
 
 == Input Validation ==
 
+Panama comes with automated, "lazy" input validation. Validation is done by the `FormData` class when, (and only if) you access the input it has stored for a certain field. As described above, you access the input using the `FormData#get...` methods or (indirectly) via `FormData.applyTo()`.
+
+The validation is done based on
+
+  * The type of field you specified when defining the Form, e.g. a `DateField`
+  * The `get...` method you use on the FormData (e.g. calling `getDate()` on a `StringField` would give an error)
+  * Any additional `Validator`s added to the Field when defining the Form.
+
+Validation errors are collected by `FormData` and can be checked and accessed via `FormData#hasErrors()` resp. `FormData#getErrors()`. 
+
+*Note* The validation process for a field is stopped as soon as any of these steps fails - so, there's at most one validation error per field at any time (although an input might violate several rules at once).
+
+*Note* Unlike other frameworks, Panama does not automatically force the user back to the input form when errors occur. It's up to you to check if there are errors and what to make of it.
+
+Now, let's extend our example from above.
+{{{
+@Action
+public Target save() {
+  FormData fd = new FormData(myForm)                   // 1
+                       .withDataFromRequest(context);  // 2
+  String firstName = fd.getString("firstName");        // 3
+  Date birthday = fd.getDate("birthday");              // 4
+
+  if (fd.hasErrors()) {                                // 5
+    return showForm(fd);                               // 6 
+  }
+  
+}
+}}}
+
+The validation already happens without anything for us to do, in line (3) and (4).
+Now in line (5) we check if there were errors, and if so, we render the form template again. We reuse the `showForm` method from above, passing or `FormData` object, which still contains the user's original inputs as well as all the validation errors.
+
+By extending the template a little, we can easily show those inputs and hints about errors as well:
+
+{{{
 TODO
+}}}
+
+=== Lazy Validation ===
+
+*Note* Due to the lazy validation approach, it's crucial, that you fetch the needed data from the FormData object *before* you can check if there are Validation errors.
 
 ----
 
