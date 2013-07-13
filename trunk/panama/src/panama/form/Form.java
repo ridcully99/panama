@@ -143,11 +143,12 @@ public class Form {
 	/**
 	 * Removes specified fields from the Form's list of Fields.
 	 * If the form does not contain a specified field, that field is ignored.
+	 * Used for fluid Form construction with new Form(Class).except(...)
 	 * 
 	 * @param fieldNames names of fields to be removed
 	 * @return the Form object (for fluid programming)
 	 */
-	public Form without(String... fieldNames) {
+	public Form except(String... fieldNames) {
 		if( fieldNames != null) {
 			for (String name : fieldNames) {
 				fields.remove(name);

@@ -27,7 +27,7 @@ public class Version {
 	// b: Revision (increases when cool new features are added)
 	// c: Minor	(increases when updates or fixes are made - even numbers mark stable releases)
 
-	public final static String VERSION = "3.5.0";
+	public final static String VERSION = "3.6.0";
 
 	public final static String LOGO_ASCIIART =
 	" ______ _______ _______ _______ _______ _______ \n"+
@@ -40,6 +40,8 @@ public class Version {
 
 	/* 	History
 	 * ---------------------------------------------------------------------------------
+	 * 3.6.0    2013-07-xx Consolidated Form construction and FormData#applyTo methods
+	 *                     byebye message now takes name from context instead of filter
 	 * 3.5.0    2013-03-01 Made Filters and FilterExtensions serializable to avoid nasty Exceptions when we have them in a Table and Tomcat stops/restarts
 	 * 3.4.3	2013-02-09 Replaces json-simple by built in org.json JSON implementation (with JSONException changed to a RuntimeException)
 	 * 3.4.2    2013-01-29 Didn't find velocity templates when no velocity.properties in project --> added default-fallback-velocity.properties that are used in that case

@@ -16,33 +16,91 @@
 package panama.core;
 
 import java.io.IOException;
+import java.io.UnsupportedEncodingException;
+import java.net.URLEncoder;
+import java.util.HashMap;
+import java.util.Iterator;
+import java.util.Map;
+
+import org.apache.commons.lang.StringUtils;
 
 /**
  * @author Robert
  */
 public class RedirectTarget extends Target {
 
-	private String url;
+	private String baseUrl;
+	private Map<Object, Object> parameterMap = new HashMap<Object, Object>();
+	private String anchor;
 	
 	public RedirectTarget(String url) {
 		super();
-		setUrl(url);
+		setBaseUrl(url);
+	}
+	
+	/**
+	 * Set parameters
+	 * 
+	 * @param parameterMap map of parameters
+	 * @return the Target object, for fluid programming
+	 */
+	public RedirectTarget setParameters(Map<Object, Object> parameterMap) {
+		this.parameterMap.clear();
+		this.parameterMap.putAll(parameterMap);
+		return this;
+	}	
+	
+	/**
+	 * Sets anchor part for the redirect target.
+	 * @param anchor Anchor part, do not include the hash (#) symbol, it's added automatically
+	 * @return
+	 */
+	public RedirectTarget withAnchor(String anchor) {
+		this.anchor = anchor;
+		return this;
+	}
+	
+	public String getCompleteUrl() {
+		String baseUrl = getBaseUrl();
+		Context ctx = Context.getInstance();
+		/* if baseUrl starts with / we prepend the contextPath (i.e. /<appname>) */
+		if (baseUrl.startsWith("/")) {
+			baseUrl = ctx.getRequest().getContextPath()+baseUrl;
+		}
+		StringBuilder urlBuilder = new StringBuilder(baseUrl);
+		try {
+			if (parameterMap != null && !parameterMap.isEmpty()) {
+				boolean first = true;
+				for (Iterator it = parameterMap.entrySet().iterator(); it.hasNext(); ) {
+					urlBuilder.append(first ? "?" : "&");
+					first = false;
+					Map.Entry entry = (Map.Entry)it.next();
+					urlBuilder.append(URLEncoder.encode(entry.getKey().toString(), "UTF-8"));
+					urlBuilder.append("=");
+					if (entry.getValue() != null) {
+						urlBuilder.append(URLEncoder.encode(entry.getValue().toString(), "UTF-8"));
+					}
+				}
+			}
+		} catch (UnsupportedEncodingException e) {
+			assert false : "No UTF-8 encoding supported?! Really?!";
+		}
+		if (!StringUtils.isEmpty(anchor)) {
+			urlBuilder.append("#").append(anchor);
+		}
+		return urlBuilder.toString();
 	}
 	
 	public void go() throws IOException {
-		String url = getUrl();
 		Context ctx = Context.getInstance();
-		/* if url starts with / we prepend the contextPath (i.e. /<appname>) */
-		if (url.startsWith("/")) {
-			url = ctx.getRequest().getContextPath()+url;
-		}		
-		ctx.getResponse().sendRedirect(ctx.getResponse().encodeRedirectURL(url));
+		ctx.getResponse().sendRedirect(getCompleteUrl());
 	}
 	
-	public String getUrl() {
-		return url;
+	public String getBaseUrl() {
+		return baseUrl;
 	}
-	public void setUrl(String url) {
-		this.url = url;
+	
+	public void setBaseUrl(String url) {
+		this.baseUrl = url;
 	}
 }
