@@ -15,12 +15,8 @@
  */
 package panama.core;
 
-import java.io.UnsupportedEncodingException;
-import java.net.URLEncoder;
 import java.util.ArrayList;
 import java.util.Arrays;
-import java.util.HashMap;
-import java.util.Iterator;
 import java.util.List;
 import java.util.Map;
 
@@ -88,15 +84,15 @@ public class BaseController {
 	 * relative to the current request URI.
 	 * If the location is relative with a leading slash (/) the container interprets it as relative to the webapp.
 	 *
-	 * To redirect to other action use /controller/action.now
+	 * To redirect to other action use {@see #redirectToAction(String)} or {@see #redirectToAction(Class, String)}
 	 *
 	 * Note: Use redirect only if you need the client browser's URL to have a new URL.
 	 *
 	 * @param url
 	 * @return A Target object
 	 */
-	public Target redirect(String url) {
-		Target t = new RedirectTarget(url);
+	public RedirectTarget redirect(String url) {
+		RedirectTarget t = new RedirectTarget(url);
 		return t;
 	}
 
@@ -134,14 +130,42 @@ public class BaseController {
 	 *
 	 * @param controllerClass
 	 * @param action
-	 * @param optionalParamsAndValues an optional list of parameters and values, alternating like so: param1, value1, param2, value2...
 	 * @return A Target object
 	 */
 	public Target redirectToAction(Class<? extends BaseController> controllerClass, String action, String... optionalParamsAndValues) {
-		Map<Object, Object> parameterMap = buildParameterMap(optionalParamsAndValues);
+		Map<Object, Object> parameterMap = context.buildParameterMap(optionalParamsAndValues);
 		return internalRedirectToAction(controllerClass, action, parameterMap);
 	}
 
+	/**
+	 * Defines a redirect to other action.
+	 * This internal method is used by all the public redirectToAction() methods.
+	 *
+	 * Sends a temporary redirect response to the client using a URL created from the
+	 * specified controllerClass and action
+	 * The URL has the form: ../controllerName/action
+	 *
+	 * To set parameters, use {@see RedirectTarget#setParameters(Map)} or {@see RedirectTarget#setParameters(String...)}
+	 *
+	 * Note: Use redirect only if you need the client browser's URL to have a new URL.
+	 *       Its <strong>much faster</strong> to create a new instance of controllerClass, invoke the required action's method and return it's result.
+	 *
+	 * @param controllerClass
+	 * @param action can be null to use default action
+	 * @param parameterMap A map of parameter/value pairs.
+	 * @return A Target object
+	 */
+	private RedirectTarget internalRedirectToAction(Class<? extends BaseController> controllerClass, String action, Map<Object, Object> parameterMap) {
+		Controller annotation = controllerClass.getAnnotation(Controller.class);
+		String ctrlName = annotation != null && !StringUtils.isEmpty(annotation.alias()) ? annotation.alias() : controllerClass.getName();
+		StringBuffer url = new StringBuffer();
+		url.append("../").append(ctrlName).append("/");
+		if (action != null) {
+			url.append(action);
+		}
+		return new RedirectTarget(url.toString()).setParameters(parameterMap);
+	}
+	
 	/**
 	 * Creates a TemplateTarget for the specified templateName (building absolute path is a relativ path was provided)
 	 *
@@ -183,80 +207,12 @@ public class BaseController {
 		@SuppressWarnings("rawtypes")
 		Map originalParameters = context.getParameterMap();
 		try {
-			Map<Object, Object> parameterMap = buildParameterMap(optionalParamsAndValues);
+			Map<Object, Object> parameterMap = context.buildParameterMap(optionalParamsAndValues);
 			context.setParameterMap(parameterMap);
 			return context.getCore().executeAction(context, this, actionName);
 		} finally {
 			context.setParameterMap(originalParameters);
 		}
-	}
-
-	/**
-	 * Builds parameter Map from list of parameter and value elements.
-	 * @param paramsAndValues a variable list of parameters and values, alternating like so: param1, value1, param2, value2...; These replace the original parameters during the execution of the action.
-	 * @return a Map, mapping parameters to values
-	 */
-	private Map<Object, Object> buildParameterMap(String... paramsAndValues) {
-		Map<Object, Object> parameterMap = null;
-		if (paramsAndValues != null && paramsAndValues.length > 0) {
-			parameterMap = new HashMap<Object, Object>();
-			for (int i=0; i<paramsAndValues.length; i+=2) {
-				Object key = paramsAndValues[i];
-				if (key == null) {
-					throw new IllegalArgumentException("parameter names must not be null");
-				}
-				Object value = i+1 < paramsAndValues.length ? paramsAndValues[i+1] : "";
-				parameterMap.put(key, value);
-			}
-		}
-		return parameterMap;
-	}
-
-	/**
-	 * Defines a redirect to other action.
-	 * This internal method is used by all the public redirectToAction() methods.
-	 *
-	 * Sends a temporary redirect response to the client using a URL created from the
-	 * specified controllerClass, action and parameters.
-	 * The URL has the form: ../controllerName/action?param1=value1&param2=value2 ....
-	 *
-	 * The parameter names and values are url-encoded by this method.
-	 *
-	 * Note: Use redirect only if you need the client browser's URL to have a new URL.
-	 *       Its <strong>much faster</strong> to create a new instance of controllerClass, invoke the required action's method and return it's result.
-	 *
-	 * @param controllerClass
-	 * @param action can be null to use default action
-	 * @param parameterMap A map of parameter/value pairs.
-	 * @return A Target object
-	 */
-	@SuppressWarnings("rawtypes")
-	private Target internalRedirectToAction(Class<? extends BaseController> controllerClass, String action, Map<Object, Object> parameterMap) {
-		Controller annotation = controllerClass.getAnnotation(Controller.class);
-		String ctrlName = annotation != null && !StringUtils.isEmpty(annotation.alias()) ? annotation.alias() : controllerClass.getName();
-		StringBuffer url = new StringBuffer();
-		url.append("../").append(ctrlName).append("/");
-		if (action != null) {
-			url.append(action);
-		}
-		try {
-			if (parameterMap != null && !parameterMap.isEmpty()) {
-				boolean first = true;
-				for (Iterator it = parameterMap.entrySet().iterator(); it.hasNext(); ) {
-					url.append(first ? "?" : "&");
-					first = false;
-					Map.Entry entry = (Map.Entry)it.next();
-					url.append(URLEncoder.encode(entry.getKey().toString(), "UTF-8"));
-					url.append("=");
-					if (entry.getValue() != null) {
-						url.append(URLEncoder.encode(entry.getValue().toString(), "UTF-8"));
-					}
-				}
-			}
-		} catch (UnsupportedEncodingException e) {
-			assert false : "No UTF-8 encoding supported?! Really?!";
-		}
-		return redirect(url.toString());
 	}
 
 	/**

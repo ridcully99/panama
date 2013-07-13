@@ -311,6 +311,26 @@ public class Context {
 		}
 	}
 
+	/**
+	 * Builds parameter Map from list of parameter and value elements.
+	 * @param paramsAndValues a variable list of parameters and values, alternating like so: param1, value1, param2, value2...; These replace the original parameters during the execution of the action.
+	 * @return a Map, mapping parameters to values
+	 */
+	public Map<Object, Object> buildParameterMap(String... paramsAndValues) {
+		Map<Object, Object> parameterMap = new HashMap<Object, Object>();
+		if (paramsAndValues != null && paramsAndValues.length > 0) {
+			for (int i=0; i<paramsAndValues.length; i+=2) {
+				Object key = paramsAndValues[i];
+				if (key == null) {
+					throw new IllegalArgumentException("parameter names must not be null");
+				}
+				Object value = i+1 < paramsAndValues.length ? paramsAndValues[i+1] : "";
+				parameterMap.put(key, value);
+			}
+		}
+		return parameterMap;
+	}	
+	
 	// -------------------------------------------------------------------------------------
 	// FileItem methods (return null for non-MultipartServletRequests)
 	// Normally you'd not use these methods directly, but use the FileItemField class

@@ -39,7 +39,7 @@ public class FormTest extends TestCase {
 		Form f2 = new Form(TestBean.class, "bln", "dt", "dbl");
 		assertEquals(3, f2.getFields().size());
 
-		Form f3 = new Form(TestBean.class).without("bln", "dt", "dbl");
+		Form f3 = new Form(TestBean.class).except("bln", "dt", "dbl");
 		assertEquals(7, f3.getFields().size());
 		assertNull(f3.getField("bln"));
 		

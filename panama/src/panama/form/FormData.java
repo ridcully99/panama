@@ -211,7 +211,7 @@ public class FormData {
 	 * @param bean The bean, the input should be applied to.
 	 * @param propertiesToExclude the properties to be set; a null value addresses _all_ properties
 	 */
-	public void applyToWithout(Object bean, String... propertiesToExclude) {
+	public void applyToExcept(Object bean, String... propertiesToExclude) {
 		applyTo(bean, null, propertiesToExclude);
 	}
 	
