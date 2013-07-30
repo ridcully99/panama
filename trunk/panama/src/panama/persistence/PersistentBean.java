@@ -71,6 +71,14 @@ public class PersistentBean implements Serializable {
 	}
 
 	/**
+	 * Tells if the object has been saved to the database.
+	 * @return true if object has been saved, false otherwise
+	 */
+	public boolean isPersisted() {
+		return getTimeStamp() != null;
+	}
+	
+	/**
 	 * Tries to fetch an object of type beanType with specified id from database (using Ebean).
 	 * If no such object is found, a new one is created and it's id property set to the specified id.
 	 * This newly created object is _not_ saved to the database.
@@ -98,7 +106,7 @@ public class PersistentBean implements Serializable {
 		}
 		return o;
 	}
-
+	
 	/**
 	 * equals - based on id
 	 */
