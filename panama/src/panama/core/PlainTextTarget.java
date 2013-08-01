@@ -32,6 +32,6 @@ public class PlainTextTarget extends Target {
 	public void go() throws Exception {
 		Context ctx = Context.getInstance();
 		ctx.getResponse().setContentType("text/plain; charset=UTF-8");
-		ctx.getResponse().getWriter().write(text);
+		ctx.getResponse().getWriter().write(text+"");
 	}
 }
