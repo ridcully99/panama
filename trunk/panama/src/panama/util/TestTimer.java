@@ -25,7 +25,7 @@
 
 package panama.util;
 
-import org.grlea.log.SimpleLogger;
+import panama.log.SimpleLogger;
 
 /**
  * Simple utilities class for benchmarking unit tests. Use is a follows:

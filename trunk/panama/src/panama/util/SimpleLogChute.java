@@ -21,8 +21,9 @@ import java.util.Map;
 import org.apache.velocity.app.Velocity;
 import org.apache.velocity.runtime.RuntimeServices;
 import org.apache.velocity.runtime.log.LogChute;
-import org.grlea.log.DebugLevel;
-import org.grlea.log.SimpleLogger;
+
+import panama.log.DebugLevel;
+import panama.log.SimpleLogger;
 
 /**
  * A logger for Velocity that uses SimpleLog for logging.

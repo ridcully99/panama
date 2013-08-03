@@ -27,11 +27,11 @@ import java.util.Map;
 import java.util.Set;
 
 import org.apache.commons.fileupload.FileItem;
-import org.grlea.log.SimpleLogger;
 
 import panama.core.Context;
 import panama.exceptions.NoSuchFieldException;
 import panama.exceptions.ValidatorException;
+import panama.log.SimpleLogger;
 import panama.util.DynaBeanUtils;
 
 

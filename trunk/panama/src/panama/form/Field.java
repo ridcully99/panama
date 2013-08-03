@@ -21,9 +21,9 @@ import java.util.List;
 
 import javax.swing.text.DefaultFormatter;
 
-import org.grlea.log.SimpleLogger;
 
 import panama.exceptions.ValidatorException;
+import panama.log.SimpleLogger;
 import panama.util.DynaBeanUtils;
 
 

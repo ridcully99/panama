@@ -22,8 +22,8 @@ import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 
-import org.grlea.log.SimpleLogger;
 
+import panama.log.SimpleLogger;
 import panama.persistence.PersistentBean;
 import panama.util.DynaBeanUtils;
 

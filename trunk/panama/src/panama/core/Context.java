@@ -32,7 +32,8 @@ import javax.servlet.http.HttpServletResponse;
 import javax.servlet.http.HttpSession;
 
 import org.apache.commons.fileupload.FileItem;
-import org.grlea.log.SimpleLogger;
+
+import panama.log.SimpleLogger;
 
 /**
  * Provides methods to access application scope, session scope, request scope and parameters.

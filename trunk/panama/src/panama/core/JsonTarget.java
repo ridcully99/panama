@@ -15,8 +15,8 @@
  */
 package panama.core;
 
-import org.json.JSONArray;
-import org.json.JSONObject;
+import panama.json.JSONArray;
+import panama.json.JSONObject;
 
 /**
  * Converts the specified json to a string and writes it as response.

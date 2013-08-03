@@ -42,7 +42,6 @@ import javax.servlet.http.HttpSession;
 import org.apache.commons.lang.StringUtils;
 import org.apache.velocity.app.VelocityEngine;
 import org.apache.velocity.tools.view.ViewToolManager;
-import org.grlea.log.SimpleLogger;
 import org.scannotation.AnnotationDB;
 import org.scannotation.WarUrlFinder;
 
@@ -51,6 +50,7 @@ import panama.annotations.Controller;
 import panama.exceptions.ForceTargetException;
 import panama.exceptions.HttpErrorException;
 import panama.exceptions.NoSuchActionException;
+import panama.log.SimpleLogger;
 import panama.util.TestTimer;
 
 import com.avaje.ebeaninternal.server.lib.ShutdownManager;

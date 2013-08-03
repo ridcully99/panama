@@ -21,7 +21,6 @@ import java.util.List;
 import java.util.Map;
 
 import org.apache.commons.lang.StringUtils;
-import org.grlea.log.SimpleLogger;
 
 import panama.annotations.Controller;
 import panama.collections.Table;
@@ -30,6 +29,7 @@ import panama.exceptions.AuthorizationException;
 import panama.exceptions.ForceTargetException;
 import panama.exceptions.HttpErrorException;
 import panama.exceptions.NoSuchActionException;
+import panama.log.SimpleLogger;
 import panama.util.TableController;
 import panama.util.TreeController;
 

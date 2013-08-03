@@ -15,7 +15,7 @@
  */
 package panama.core;
 
-import org.grlea.log.SimpleLogger;
+import panama.log.SimpleLogger;
 
 
 /**
