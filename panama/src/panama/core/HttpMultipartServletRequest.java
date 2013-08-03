@@ -40,7 +40,8 @@ import org.apache.commons.fileupload.disk.DiskFileItemFactory;
 import org.apache.commons.fileupload.servlet.ServletFileUpload;
 import org.apache.commons.fileupload.servlet.ServletRequestContext;
 import org.apache.commons.lang.StringUtils;
-import org.grlea.log.SimpleLogger;
+
+import panama.log.SimpleLogger;
 
 /**
  * A MultiPartServletRequest using commons-fileupload API.
