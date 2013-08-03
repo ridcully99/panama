@@ -1,11 +1,12 @@
-org.grlea.log
-org.grlea.log.rollover
 panama.annotations
 panama.collections
 panama.core
 panama.exceptions
 panama.filter
 panama.form
+panama.json
+panama.log
+panama.log.rollover
 panama.persistence
 panama.tools
 panama.util
