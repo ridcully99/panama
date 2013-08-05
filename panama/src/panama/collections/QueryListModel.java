@@ -19,7 +19,7 @@ import java.io.Serializable;
 import java.util.List;
 import java.util.Map;
 
-import panama.filter.Filter;
+import panama.collections.filters.Filter;
 
 import com.avaje.ebean.Query;
 

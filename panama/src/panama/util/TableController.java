@@ -21,12 +21,12 @@ import java.util.Map;
 import panama.annotations.Action;
 import panama.annotations.Controller;
 import panama.collections.Table;
+import panama.collections.filters.Filter;
+import panama.collections.filters.SearchPropertyComparator;
 import panama.core.BaseController;
 import panama.core.Context;
 import panama.core.Target;
 import panama.exceptions.ForceTargetException;
-import panama.filter.Filter;
-import panama.filter.SearchPropertyComparator;
 
 
 
