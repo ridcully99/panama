@@ -352,6 +352,27 @@ TODO
 
 ----
 
+= Tables =
+
+As the presentation of tabular data is very common in web applications (especially for backends or administration areas), we've included some features into Panama that make creating these kinds of things very easy. With Panama you can out of the box have
+
+  * Tables backed with data from arbitrary sources, with special support for data from database tables.
+  * Sorting tabular data by any column.
+  * Paging for tabular data.
+  * Filters of arbitrary complexity.
+  * Fulltext search filter.
+
+== Filters ==
+
+To restrict your table to only show data with certain characteristics, you can apply any number of filters to the table.
+
+To only show data where property _name_ has the value "panama":
+{{{
+getTable("tablename").getFilters().put("filtername", Filter.eq("name", "panama"));
+}}}
+
+
+
 = Internationalization =
 
 Externalize strings to `resources.properties` resp. `resources_<lang>.properties` files in your _src_ root directory.
