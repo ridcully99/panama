@@ -17,8 +17,6 @@ package panama.filter;
 
 import java.io.Serializable;
 import java.util.Collection;
-import java.util.HashMap;
-import java.util.Map;
 
 import panama.collections.QueryTable;
 
@@ -28,6 +26,10 @@ import com.avaje.ebean.Query;
 
 /**
  * Base class and Factory for filters of all kinds.
+ * 
+ * If you're missing a Filter, you can
+ * - create your own by implementing the Filter interface
+ * - create a Filter for any Ebean Expression using Filter.withExpression()
  *
  * @author Ridcully
  *
@@ -35,8 +37,6 @@ import com.avaje.ebean.Query;
 public class Filter implements Serializable {
 
 	protected static final long serialVersionUID = 1L;
-
-	protected Map<String, FilterExtension> extensions = new HashMap<String, FilterExtension>();
 
 	/**
 	 * This method applies the Filter onto the specified object. The method in this base class
@@ -61,17 +61,6 @@ public class Filter implements Serializable {
 	}
 
 	/**
-	 * Sets an FilterExtension to modify the way the filter handles the specified property.
-	 * E.g. you can set the IntegerFilterExtension for Integer properties.
-	 *
-	 * @param propertyName
-	 * @param extension
-	 */
-	public void setExtension(String propertyName, FilterExtension extension) {
-		extensions.put(propertyName, extension);
-	}
-
-	/**
 	 * Gets a string representation of the filter.
 	 * @return A string representation of the filter.
 	 */
@@ -88,19 +77,23 @@ public class Filter implements Serializable {
 		return new SearchPropertyComparator(pattern, PropertyComparator.ANY_PROPERTIES, propertyNames);
 	}
 
-	public static Filter eq(String pattern, String propertyName) {
+	public static Filter eq(String propertyName, Object pattern) {
 		return new PropertyComparator(pattern, PropertyComparator.ALL_PROPERTIES, propertyName);
 	}
+	
+	public static Filter ne(String propertyName, Object pattern) {
+		return new PropertyComparator(pattern, PropertyComparator.NO_PROPERTIES, propertyName);
+	}
 
-	public static Filter anyEq(String pattern, String... propertyNames) {
+	public static Filter anyEq(Object pattern, String... propertyNames) {
 		return new PropertyComparator(pattern, PropertyComparator.ANY_PROPERTIES, propertyNames);
 	}
 
-	public static Filter noneEq(String pattern, String... propertyNames) {
+	public static Filter noneEq(Object pattern, String... propertyNames) {
 		return new PropertyComparator(pattern, PropertyComparator.NO_PROPERTIES, propertyNames);
 	}
 
-	public static Filter allEq(String pattern, String... propertyNames) {
+	public static Filter allEq(Object pattern, String... propertyNames) {
 		return new PropertyComparator(pattern, PropertyComparator.ALL_PROPERTIES, propertyNames);
 	}
 
@@ -110,8 +103,8 @@ public class Filter implements Serializable {
 	 * @param propertyName
 	 * @return
 	 */
-	public static Filter matches(String pattern, String propertyName) {
-		return new PropertyComparator(pattern, PropertyComparator.ALL_PROPERTIES, propertyName);
+	public static Filter matches(String propertyName, String pattern) {
+		return new RegExpPropertyComparator(pattern, PropertyComparator.ALL_PROPERTIES, propertyName);
 	}
 
 	public static Filter anyMatches(String pattern, String... propertyNames) {
@@ -154,7 +147,43 @@ public class Filter implements Serializable {
 		return new LogicalExpression(LogicalExpression.OR, filters.toArray(new Filter[0]));
 	}
 
+	// ---- Additional factory methods for common uses of expression filters ------------------
+
+	public static ExpressionFilter gt(String propertyName, Object value) {
+		return new ExpressionFilter(Ebean.getExpressionFactory().gt(propertyName, value));
+	}
+	
+	public static ExpressionFilter ge(String propertyName, Object value) {
+		return new ExpressionFilter(Ebean.getExpressionFactory().ge(propertyName, value));
+	}	
+	
+	public static ExpressionFilter lt(String propertyName, Object value) {
+		return new ExpressionFilter(Ebean.getExpressionFactory().lt(propertyName, value));
+	}
+	
+	public static ExpressionFilter le(String propertyName, Object value) {
+		return new ExpressionFilter(Ebean.getExpressionFactory().le(propertyName, value));
+	}	
+
+	public static ExpressionFilter in(String propertyName, Object[] values)  {
+		return new ExpressionFilter(Ebean.getExpressionFactory().in(propertyName, values));
+	}
+
+	public static ExpressionFilter isNotNull(String propertyName)  {
+		return new ExpressionFilter(Ebean.getExpressionFactory().isNotNull(propertyName));
+	}
+
+	public static ExpressionFilter isNull(String propertyName)  {
+		return new ExpressionFilter(Ebean.getExpressionFactory().isNull(propertyName));
+	}
+	
+	/**
+	 * For creating arbitrary complex Expression filters directly
+	 * @param expression
+	 * @return
+	 */
 	public static Filter withExpression(Expression expression) {
 		return new ExpressionFilter(expression);
 	}
+	
 }

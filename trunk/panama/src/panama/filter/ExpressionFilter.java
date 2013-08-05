@@ -15,6 +15,7 @@
  */
 package panama.filter;
 
+import com.avaje.ebean.Ebean;
 import com.avaje.ebean.Expression;
 import com.avaje.ebean.Query;
 
@@ -22,7 +23,7 @@ import com.avaje.ebean.Query;
  * A Filter encapsulating a Ebean Expression.
  * Only for use with QueryListModels.
  * The Expression is passed to the Constructor and can be arbitrarily complex.
- *
+ * 
  * @author ridcully
  */
 public class ExpressionFilter extends Filter {

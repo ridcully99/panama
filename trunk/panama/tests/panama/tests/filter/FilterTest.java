@@ -16,19 +16,13 @@
 package panama.tests.filter;
 
 import java.util.Date;
-import java.util.HashMap;
-import java.util.Map;
 import java.util.regex.Matcher;
 import java.util.regex.Pattern;
 
+import junit.framework.TestCase;
 import panama.filter.Filter;
-import panama.filter.FilterExtension;
 import panama.tests.entities.Entry;
 import panama.util.TestTimer;
-
-import junit.framework.TestCase;
-
-import com.avaje.ebean.Expression;
 
 
 public class FilterTest extends TestCase {
@@ -106,21 +100,21 @@ public class FilterTest extends TestCase {
 		System.out.println(f2);
 	}
 
-	public void testFilterExtensions() {
-		FilterExtension ex = new FilterExtension() {
-			public boolean matchProperty(String name, Object value, String pattern) {
-				return false;
-			}
-
-			public Expression forProperty(String name, String pattern) {
-				return null;
-			}
-		};
-		Filter f = Filter.anyMatches("Mustrum Ridcully", "email", "name");
-		assertTrue(f.match(e));
-		f.setExtension("name", ex);
-		assertFalse(f.match(e));
-	}
+//	public void testFilterExtensions() {
+//		FilterExtension ex = new FilterExtension() {
+//			public boolean matchProperty(String name, Object value, String pattern) {
+//				return false;
+//			}
+//
+//			public Expression forProperty(String name, String pattern) {
+//				return null;
+//			}
+//		};
+//		Filter f = Filter.anyMatches("Mustrum Ridcully", "email", "name");
+//		assertTrue(f.match(e));
+//		f.setExtension("name", ex);
+//		assertFalse(f.match(e));
+//	}
 
 	public void testPerformance() {
 		TestTimer tt = new TestTimer("anyMatches");

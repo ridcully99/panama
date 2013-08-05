@@ -65,11 +65,13 @@ public class RegExpPropertyComparator extends PropertyComparator {
 
 	/**
 	 * Expression for one Property.
-	 * Note, that the pattern itself must contain SQL wildcards like % or _ here, whereas the {@link SearchPropertyComparator} automatically encloses the pattern with % wildcards.
-	 * @param name
-	 * @return ilike(name, pattern) Expression
+	 * Note, that the pattern itself must contain SQL wildcards like % or _ here if you want partial matches, 
+	 * whereas {@link SearchPropertyComparator#getExpressionForProperty(String)} automatically encloses the pattern with % wildcards.
+	 * @param propertyName
+	 * @return ilike(propertyName, pattern) Expression
 	 */
-	protected Expression forProperty(String name) {
-		return Ebean.getExpressionFactory().ilike(name, pattern);
+	@Override
+	protected Expression getExpressionForProperty(String propertyName) {
+		return Ebean.getExpressionFactory().ilike(propertyName, pattern+"");
 	}
 }

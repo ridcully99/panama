@@ -20,7 +20,6 @@ import java.util.Map;
 import java.util.Set;
 
 import panama.filter.Filter;
-import panama.filter.FilterExtension;
 
 
 public interface Table {

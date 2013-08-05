@@ -45,7 +45,7 @@ public class PropertyComparator extends Filter {
 	public final static int NO_PROPERTIES = 3;
 
 	protected List<String> properties;
-	protected String pattern;
+	protected Object pattern;
 	protected int mode;
 
 	/**
@@ -53,7 +53,7 @@ public class PropertyComparator extends Filter {
 	 * @param mode
 	 * @param pattern
 	 */
-	public PropertyComparator(String pattern, int mode, String... properties) {
+	public PropertyComparator(Object pattern, int mode, String... properties) {
 		this.properties = properties == null || properties.length == 0 ? null : Arrays.asList(properties);
 		this.pattern = pattern == null || pattern.equals("") ? null : pattern;
 		this.mode = mode >= ALL_PROPERTIES && mode <= NO_PROPERTIES ? mode : ANY_PROPERTIES;
@@ -73,8 +73,7 @@ public class PropertyComparator extends Filter {
 			boolean match = false;
 			try {
 				Object value = DynaBeanUtils.getProperty(object, name);
-				FilterExtension extension = extensions.get(name);
-				match = extension == null ? matchProperty(name, value) : extension.matchProperty(name, value, pattern);
+				match = matchProperty(name, value);
 				all = all && match;
 				any = any || match;
 				if (match && mode == NO_PROPERTIES) { return false; }
@@ -88,7 +87,7 @@ public class PropertyComparator extends Filter {
 	}
 
 	public String toString() {
-		return pattern;
+		return "PropertyComparator("+pattern+")";
 	}
 
 	/**
@@ -118,8 +117,7 @@ public class PropertyComparator extends Filter {
 			result = Ebean.getExpressionFactory().disjunction(query);
 		}
 		for (String property : getProperties()) {
-			FilterExtension extension = extensions.get(property);
-			Expression exp = extension == null ? forProperty(property) : extension.forProperty(property, pattern);
+			Expression exp = getExpressionForProperty(property);
 			if (exp != null) {
 				((Junction<?>)result).add(exp);
 			}
@@ -132,11 +130,11 @@ public class PropertyComparator extends Filter {
 
 	/**
 	 * Expression for one Property
-	 * @param name
-	 * @return eq(name, pattern)
+	 * @param propertyName
+	 * @return eq(propertyName, pattern)
 	 */
-	protected Expression forProperty(String name) {
-		return Ebean.getExpressionFactory().eq(name, pattern);
+	protected Expression getExpressionForProperty(String propertyName) {
+		return Ebean.getExpressionFactory().eq(propertyName, pattern);
 	}
 
 	public int getMode() {
@@ -147,11 +145,11 @@ public class PropertyComparator extends Filter {
 		this.mode = mode;
 	}
 
-	public String getPattern() {
+	public Object getPattern() {
 		return pattern;
 	}
 
-	public void setPattern(String pattern) {
+	public void setPattern(Object pattern) {
 		this.pattern = pattern;
 	}
 

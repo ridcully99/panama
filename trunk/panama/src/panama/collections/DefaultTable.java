@@ -28,10 +28,8 @@ import java.util.List;
 import java.util.Map;
 import java.util.Set;
 
-
 import panama.core.Context;
 import panama.filter.Filter;
-import panama.filter.FilterExtension;
 import panama.log.SimpleLogger;
 import panama.util.DynaBeanUtils;
 import panama.util.TableController;

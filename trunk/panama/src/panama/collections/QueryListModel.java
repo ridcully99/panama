@@ -20,7 +20,6 @@ import java.util.List;
 import java.util.Map;
 
 import panama.filter.Filter;
-import panama.filter.FilterExtension;
 
 import com.avaje.ebean.Query;
 

@@ -43,10 +43,11 @@ public class SearchPropertyComparator extends RegExpPropertyComparator {
 
 	/**
 	 * Expression for one Property: ILIKE '%pattern%'
-	 * @param name
-	 * @return an Expression object
+	 * @param propertyName
+	 * @return ilike(propertyName, '%pattern%') Expression
 	 */
-	protected Expression forProperty(String name) {
-		return Ebean.getExpressionFactory().ilike(name, "%"+pattern+"%");
+	@Override
+	protected Expression getExpressionForProperty(String propertyName) {
+		return Ebean.getExpressionFactory().ilike(propertyName, "%"+pattern+"%");
 	}
 }
