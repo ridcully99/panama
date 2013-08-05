@@ -18,6 +18,8 @@
     * [Documentation#Fields Fields]
     * [Documentation#FormData FormData]
     * [Documentation#Input_Validation Input Validation]
+  * [Documentation#Tables Tables]
+  * [Documentation#Trees Trees]
   * [Documentation#Internationalization Internationalization]
   * [Documentation#Tiles Tiles]
   * [Documentation#Persistence Persistence]
