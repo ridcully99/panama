@@ -1,0 +1,14 @@
+#summary What is new in version 3.6
+#labels Phase-Design
+
+*Disclaimer:* Release 3.6 is not released yet, so the information here may change
+
+*Warning:* Release 3.6 contains some API changes due to consolitations and simplifications of the framework.
+
+  * Consolidated Form construction and FormData#applyTo methods
+  * Goodbye message now takes name from context instead of filter
+  * Removed FilterExtensions - they were hardly used and quite complicated to understand
+  * Added Factory Methods to Filter for common Expression filters like gt, lt, ...
+  * Made filter package a sub-package of collections, as it belongs there logically.
+  * Repackaged the JSON classes from org.json to panama.json
+  * Repackaged the simple log classes into panama.log
