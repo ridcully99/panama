@@ -12,3 +12,4 @@
   * Made filter package a sub-package of collections, as it belongs there logically.
   * Repackaged the JSON classes from org.json to panama.json
   * Repackaged the simple log classes into panama.log
+  * Refactored TableController and TreeController allowing new methods getTable() and getTree() in BaseController.
