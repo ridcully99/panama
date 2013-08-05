@@ -1,5 +1,5 @@
 /*
- *  Copyright 2004-2012 Robert Brandner (robert.brandner@gmail.com) 
+ *  Copyright 2004-2013 Robert Brandner (robert.brandner@gmail.com) 
  *  
  *  Licensed under the Apache License, Version 2.0 (the "License"); 
  *  you may not use this file except in compliance with the License. 
@@ -13,19 +13,12 @@
  *  See the License for the specific language governing permissions and 
  *  limitations under the License. 
  */
-package panama.filter;
-
-import com.avaje.ebean.Expression;
+package panama.tests.statics;
 
 /**
- * Special filter treatment.
- * @author Ridcully
+ * @author ridcully
  *
  */
-public interface FilterExtension {
+public class ExtenderB extends StaticController {
 
-	public boolean matchProperty(String name, Object value, String pattern);
-	
-	public Expression forProperty(String name, String pattern);
-	
 }
