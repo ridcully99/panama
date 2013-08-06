@@ -43,7 +43,7 @@ import javax.imageio.stream.ImageInputStream;
 import javax.imageio.stream.ImageOutputStream;
 import javax.imageio.stream.MemoryCacheImageOutputStream;
 
-import org.grlea.log.SimpleLogger;
+import panama.log.SimpleLogger;
 
 import com.gurge.gifencoder.GIFEncoder;
 
