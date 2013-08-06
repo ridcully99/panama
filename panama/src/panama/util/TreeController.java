@@ -15,13 +15,9 @@
  */
 package panama.util;
 
-import java.util.HashMap;
-import java.util.Map;
-
 import panama.annotations.Controller;
 import panama.collections.Tree;
 import panama.core.BaseController;
-import panama.core.Context;
 import panama.core.Dispatcher;
 import panama.core.Target;
 import panama.exceptions.ForceTargetException;
@@ -35,9 +31,6 @@ import panama.exceptions.ForceTargetException;
 @Controller
 public class TreeController extends BaseController {
 
-	/** Key used to store DefaultTree-Map in Session-Scope */
-	public final static String TREEMAP_KEY = Dispatcher.PREFIX + "treemap";
-		
 	/**
 	 * This actions toggles the open/closed state of one node of a DefaultTree
 	 */
@@ -52,37 +45,4 @@ public class TreeController extends BaseController {
 		}
 		return redirect(context.getRequest().getHeader("referer"));
 	}
-	
-	// -------------------------------------------------------------------------------------
-	// Useful helper methods
-	// -------------------------------------------------------------------------------------
-
-	/**
-	 * Gets a tree from the tree-map in session scope.
-	 * @param treeId Unique ID
-	 * @return A Tree object
-	 */
-	public Tree getTree(String treeId) {
-		return getTreeMap().get(treeId);
-	}
-
-	/**
-	 * Puts a tree into the tree-map in session scope .
-	 * @param tree Some kind of tree
-	 */
-	public void addTree(Tree tree) {
-		getTreeMap().put(tree.getKey(), tree);
-	}
-	
-	/** lazily create treeMap */
-	private Map<String, Tree> getTreeMap() {
-		@SuppressWarnings("unchecked")
-		Map<String, Tree> map = (Map<String, Tree>)Context.getInstance().session.get(TREEMAP_KEY);
-		if (map == null) {
-			/* create map if not already there */
-			map = new HashMap<String, Tree>();
-			Context.getInstance().session.put(TREEMAP_KEY, map);			
-		}
-		return map;
-	}	
 }

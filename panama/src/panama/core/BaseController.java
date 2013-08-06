@@ -17,6 +17,7 @@ package panama.core;
 
 import java.util.ArrayList;
 import java.util.Arrays;
+import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 
@@ -30,8 +31,6 @@ import panama.exceptions.ForceTargetException;
 import panama.exceptions.HttpErrorException;
 import panama.exceptions.NoSuchActionException;
 import panama.log.SimpleLogger;
-import panama.util.TableController;
-import panama.util.TreeController;
 
 
 
@@ -42,6 +41,13 @@ import panama.util.TreeController;
  */
 public class BaseController {
 
+	/** Key used to store DefaultTable-Map in Session-Scope */
+	public final static String TABLEMAP_KEY = Dispatcher.PREFIX + "tablemap";	
+	
+	/** Key used to store DefaultTree-Map in Session-Scope */
+	public final static String TREEMAP_KEY = Dispatcher.PREFIX + "treemap";
+
+	
 	/** Logging */
 	protected static SimpleLogger log = new SimpleLogger(BaseController.class);
 
@@ -215,6 +221,8 @@ public class BaseController {
 		}
 	}
 
+	// --- Methods for using Tables and Trees -----------------------------------------------------
+	
 	/**
 	 * If no table with specified key exists in current session, a new entry with the specified initialTable is created
 	 * and returned, otherwise the already existing table is returned.
@@ -223,11 +231,10 @@ public class BaseController {
 	 * @return existing or initial table
 	 */
 	public Table registerTable(Table initialTable) {
-		TableController tableCtrl = new TableController();
-		Table table = tableCtrl.getTable(initialTable.getKey());
+		Table table = getTable(initialTable.getKey());
 		if (table == null) {
 			table = initialTable;
-			tableCtrl.addTable(initialTable);
+			getTableMap().put(table.getKey(), table);
 		} else {
 			/* table model is intentionally transient, so it might be null even if the table is still there,
 			 * after a session got restored. In that case, we take the model from the initialTable.
@@ -239,7 +246,28 @@ public class BaseController {
 		context.put(table.getKey(), table);
 		return table;
 	}
+		
+	/**
+	 * Gets a table from the table-map in session scope.
+	 * @param tableId Unique ID
+	 * @return a Table
+	 */
+	public Table getTable(String tableId) {
+		return getTableMap().get(tableId);
+	}
 
+	/** lazily create tableMap */
+	private Map<String, Table> getTableMap() {
+		@SuppressWarnings("unchecked")
+		Map<String, Table> map = (Map<String, Table>)context.session.get(TABLEMAP_KEY);
+		if (map == null) {
+			/* create map if not already there */
+			map = new HashMap<String, Table>();
+			Context.getInstance().session.put(TABLEMAP_KEY, map);			
+		}
+		return map;
+	}
+	
 	/**
 	 * If no tree with specified key exists in current session, a new entry with the specified initialTree is created
 	 * and returned, otherwise the already existing tree is returned.
@@ -247,11 +275,10 @@ public class BaseController {
 	 * @return the existing or initial Tree object
 	 */
 	public Tree registerTree(Tree initialTree) {
-		TreeController trees = new TreeController();
-		Tree tree = trees.getTree(initialTree.getKey());
+		Tree tree = getTree(initialTree.getKey());
 		if (tree == null) {
 			tree = initialTree;
-			trees.addTree(initialTree);
+			getTreeMap().put(tree.getKey(), tree);
 		} else {
 			/* tree model is intentionally transient, so it might be null even if the tree is still there,
 			 * after a session got restored. In that case, we take the model from the initialTree.
@@ -261,5 +288,26 @@ public class BaseController {
 			}
 		}
 		return tree;
+	}	
+	
+	/**
+	 * Gets a tree from the tree-map in session scope.
+	 * @param treeId Unique ID
+	 * @return A Tree object
+	 */
+	public Tree getTree(String treeId) {
+		return getTreeMap().get(treeId);
 	}
+
+	/** lazily create treeMap */
+	private Map<String, Tree> getTreeMap() {
+		@SuppressWarnings("unchecked")
+		Map<String, Tree> map = (Map<String, Tree>)Context.getInstance().session.get(TREEMAP_KEY);
+		if (map == null) {
+			/* create map if not already there */
+			map = new HashMap<String, Tree>();
+			Context.getInstance().session.put(TREEMAP_KEY, map);			
+		}
+		return map;
+	}		
 }
