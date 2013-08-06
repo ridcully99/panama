@@ -46,10 +46,11 @@ public class IssueTrackerController extends BaseController {
 
 	private Table table;
 
-	private final static Form form = new Form(Issue.class).without("createdAt");
+	private final static Form form = new Form(Issue.class).except("createdAt");
 	static {
-		form.getField("title").addValidator(ValidatorFactory.getNotEmptyValidator());
-		form.addField(new PersistentBeanField("tags", Tag.class));
+		// TODO reactivate and fix NPE
+//		form.getField("title").addValidator(ValidatorFactory.getNotEmptyValidator());
+//		form.addField(new PersistentBeanField("tags", Tag.class));
 	}
 
 	public IssueTrackerController() {
@@ -84,7 +85,7 @@ public class IssueTrackerController extends BaseController {
 			FormData fd = new FormData(form).withDataFromRequest(context);
 			String id = fd.getString("id");
 			Issue e = PersistentBean.findOrCreate(Issue.class, id);
-			fd.applyToWithout(e, "tags");
+			fd.applyToExcept(e, "tags");
 			if (fd.hasErrors()) {
 				return showForm(fd);
 			}
