@@ -52,7 +52,7 @@ public class SecureGuestbookController extends BaseController {
 	private final static Form form;
 	static {
 		/* create form model based on GuestbookEntry class. This may be done static as long as the form is not changed later (make it final to ensure this) */
-		form = new Form(GuestbookEntry.class).without("date");
+		form = new Form(GuestbookEntry.class).except("date");
 		form.addField(new StringField("token"));
 	}
 
@@ -87,7 +87,11 @@ public class SecureGuestbookController extends BaseController {
 	@Action
 	public Target logout() {
 		context.session.put("logged-in", null);
-		return redirectToAction("list");							// will be directed to login-page by beforeAction()
+		//return redirect("list");
+		//return redirectToAction(SecureGuestbookController.class, "list").withParameters("a","1","b","2");
+		//return redirect("http://localhost:8080/panama-examples/secureguestbook/list");
+		//return redirectToAction("list").setAnchor("foo");	
+		return redirectToAction("list");			// will be directed to login-page by beforeAction()
 	}
 
 	@Action
