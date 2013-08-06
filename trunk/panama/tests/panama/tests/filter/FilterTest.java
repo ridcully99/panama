@@ -20,7 +20,7 @@ import java.util.regex.Matcher;
 import java.util.regex.Pattern;
 
 import junit.framework.TestCase;
-import panama.filter.Filter;
+import panama.collections.filters.Filter;
 import panama.tests.entities.Entry;
 import panama.util.TestTimer;
 

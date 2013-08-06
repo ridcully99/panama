@@ -15,16 +15,12 @@
  */
 package panama.util;
 
-import java.util.HashMap;
-import java.util.Map;
-
 import panama.annotations.Action;
 import panama.annotations.Controller;
 import panama.collections.Table;
 import panama.collections.filters.Filter;
 import panama.collections.filters.SearchPropertyComparator;
 import panama.core.BaseController;
-import panama.core.Context;
 import panama.core.Target;
 import panama.exceptions.ForceTargetException;
 
@@ -37,11 +33,6 @@ import panama.exceptions.ForceTargetException;
 @Controller
 public class TableController extends BaseController {
 
-	/**
-	 * Key used to store DefaultTable-Map in Session-Scope
-	 */
-	public final static String TABLEMAP_KEY = "panama_tablemap";	
-	
 	/**
 	 * This action sets sorting parameters in a table
 	 * Expected parameters in request:
@@ -155,37 +146,4 @@ public class TableController extends BaseController {
 		}
 		return redirect(context.getRequest().getHeader("referer"));
 	}			
-	
-	// -------------------------------------------------------------------------------------
-	// Useful helper methods
-	// -------------------------------------------------------------------------------------
-
-	/**
-	 * Gets a table from the table-map in session scope.
-	 * @param tableId Unique ID
-	 * @return a Table
-	 */
-	public Table getTable(String tableId) {
-		return getTableMap().get(tableId);
-	}
-
-	/**
-	 * Puts a table into the table-map in the session .
-	 * @param table Some kind of table
-	 */
-	public void addTable(Table table) {
-		getTableMap().put(table.getKey(), table);
-	}
-
-	/** lazily create tableMap */
-	private Map<String, Table> getTableMap() {
-		@SuppressWarnings("unchecked")
-		Map<String, Table> map = (Map<String, Table>)Context.getInstance().session.get(TABLEMAP_KEY);
-		if (map == null) {
-			/* create map if not already there */
-			map = new HashMap<String, Table>();
-			Context.getInstance().session.put(TABLEMAP_KEY, map);			
-		}
-		return map;
-	}
 }
