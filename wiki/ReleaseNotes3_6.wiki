@@ -5,11 +5,13 @@
 
 *Warning:* Release 3.6 contains some API changes due to consolitations and simplifications of the framework.
 
+  * Upgraded Ebean to version 3.2.1
   * Consolidated Form construction and FormData#applyTo methods
   * Goodbye message now takes name from context instead of filter
   * Removed FilterExtensions - they were hardly used and quite complicated to understand
   * Added Factory Methods to Filter for common Expression filters like gt, lt, ...
   * Made filter package a sub-package of collections, as it belongs there logically.
+  * Added setFilter(), removeFilter(), clearFilters() to Table for cleaner Filter handling.
   * Repackaged the JSON classes from org.json to panama.json
   * Repackaged the simple log classes into panama.log
   * Refactored TableController and TreeController allowing new methods getTable() and getTree() in BaseController.
