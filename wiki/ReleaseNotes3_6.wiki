@@ -5,7 +5,8 @@
 
 *Warning:* Release 3.6 contains some API changes due to consolitations and simplifications of the framework.
 
-  * Upgraded Ebean to version 3.2.1
+  * Upgraded Ebean to version 3.2.1 (this brings new dependency to sl4j-x.y.jar)
+  * TODO : Wrapper for simple-log to get sl4j logs (from Ebean)
   * Consolidated Form construction and FormData#applyTo methods
   * Goodbye message now takes name from context instead of filter
   * Removed FilterExtensions - they were hardly used and quite complicated to understand
