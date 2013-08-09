@@ -35,7 +35,7 @@ public class QueryTable extends DefaultTable {
 	
 	/** {@inheritDoc} */
 	@Override
-	public List<Object> getRows() {
+	public List<? extends Object> getRows() {
 		boolean paged = getPagingEnabled();
 		try {
 			setPagingEnabled(false);
@@ -47,7 +47,7 @@ public class QueryTable extends DefaultTable {
 	
 	/** {@inheritDoc} */
 	@Override
-	public List<Object> getPageRows() {
+	public List<? extends Object> getPageRows() {
 		return fetchRows();
 	}
 	

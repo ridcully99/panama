@@ -43,7 +43,7 @@ public class QueryListModel implements ListModel, Serializable {
 
 	/** {@inheritDoc} */
 	@Override
-	public List<Object> getList() {
+	public List<? extends Object> getList() {
 		if (query == null) {
 			return null;
 		} else {

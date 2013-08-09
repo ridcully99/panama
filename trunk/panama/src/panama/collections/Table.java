@@ -82,20 +82,20 @@ public interface Table {
 	 * and may query it later to see what rows are in there.
 	 * @return a set
 	 */
-	public Set<Object> getSelected();
+	public Set<? extends Object> getSelected();
 
 	/**
 	 * Gets a sorted list of rows (objects)
 	 * Sorted by the property specified by setSortBy() and direction specified by setSortDirection()
 	 * @return a list of objects or null
 	 */
-	public List<Object> getRows();
+	public List<? extends Object> getRows();
 
 	/**
 	 * Gets list of rows on current page
 	 * @return a list of objects or null
 	 */
-	public List<Object> getPageRows();
+	public List<? extends Object> getPageRows();
 
 	public String getSortBy();
 

@@ -56,7 +56,7 @@ public class DefaultTable implements Table, Comparator<Object>, Serializable {
 	 * and would be null otherwise after a restored session
 	 */
 	protected transient ListModel model = null;
-	protected Set<Object> selected = new HashSet<Object>();
+	protected Set<? extends Object> selected = new HashSet();
 	protected Map<String, Filter> filters = new HashMap<String, Filter>();
 	protected String cacheCode = new VMID().toString();		/* a unique identifier */
 	private String isSorted = cacheCode + "_isSorted";		/* another one */
@@ -109,13 +109,13 @@ public class DefaultTable implements Table, Comparator<Object>, Serializable {
 	 * Thus the list is only fetched from model once per request.
 	 * @return List of rows.
 	 */
-	protected List<Object> fetchRows() {
+	protected List<? extends Object> fetchRows() {
 		log.debug("about to fetch rows from cache or model");
-		List<Object> rows = null;
+		List<? extends Object> rows = null;
 		/* check if list already fetched in current Request */
 		Context ctx = Context.getInstance();
 		if (ctx != null) {
-			rows = (List<Object>)ctx.get(cacheCode);
+			rows = (List<? extends Object>)ctx.get(cacheCode);
 		}
 		if (rows == null && model != null) {
 			rows = model.getList();
@@ -129,9 +129,9 @@ public class DefaultTable implements Table, Comparator<Object>, Serializable {
 
 	/** {@inheritDoc} */
 	@Override
-	public List<Object> getRows() {
+	public List<? extends Object> getRows() {
 		try {
-			List<Object> rows = fetchRows();
+			List<? extends Object> rows = fetchRows();
 			if (rows == null) { return null; }
 			Context ctx = Context.getInstance();
 
@@ -166,8 +166,8 @@ public class DefaultTable implements Table, Comparator<Object>, Serializable {
 
 	/** {@inheritDoc} */
 	@Override
-	public List<Object> getPageRows() {
-		List<Object> rows = getRows();
+	public List<? extends Object> getPageRows() {
+		List<? extends Object> rows = getRows();
 		if (rows == null) { return null; }
 		/* invoke paging after sorting (which is done in getRows()) */
 		if (getPageCount() > 1) {
@@ -185,7 +185,7 @@ public class DefaultTable implements Table, Comparator<Object>, Serializable {
 	/** {@inheritDoc} */
 	@Override
 	public int getRowCount() {
-		List<Object> rows = getRows();
+		List<? extends Object> rows = getRows();
 		return rows != null ? rows.size() : 0;
 	}
 
@@ -193,7 +193,7 @@ public class DefaultTable implements Table, Comparator<Object>, Serializable {
 	 * Sorts the specified list.
 	 * @param rows
 	 */
-	protected void sortRows(List<Object> rows) throws Exception {
+	protected void sortRows(List<? extends Object> rows) throws Exception {
 		if (rows == null || rows.size() == 0) {
 			return;
 		}
@@ -363,7 +363,7 @@ public class DefaultTable implements Table, Comparator<Object>, Serializable {
 
 	/** {@inheritDoc} */
 	@Override
-	public Set<Object> getSelected() {
+	public Set<? extends Object> getSelected() {
 		return selected;
 	}
 

@@ -110,6 +110,6 @@ public class DefaultTree implements Tree, Serializable {
 	/** {@inheritDoc} */
 	@Override
 	public String toggleLink(Object nodeId) {
-		return "../"+TreeController.class.getName()+"/toggle.now?treeid="+this.key+"&nodeid="+nodeId;		
+		return "../"+TreeController.class.getName()+"/toggle?treeid="+this.key+"&nodeid="+nodeId;		
 	}	
 }
