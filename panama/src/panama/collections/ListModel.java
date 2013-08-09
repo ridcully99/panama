@@ -19,6 +19,7 @@ import java.util.List;
 
 /**
  * A list from some source.
+ * 
  * The rows may be fetched from database, session or application scope, created from scratch, what ever.
  *
  * @author Ridcully
@@ -26,7 +27,7 @@ import java.util.List;
  */
 public interface ListModel {
 
-	public List getList();
+	public List<Object> getList();
 	
 	public void setTable(Table table);
 	

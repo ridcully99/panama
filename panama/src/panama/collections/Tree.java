@@ -44,10 +44,24 @@ public interface Tree {
 	 */
 	public List getRootNodes();
 	
+	/**
+	 * Toggle open/closed state of node identified by given nodeId
+	 * @param nodeId
+	 */
 	public void toggleNode(Object nodeId);
 	
+	/**
+	 * Check open/closed state of node identified by given nodeId.
+	 * @param nodeId
+	 * @return true if node is closed, false otherwise
+	 */
 	public boolean isClosed(Object nodeId);
 	
+	/**
+	 * Check open/closed state of node identified by given nodeId.
+	 * @param nodeId
+	 * @return true if node is open, false otherwise
+	 */
 	public boolean isOpen(Object nodeId);
 	
 	public Set getSelected();

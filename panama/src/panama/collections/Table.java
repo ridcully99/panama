@@ -49,31 +49,53 @@ public interface Table {
 	public ListModel getModel();
 
 	/**
-	 * Gets a map of Filter objects specified for this table.
-	 * @return a Map of Filters where keys are unique String identifiers and values are Filter objects
+	 * Gets all Filters currently set for the table.
+	 * @return a Map of Filters set via {@link #setFilter(String, Filter)}.
 	 */
 	public Map<String, Filter> getFilters();
 
+	/**
+	 * Sets specified filter using the specified name. 
+	 * @param name
+	 * @param filter
+	 * @return the Table object
+	 */
+	public Table setFilter(String name, Filter filter);
+	
+	/**
+	 * Removes filter with specified name. 
+	 * If no filter with that name is found, nothing is done, especially no Exception is thrown.
+	 * @param name
+	 * @return the Table object.
+	 */
+	public Table removeFilter(String name);
+	
+	/**
+	 * Removes all filters.
+	 * @return the Table object.
+	 */
+	public Table clearFilters();
+	
 	/**
 	 * Gets a set allowing you to keep track of selected rows.
 	 * You may e.g. add or remove some rows or ids or whatever you like to this set
 	 * and may query it later to see what rows are in there.
 	 * @return a set
 	 */
-	public Set getSelected();
+	public Set<Object> getSelected();
 
 	/**
 	 * Gets a sorted list of rows (objects)
 	 * Sorted by the property specified by setSortBy() and direction specified by setSortDirection()
 	 * @return a list of objects or null
 	 */
-	public List getRows();
+	public List<Object> getRows();
 
 	/**
 	 * Gets list of rows on current page
 	 * @return a list of objects or null
 	 */
-	public List getPageRows();
+	public List<Object> getPageRows();
 
 	public String getSortBy();
 

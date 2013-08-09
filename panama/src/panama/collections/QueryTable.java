@@ -33,7 +33,9 @@ public class QueryTable extends DefaultTable {
 		super(key, model);
 	}
 	
-	public List getRows() {
+	/** {@inheritDoc} */
+	@Override
+	public List<Object> getRows() {
 		boolean paged = getPagingEnabled();
 		try {
 			setPagingEnabled(false);
@@ -43,14 +45,17 @@ public class QueryTable extends DefaultTable {
 		}
 	}
 	
-	public List getPageRows() {
+	/** {@inheritDoc} */
+	@Override
+	public List<Object> getPageRows() {
 		return fetchRows();
 	}
 	
 	/**
-	 * RowCount with caching as this method might be invoked several times during one request.
-	 * The cache is only kept during one request.
+	 * {@inheritDoc}
+	 * The rowcount value if cached for the lifespan of the current request, as this method might be invoked several times during one request.
 	 */
+	@Override
 	public int getRowCount() {
 		Integer cnt = null;
 		int n = 0;

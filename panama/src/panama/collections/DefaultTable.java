@@ -39,6 +39,7 @@ import panama.util.TableController;
 
 /**
  * Table implementing paging and sorting and filtering.
+ * 
  * @author Ridcully
  */
 public class DefaultTable implements Table, Comparator<Object>, Serializable {
@@ -55,7 +56,7 @@ public class DefaultTable implements Table, Comparator<Object>, Serializable {
 	 * and would be null otherwise after a restored session
 	 */
 	protected transient ListModel model = null;
-	protected Set selected = new HashSet();
+	protected Set<Object> selected = new HashSet<Object>();
 	protected Map<String, Filter> filters = new HashMap<String, Filter>();
 	protected String cacheCode = new VMID().toString();		/* a unique identifier */
 	private String isSorted = cacheCode + "_isSorted";		/* another one */
@@ -78,14 +79,20 @@ public class DefaultTable implements Table, Comparator<Object>, Serializable {
 		setModel(model);
 	}
 
+	/** {@inheritDoc} */
+	@Override
 	public String getKey() {
 		return key;
 	}
 
+	/** {@inheritDoc} */
+	@Override
 	public ListModel getModel() {
 		return model;
 	}
 
+	/** {@inheritDoc} */
+	@Override
 	public Table setModel(ListModel model) {
 		this.model = model;
 		model.setTable(this);
@@ -102,13 +109,13 @@ public class DefaultTable implements Table, Comparator<Object>, Serializable {
 	 * Thus the list is only fetched from model once per request.
 	 * @return List of rows.
 	 */
-	protected List fetchRows() {
+	protected List<Object> fetchRows() {
 		log.debug("about to fetch rows from cache or model");
-		List rows = null;
+		List<Object> rows = null;
 		/* check if list already fetched in current Request */
 		Context ctx = Context.getInstance();
 		if (ctx != null) {
-			rows = (List)ctx.get(cacheCode);
+			rows = (List<Object>)ctx.get(cacheCode);
 		}
 		if (rows == null && model != null) {
 			rows = model.getList();
@@ -120,12 +127,11 @@ public class DefaultTable implements Table, Comparator<Object>, Serializable {
 		return rows;
 	}
 
-	/**
-	 * @see panama.collections.Table#getRows()
-	 */
-	public List getRows() {
+	/** {@inheritDoc} */
+	@Override
+	public List<Object> getRows() {
 		try {
-			List rows = fetchRows();
+			List<Object> rows = fetchRows();
 			if (rows == null) { return null; }
 			Context ctx = Context.getInstance();
 
@@ -158,11 +164,10 @@ public class DefaultTable implements Table, Comparator<Object>, Serializable {
 		}
 	}
 
-	/**
-	 * @see panama.collections.Table#getPageRows()
-	 */
-	public List getPageRows() {
-		List rows = getRows();
+	/** {@inheritDoc} */
+	@Override
+	public List<Object> getPageRows() {
+		List<Object> rows = getRows();
 		if (rows == null) { return null; }
 		/* invoke paging after sorting (which is done in getRows()) */
 		if (getPageCount() > 1) {
@@ -177,11 +182,10 @@ public class DefaultTable implements Table, Comparator<Object>, Serializable {
 		}
 	}
 
-	/**
-	 * @see panama.collections.Table#getRowCount()
-	 */
+	/** {@inheritDoc} */
+	@Override
 	public int getRowCount() {
-		List rows = getRows();
+		List<Object> rows = getRows();
 		return rows != null ? rows.size() : 0;
 	}
 
@@ -189,7 +193,7 @@ public class DefaultTable implements Table, Comparator<Object>, Serializable {
 	 * Sorts the specified list.
 	 * @param rows
 	 */
-	protected void sortRows(List rows) throws Exception {
+	protected void sortRows(List<Object> rows) throws Exception {
 		if (rows == null || rows.size() == 0) {
 			return;
 		}
@@ -209,9 +213,11 @@ public class DefaultTable implements Table, Comparator<Object>, Serializable {
 	}
 
 	/**
-	 * The compare method for sorting our rows,
+	 * Implementation of Comparator interface.
+	 * The compare method for sorting our rows.
 	 * @see java.util.Comparator#compare(java.lang.Object, java.lang.Object)
 	 */
+	@Override
 	public int compare(Object o1, Object o2) {
 		try {
 			Comparable p1 = getCompareValue(o1);
@@ -253,16 +259,14 @@ public class DefaultTable implements Table, Comparator<Object>, Serializable {
 		return v;
 	}
 
-	/**
-	 * @see panama.collections.Table#getSortBy()
-	 */
+	/** {@inheritDoc} */
+	@Override
 	public String getSortBy() {
 		return sortBy;
 	}
 
-	/**
-	 * @see panama.collections.Table#setSortBy(java.lang.String)
-	 */
+	/** {@inheritDoc} */
+	@Override
 	public Table setSortBy(String sortBy) {
 		if (sortBy != null && sortBy.length() == 0) { sortBy = null; }
 		this.sortBy = sortBy;
@@ -275,31 +279,29 @@ public class DefaultTable implements Table, Comparator<Object>, Serializable {
 		return this;
 	}
 
-	/**
-	 * @see panama.collections.Table#getSortDirection()
-	 */
+	/** {@inheritDoc} */
+	@Override
 	public String getSortDirection() {
 		return sortDirection;
 	}
 
-	/**
-	 * @see panama.collections.Table#setSortDirection(java.lang.String)
-	 */
+	/** {@inheritDoc} */
+	@Override
 	public Table setSortDirection(String sortDirection) {
 		this.sortDirection = sortDirection;
 		return this;
 	}
 
+	/** {@inheritDoc} */
+	@Override
 	public Table setSortBy(String sortBy, String sortDirection) {
 		setSortBy(sortBy);
 		setSortDirection(sortDirection);
 		return this;
 	}
 
-
-	/**
-	 * @see panama.collections.Table#getCurrentPage()
-	 */
+	/** {@inheritDoc} */
+	@Override
 	public int getCurrentPage() {
 		/* always check if pagecount is still valid (might become invalid due to changes in the model) */
 		int pageCount = getPageCount();
@@ -307,9 +309,8 @@ public class DefaultTable implements Table, Comparator<Object>, Serializable {
 		return currentPage;
 	}
 
-	/**
-	 * @see panama.collections.Table#setCurrentPage(int)
-	 */
+	/** {@inheritDoc} */
+	@Override
 	public Table setCurrentPage(int currentPage) {
 		if (currentPage < 1) { currentPage = 1; }
 		if (currentPage > getPageCount()) { currentPage = getPageCount(); }
@@ -317,9 +318,8 @@ public class DefaultTable implements Table, Comparator<Object>, Serializable {
 		return this;
 	}
 
-	/**
-	 * @see panama.collections.Table#getEntriesPerPage()
-	 */
+	/** {@inheritDoc} */
+	@Override
 	public int getEntriesPerPage() {
 		if (getPagingEnabled()) {
 			return entriesPerPage;
@@ -328,9 +328,8 @@ public class DefaultTable implements Table, Comparator<Object>, Serializable {
 		}
 	}
 
-	/**
-	 * @see panama.collections.Table#setEntriesPerPage(int)
-	 */
+	/** {@inheritDoc} */
+	@Override
 	public Table setEntriesPerPage(int entriesPerPage) {
 		if (entriesPerPage <= 0) {
 			entriesPerPage = 10;
@@ -339,9 +338,8 @@ public class DefaultTable implements Table, Comparator<Object>, Serializable {
 		return this;
 	}
 
-	/**
-	 * @see panama.collections.Table#getPageCount()
-	 */
+	/** {@inheritDoc} */
+	@Override
 	public int getPageCount() {
 		if (getEntriesPerPage() == 0) { return 1; }
 		int rowCount = getRowCount();	//List rows = getRows();
@@ -350,27 +348,52 @@ public class DefaultTable implements Table, Comparator<Object>, Serializable {
 		return new Double(Math.ceil((rowCount*1.0) / getEntriesPerPage())).intValue();
 	}
 
+	/** {@inheritDoc} */
+	@Override
 	public Table setPagingEnabled(boolean pagingEnabled) {
 		this.pagingEnabled = pagingEnabled;
 		return this;
 	}
 
+	/** {@inheritDoc} */
+	@Override
 	public boolean getPagingEnabled() {
 		return pagingEnabled;
 	}
 
-	public Set getSelected() {
+	/** {@inheritDoc} */
+	@Override
+	public Set<Object> getSelected() {
 		return selected;
 	}
 
-	/**
-	 * Gets the tables Map of Filters.
-	 * @return A Map of Filters
-	 */
+	/** {@inheritDoc} */
+	@Override
 	public Map<String, Filter> getFilters() {
 		return filters;
 	}
 
+	/** {@inheritDoc} */
+	@Override
+	public Table setFilter(String name, Filter filter) {
+		filters.put(name, filter);
+		return this;
+	}
+	
+	/** {@inheritDoc} */
+	@Override
+	public Table removeFilter(String name) {
+		filters.remove(name);
+		return this;
+	}
+	
+	/** {@inheritDoc} */
+	@Override
+	public Table clearFilters() {
+		filters.clear();
+		return this;
+	}
+	
 	/**
 	 * Applies all filters onto the specified rows. The original list is not changed by this method.
 	 * It is probably faster to iterate over the rows for every filter as with some luck
@@ -392,30 +415,26 @@ public class DefaultTable implements Table, Comparator<Object>, Serializable {
 		return result;
 	}
 
-	/**
-	 * @see panama.collections.Table#sortLink(java.lang.String)
-	 */
+	/** {@inheritDoc} */
+	@Override
 	public String sortLink(String property) {
 		return "../"+TableController.class.getName()+"/sort?tableid="+key+"&property="+property;
 	}
 
-	/**
-	 * @see panama.collections.Table#pageLink(int)
-	 */
+	/** {@inheritDoc} */
+	@Override
 	public String pageLink(int page) {
 		return "../"+TableController.class.getName()+"/turnto?tableid="+key+"&page="+page;
 	}
 
-	/**
-	 * @see panama.collections.Table#eppLink(int)
-	 */
+	/** {@inheritDoc} */
+	@Override
 	public String eppLink(int epp) {
 		return "../"+TableController.class.getName()+"/setepp?tableid="+key+"&epp="+epp;
 	}
 
-	/**
-	 * @see panama.collections.Table#searchLink(String...)
-	 */
+	/** {@inheritDoc} */
+	@Override
 	public String searchLink(String... properties) {
 		StringBuffer b = new StringBuffer("../"+TableController.class.getName()+"/setsearchquery?tableid="+key+"&properties=");
 		if (properties != null) {
@@ -431,9 +450,8 @@ public class DefaultTable implements Table, Comparator<Object>, Serializable {
 		return b.toString();
 	}
 
-	/**
-	 * @see panama.collections.Table#pagingEnabledLink(boolean)
-	 */
+	/** {@inheritDoc} */
+	@Override
 	public String pagingEnabledLink(boolean enabled) {
 		return "../"+TableController.class.getName()+"/setpagingenabled?tableid="+key+"&enabled="+enabled;
 	}
