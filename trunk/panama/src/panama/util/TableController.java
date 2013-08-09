@@ -139,9 +139,9 @@ public class TableController extends BaseController {
 				// \W == non Word-Characters
 				String[] propertyArray = properties != null ? properties.split("\\W+") : null;
 				SearchPropertyComparator searchfilter = (SearchPropertyComparator)Filter.stdSearchFilter(query, propertyArray);
-				table.getFilters().put(Table.SEARCH_FILTER, searchfilter);
+				table.setFilter(Table.SEARCH_FILTER, searchfilter);
 			} else {
-				table.getFilters().remove(Table.SEARCH_FILTER);
+				table.removeFilter(Table.SEARCH_FILTER);
 			}
 		}
 		return redirect(context.getRequest().getHeader("referer"));

@@ -18,7 +18,6 @@ package panama.util;
 import panama.annotations.Controller;
 import panama.collections.Tree;
 import panama.core.BaseController;
-import panama.core.Dispatcher;
 import panama.core.Target;
 import panama.exceptions.ForceTargetException;
 
