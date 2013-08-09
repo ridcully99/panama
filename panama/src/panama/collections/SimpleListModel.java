@@ -28,20 +28,20 @@ public class SimpleListModel implements ListModel, Serializable {
 
 	private static final long serialVersionUID = 1L;
 	
-	private List<Object> list;
+	private List list;
 	protected Table table = null;
 	
 	public SimpleListModel() {
 	}
 	
-	public SimpleListModel(List<Object> list) {
+	public SimpleListModel(List<? extends Object> list) {
 		setList(list);
 	}
 	
 	/** {@inheritDoc} */
 	@Override
-	public List<Object> getList() {
-		return new ArrayList<Object>(list);
+	public List<? extends Object> getList() {
+		return new ArrayList(list);
 	}
 
 	/** {@inheritDoc} */
@@ -54,7 +54,7 @@ public class SimpleListModel implements ListModel, Serializable {
 	 * Set the data, the ListModel shall hold.
 	 * @param list
 	 */
-	public void setList(List<Object> list) {
+	public void setList(List<? extends Object> list) {
 		this.list = list;
 	}
 }

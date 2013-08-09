@@ -27,7 +27,7 @@ import java.util.List;
  */
 public interface ListModel {
 
-	public List<Object> getList();
+	public List<? extends Object> getList();
 	
 	public void setTable(Table table);
 	
