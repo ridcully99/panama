@@ -368,7 +368,7 @@ To restrict your table to only show data with certain characteristics, you can a
 
 To only show data where property _name_ has the value "panama":
 {{{
-getTable("tablename").getFilters().put("filtername", Filter.eq("name", "panama"));
+getTable("tablename").setFilter("filtername", Filter.eq("name", "panama"));
 }}}
 
 
