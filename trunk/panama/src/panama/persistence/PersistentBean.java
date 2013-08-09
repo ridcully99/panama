@@ -82,8 +82,7 @@ public class PersistentBean implements Serializable {
 	 * Tries to fetch an object of type beanType with specified id from database (using Ebean).
 	 * If no such object is found, a new one is created and it's id property set to the specified id.
 	 * This newly created object is _not_ saved to the database.
-	 * You can detect wether an object is new or came from the database by checking it's timeStamp property,
-	 * which is null for unsaved objects and not null for saved ones.
+	 * You can detect wether an object is new or came from the database via {@link #isPersisted()}
 	 *
 	 * @param beanType
 	 * @param id
