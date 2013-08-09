@@ -25,6 +25,8 @@ import com.avaje.ebean.Query;
 
 
 /**
+ * Implementation of {@link ListModel} interface for use with Ebean on persisted data.
+ * 
  * @author ridcully
  *
  */
@@ -39,10 +41,9 @@ public class QueryListModel implements ListModel, Serializable {
 		this.query = query;
 	}
 
-	/* (non-Javadoc)
-	 * @see panama.collections.ListModel#getList()
-	 */
-	public List getList() {
+	/** {@inheritDoc} */
+	@Override
+	public List<Object> getList() {
 		if (query == null) {
 			return null;
 		} else {
@@ -56,15 +57,21 @@ public class QueryListModel implements ListModel, Serializable {
 		}
 	}
 
-	protected void applySorting(Query q) {
+	/**
+	 * Applies sorting as defined in Table to specified Query.
+	 * @param query
+	 */
+	protected void applySorting(Query query) {
 		if (table.getSortBy() != null && table.getSortDirection() != Table.SORT_NONE) {
-			q.orderBy(table.getSortBy()+" "+table.getSortDirection());
+			query.orderBy(table.getSortBy()+" "+table.getSortDirection());
 		} else {
-			q.orderBy("");
+			query.orderBy("");
 		}
 	}
 
 	/**
+	 * Creates a _new_ Query from the specified Query and the filters as defined in Table.
+	 * 
 	 * @param query
 	 * @return a new Query object (even if no filters exist)
 	 */
@@ -91,9 +98,8 @@ public class QueryListModel implements ListModel, Serializable {
 		}
 	}
 
-	/* (non-Javadoc)
-	 * @see panama.collections.ListModel#setTable(panama.collections.Table)
-	 */
+	/** {@inheritDoc} */
+	@Override
 	public void setTable(Table table) {
 		this.table = table;
 	}

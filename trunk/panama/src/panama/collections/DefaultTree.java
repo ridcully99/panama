@@ -47,19 +47,27 @@ public class DefaultTree implements Tree, Serializable {
 		setModel(model);
 	}
 
+	/** {@inheritDoc} */
+	@Override
 	public String getKey() {
 		return this.key;
 	}
 	
+	/** {@inheritDoc} */
+	@Override
 	public ListModel getModel() {
 		return rootModel;
 	}
 
+	/** {@inheritDoc} */
+	@Override
 	public Tree setModel(ListModel model) {
 		this.rootModel = model;
 		return this;
 	}
 
+	/** {@inheritDoc} */
+	@Override
 	public List getRootNodes() {
 		if (rootModel != null) {
 			return rootModel.getList();
@@ -68,10 +76,8 @@ public class DefaultTree implements Tree, Serializable {
 		}
 	}	
 	
-	/**
-	 * Toggles closed/open state of given node
-	 * @param nodeId
-	 */
+	/** {@inheritDoc} */
+	@Override
 	public void toggleNode(Object nodeId) {
 		/* only the open nodes are stored, all others are closed */
 		String current = (String)openNodes.get(nodeId);
@@ -82,30 +88,27 @@ public class DefaultTree implements Tree, Serializable {
 		}
 	}
 
-	/**
-	 * Tells wether node is currently closed.
-	 * @param nodeId
-	 */
+	/** {@inheritDoc} */
+	@Override
 	public boolean isClosed(Object nodeId) {
 		return !openNodes.containsKey(nodeId); 
 	}
 
-	/**
-	 * Tells wether node is currently open
-	 * @param nodeId
-	 */
+	/** {@inheritDoc} */
+	@Override
 	public boolean isOpen(Object nodeId) {
 		boolean res = openNodes.containsKey(nodeId);
 		return res;
 	}
 	
+	/** {@inheritDoc} */
+	@Override
 	public Set getSelected() {
 		return selected;
 	}
 	
-	/**
-	 * @see panama.collections.Tree#toggleLink(java.lang.Object)
-	 */
+	/** {@inheritDoc} */
+	@Override
 	public String toggleLink(Object nodeId) {
 		return "../"+TreeController.class.getName()+"/toggle.now?treeid="+this.key+"&nodeid="+nodeId;		
 	}	

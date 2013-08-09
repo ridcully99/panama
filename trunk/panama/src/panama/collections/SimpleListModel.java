@@ -26,25 +26,35 @@ import java.util.List;
  */
 public class SimpleListModel implements ListModel, Serializable {
 
-	private List list;
+	private static final long serialVersionUID = 1L;
+	
+	private List<Object> list;
 	protected Table table = null;
 	
 	public SimpleListModel() {
 	}
 	
-	public SimpleListModel(List list) {
+	public SimpleListModel(List<Object> list) {
 		setList(list);
 	}
 	
-	public List getList() {
-		return new ArrayList(list);
+	/** {@inheritDoc} */
+	@Override
+	public List<Object> getList() {
+		return new ArrayList<Object>(list);
 	}
 
+	/** {@inheritDoc} */
+	@Override
 	public void setTable(Table table) {
 		this.table = table;
 	}	
-	
-	public void setList(List list) {
+
+	/**
+	 * Set the data, the ListModel shall hold.
+	 * @param list
+	 */
+	public void setList(List<Object> list) {
 		this.list = list;
 	}
 }
