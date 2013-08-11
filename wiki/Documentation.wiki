@@ -429,6 +429,15 @@ The optional parameter map extends or the alters the original request parameters
 
 = Persistence =
 
+Panama provides some support for creating web apps using databases with the Ebean ORM.
+
+=== Configuration ===
+
+Ebean requires an ebean.properties file in the _src_ root directory of your application.
+
+*IMPORTANT* As of Ebean 3.x you have to add the line *`ebean.search.jars=panama.jar`* to your `ebean.properties` for Ebean to search the panama.jar for `Entity` resp. `Embeddable` artifacts.
+
+
 == Ebean ORM with JNDI ==
 
 For production environment, we recommend to use a JNDI datasource instead of Ebean's internal connection pool. Here is, how that can be archieved:
