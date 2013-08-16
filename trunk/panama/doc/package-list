@@ -1,8 +1,9 @@
+org.slf4j.impl
 panama.annotations
 panama.collections
+panama.collections.filters
 panama.core
 panama.exceptions
-panama.filter
 panama.form
 panama.json
 panama.log
