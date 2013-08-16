@@ -1,0 +1,31 @@
+<html>
+	<head>
+		<title>Panama Examples - Issues</title>
+		<link rel="stylesheet" href="../simple.css" type="text/css">
+	</head>
+	<body>
+		#set($examplename="Polyglot")
+		#parse("/panama/examples/exampleheader.vm")
+##		<div style="float:left"><input type="button" onclick="location.href='edit';" value="Create Issue..."/></div>
+##		<div style="float:right; white-space:nowrap">
+##			<form method="post" action="$issuetable.searchLink('title','description')">
+##				<input type="text" name="q" style="width:12em" value="$!issuetable.filters.searchfilter" />
+##				<input type="submit" name="search" value="Search" />
+##			</form>
+##		</div>
+		<table>
+			<tr>
+				<th>No</th>
+				<th>Name</th>
+				<th>Description</th>
+			</tr>
+			#foreach($article in $localizedarticletable.rows)
+			<tr>
+				<td>$!article.articleNo</td>
+				<td>$!article.name</td>
+				<td>$!article.description</td>
+			</tr>
+			#end
+		</table>
+	</body>
+</html>
