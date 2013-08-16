@@ -61,7 +61,7 @@ public class Form {
 	 * Creates new form object and adds fields of correct type 
 	 * for all specified properties of the specified class.
 	 *
-	 * See {@link addFields(Class, String...)}
+	 * See {@link #addFields(Class, String...)}
 	 * 
 	 * @param clazz
 	 */

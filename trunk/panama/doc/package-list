@@ -9,5 +9,11 @@ panama.json
 panama.log
 panama.log.rollover
 panama.persistence
+panama.tests
+panama.tests.collections
+panama.tests.entities
+panama.tests.filter
+panama.tests.form
+panama.tests.statics
 panama.tools
 panama.util
