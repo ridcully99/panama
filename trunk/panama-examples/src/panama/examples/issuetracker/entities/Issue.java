@@ -20,6 +20,7 @@ import java.util.Set;
 
 import javax.persistence.CascadeType;
 import javax.persistence.Entity;
+import javax.persistence.Id;
 import javax.persistence.JoinColumn;
 import javax.persistence.JoinTable;
 import javax.persistence.ManyToMany;
@@ -35,6 +36,9 @@ import com.avaje.ebean.annotation.CreatedTimestamp;
 @Entity
 public class Issue extends PersistentBean {
 
+	//@Id
+	//private String lang;
+	
 	private String title;
 	private String description;
 	private String createdBy;
