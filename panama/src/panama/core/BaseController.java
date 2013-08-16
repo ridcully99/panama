@@ -90,7 +90,7 @@ public class BaseController {
 	 * relative to the current request URI.
 	 * If the location is relative with a leading slash (/) the container interprets it as relative to the webapp.
 	 *
-	 * To redirect to other action use {@see #redirectToAction(String)} or {@see #redirectToAction(Class, String)}
+	 * To redirect to other action use {@link #redirectToAction(String, String...)} or {@link #redirectToAction(Class, String, String...)}
 	 *
 	 * Note: Use redirect only if you need the client browser's URL to have a new URL.
 	 *

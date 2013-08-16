@@ -53,7 +53,7 @@ public class Filter implements Serializable {
 	 * Creates representation of the Filter for use with Ebean Expression model.
 	 * The method in this base class simply returns an 'always true' expression, classes extending this class
 	 * will return more useful values.
-	 * @param filterExtensions A Map<propertyName, FilterExtension> with optional stuff for special filter treatments
+	 * @param query
 	 * @return an Expression representing the Filter.
 	 */
 	public Expression asExpression(Query<?> query) {
@@ -101,7 +101,7 @@ public class Filter implements Serializable {
 	 *
 	 * @param pattern pattern to match, must contain regexp-expressions or SQL-wildcards if used with {@link QueryTable}
 	 * @param propertyName
-	 * @return
+	 * @return A Filter object
 	 */
 	public static Filter matches(String propertyName, String pattern) {
 		return new RegExpPropertyComparator(pattern, PropertyComparator.ALL_PROPERTIES, propertyName);
@@ -180,7 +180,7 @@ public class Filter implements Serializable {
 	/**
 	 * For creating arbitrary complex Expression filters directly
 	 * @param expression
-	 * @return
+	 * @return ExpressionFilter object wrapping the specified expression
 	 */
 	public static Filter withExpression(Expression expression) {
 		return new ExpressionFilter(expression);

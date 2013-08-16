@@ -53,7 +53,7 @@ public class RedirectTarget extends Target {
 	/**
 	 * Sets anchor part for the redirect target.
 	 * @param anchor Anchor part, do not include the hash (#) symbol, it's added automatically
-	 * @return
+	 * @return the RedirectTarget object - for fluid programming. 
 	 */
 	public RedirectTarget withAnchor(String anchor) {
 		this.anchor = anchor;

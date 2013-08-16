@@ -105,7 +105,7 @@ public class PropertyComparator extends Filter {
 	 * Used by QueryListModel.
 	 * This method uses the forProperty() method and joins the results of that method
 	 * depending on this.mode.
-	 * @param filterExtensions an optional Map of FilterExtensions to tweak the default behaviour of the filter for each property separately.
+	 * @param query
 	 * @return Some sort of Expression representing the Filter.
 	 */
 	@Override

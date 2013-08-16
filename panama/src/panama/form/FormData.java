@@ -218,7 +218,7 @@ public class FormData {
 	/**
 	 * Applies current input-data to the specified properties of the specified bean.
 	 * 
-	 * Normally you wouldn't use this method, but {@link applyTo(Class, String...)} or {@link applyToExcluding(Class, String...)}
+	 * Normally you wouldn't use this method, but {@link #applyTo(Object, String...) or #applyToExcept(Object, String...)}
 	 * 
 	 * The field names must match the property names for this method to work as expected.
 	 * If wrong property-types are encountered, or fields are missing for property-names a message is logged at warn-level.
