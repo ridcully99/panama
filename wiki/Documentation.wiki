@@ -364,14 +364,23 @@ As the presentation of tabular data is very common in web applications (especial
 
 == Filters ==
 
-To restrict your table to only show data with certain characteristics, you can apply any number of filters to the table.
+To restrict your table to only show data with certain characteristics, you can apply any number of filters to the table. The `Filter` class provides a lot of factory methods to very easily create all sorts of filters, but you also can create your own implementations by extending `Filter` and implementing the `match()` method.
 
 To only show data where property _name_ has the value "panama":
 {{{
 getTable("tablename").setFilter("filtername", Filter.eq("name", "panama"));
 }}}
 
+For classical full-text search in a bunch of properties there's the `stdSearchFilter()` factory method. 
+{{{
+getTable("tablename").setFilter("search", Filter.stdSearchFilter("query", "firstName", "lastName", "street", "city"); 
+}}}
+This filter matches, if any of the values of the given properties matches (in a "LIKE" or "contains" sense) the given query string. So, if you pass e.g. "Jo" as the query, table will contain only items where e.g. firstName is John or lastName is Mojo etc. 
 
+To remove all filters:
+{{{
+getTable("tablename").clearFilters(); 
+}}}
 
 = Internationalization =
 
