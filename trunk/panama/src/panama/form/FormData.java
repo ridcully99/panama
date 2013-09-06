@@ -30,7 +30,9 @@ import org.apache.commons.fileupload.FileItem;
 
 import panama.core.Context;
 import panama.exceptions.NoSuchFieldException;
+import panama.exceptions.PropertyNotFoundException;
 import panama.exceptions.ValidatorException;
+import panama.exceptions.WrongValueTypeException;
 import panama.log.SimpleLogger;
 import panama.util.DynaBeanUtils;
 
@@ -109,7 +111,6 @@ public class FormData {
 	 *
 	 * @param inputMap
 	 */
-	@SuppressWarnings("unchecked")
 	public void setInput(Map inputMap) {
 		if (inputMap != null) {
 			for (Object e : inputMap.entrySet()) {
@@ -155,6 +156,7 @@ public class FormData {
 		setInput(bean);
 		return this;
 	}
+	
 	/**
 	 * Sets the input value for one field
 	 *
@@ -194,53 +196,69 @@ public class FormData {
 	// ----------------------------------------------------------------------------
 
 	/**
-	 * Applies current input-data to the specified properties of the specified bean.
+	 * Applies current input-data to the specified bean.
 	 * The field names must match the property names for this method to work as expected.
-	 * If wrong property-types are encountered, or fields are missing for property-names a message is logged at warn-level.
 	 * @param bean The bean, the input should be applied to.
-	 * @param propertiesToSet the properties to be set; a null value addresses _all_ properties
 	 */
-	public void applyTo(Object bean, String... propertiesToSet) {
-		applyTo(bean, propertiesToSet, null);
+	public void applyTo(Object bean) {
+		List<String> propertiesToSet = new ArrayList<String>();
+		if (input != null) {
+			propertiesToSet.addAll(input.keySet());
+		}
+		applyTo(bean, propertiesToSet);
 	}
 
 	/**
-	 * Applies current input-data to the properties of the specified bean, except for the properties specified to be excluded.
+	 * Applies current input-data to the specified bean, except for the properties specified to be excluded.
 	 * The field names must match the property names for this method to work as expected.
-	 * If wrong property-types are encountered, or fields are missing for property-names a message is logged at warn-level.
 	 * @param bean The bean, the input should be applied to.
 	 * @param propertiesToExclude the properties to be set; a null value addresses _all_ properties
 	 */
 	public void applyToExcept(Object bean, String... propertiesToExclude) {
-		applyTo(bean, null, propertiesToExclude);
+		List<String> propertiesToSet = new ArrayList<String>();
+		if (input != null) {
+			propertiesToSet.addAll(input.keySet());
+		}
+		if (propertiesToExclude != null) {
+			propertiesToSet.removeAll(Arrays.asList(propertiesToExclude));
+		}
+		applyTo(bean, propertiesToSet);
 	}
 	
+	
 	/**
-	 * Applies current input-data to the specified properties of the specified bean.
-	 * 
-	 * Normally you wouldn't use this method, but {@link #applyTo(Object, String...) or #applyToExcept(Object, String...)}
-	 * 
+	 * Applies current input-data to the specified bean, restricted to specified fields
 	 * The field names must match the property names for this method to work as expected.
-	 * If wrong property-types are encountered, or fields are missing for property-names a message is logged at warn-level.
 	 * @param bean The bean, the input should be applied to.
-	 * @param propertiesToSet the properties to be set; a null value addresses _all_ properties
-	 * @param propertiesToSkip the properties to be skipped; a null value addresses _no_ property
+	 * @param propertiesToSet what fields/properties to set.
 	 */
-	protected void applyTo(Object bean, String[] propertiesToSet, String[] propertiesToSkip) {
-		List<String> allProperties = Arrays.asList(DynaBeanUtils.getPropertyNames(bean));
-		List<String> props = new ArrayList<String>();
-		if (propertiesToSet == null || propertiesToSet.length == 0) {
-			props.addAll(allProperties);
-		} else {
-			props.addAll(Arrays.asList(propertiesToSet));
+	public void applyTo(Object bean, String... propertiesToSet) {
+		List<String> fieldsToUse = new ArrayList<String>();
+		if (propertiesToSet != null) {
+			fieldsToUse.addAll(Arrays.asList(propertiesToSet));
 		}
-		if (propertiesToSkip != null && propertiesToSkip.length > 0) {
-			props.removeAll(Arrays.asList(propertiesToSkip));
+		applyTo(bean, fieldsToUse);
+	}
+	
+
+	/**
+	 * Applies current input-data to the specified bean, restricted to specified fields
+	 * The field names must match the property names for this method to work as expected.
+	 * @param bean The bean, the input should be applied to.
+	 * @param fieldsToUse what fields/properties to set.
+	 */	
+	protected void applyTo(Object bean, List<String> fieldsToUse) {
+		if (fieldsToUse == null) return;
+		if (input == null) {
+			log.warn("applyTo: no input available - not changing anything on the bean");
+			return;
 		}
-		for (String propertyName : props) {
-			if (!allProperties.contains(propertyName)) {
-				log.warn("Skipping property "+propertyName+" as class "+bean.getClass()+" does not have such a property.");
-				continue;
+		for (String propertyName : input.keySet()) {
+			if (!form.fields.containsKey(propertyName)) {
+				continue;	// ignore all that's not specified in form (like buttons for example)
+			}
+			if (!fieldsToUse.contains(propertyName)) {
+				continue;	// skip if we shall not set this
 			}
 			try {
 				Class<?> propertyClass = DynaBeanUtils.getPropertyClass(bean, propertyName);
@@ -253,6 +271,9 @@ public class FormData {
 				} else {
 					DynaBeanUtils.setProperty(bean, propertyName, getValue(propertyName));
 				}
+			} catch (PropertyNotFoundException pne) {
+				log.debug("applyTo: failed to apply value of field "+propertyName+" to object of type "+bean.getClass().getName()+".");
+				pne.printStackTrace();
 			} catch (Exception e) {
 				/* NOP - continue; the error is already added to the errors-list. */
 			}
@@ -567,8 +588,8 @@ public class FormData {
 	 * Provides a copy of the input map.
 	 * To be used mainly with JSPs with JSTL as ${formdata.input["fieldName"]}
 	 */
-	public Map getInput() {
-		Map m = new HashMap();
+	public Map<String, Object> getInput() {
+		Map<String, Object> m = new HashMap<String, Object>();
 		for (String k : input.keySet()) {
 			Object value = input.get(k);
 			if (value != null) {
