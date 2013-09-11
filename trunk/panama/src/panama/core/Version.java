@@ -1,5 +1,5 @@
 /*
- *  Copyright 2004-2012 Robert Brandner (robert.brandner@gmail.com)
+ *  Copyright 2004-2013 Robert Brandner (robert.brandner@gmail.com)
  *
  *  Licensed under the Apache License, Version 2.0 (the "License");
  *  you may not use this file except in compliance with the License.
@@ -27,7 +27,7 @@ public class Version {
 	// b: Revision (increases when cool new features are added)
 	// c: Minor	(increases when updates or fixes are made - even numbers mark stable releases)
 
-	public final static String VERSION = "3.6.0";
+	public final static String VERSION = "3.7.0";
 
 	public final static String LOGO_ASCIIART =
 	" ______ _______ _______ _______ _______ _______ \n"+
@@ -40,6 +40,7 @@ public class Version {
 
 	/* 	History
 	 * ---------------------------------------------------------------------------------
+	 * 3.7.0    2013-09-xx See https://code.google.com/p/panama/wiki/ReleaseNotes3_7
 	 * 3.6.0    2013-08-xx See https://code.google.com/p/panama/wiki/ReleaseNotes3_6
 	 * 3.5.0    2013-03-01 Made Filters and FilterExtensions serializable to avoid nasty Exceptions when we have them in a Table and Tomcat stops/restarts
 	 * 3.4.3	2013-02-09 Replaces json-simple by built in org.json JSON implementation (with JSONException changed to a RuntimeException)

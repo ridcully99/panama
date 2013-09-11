@@ -1,17 +1,17 @@
 /*
- *  Copyright 2004-2012 Robert Brandner (robert.brandner@gmail.com) 
- *  
- *  Licensed under the Apache License, Version 2.0 (the "License"); 
- *  you may not use this file except in compliance with the License. 
- *  You may obtain a copy of the License at 
- *  
- *  http://www.apache.org/licenses/LICENSE-2.0 
- *  
- *  Unless required by applicable law or agreed to in writing, software 
- *  distributed under the License is distributed on an "AS IS" BASIS, 
- *  WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied. 
- *  See the License for the specific language governing permissions and 
- *  limitations under the License. 
+ *  Copyright 2004-2012 Robert Brandner (robert.brandner@gmail.com)
+ *
+ *  Licensed under the Apache License, Version 2.0 (the "License");
+ *  you may not use this file except in compliance with the License.
+ *  You may obtain a copy of the License at
+ *
+ *  http://www.apache.org/licenses/LICENSE-2.0
+ *
+ *  Unless required by applicable law or agreed to in writing, software
+ *  distributed under the License is distributed on an "AS IS" BASIS,
+ *  WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
+ *  See the License for the specific language governing permissions and
+ *  limitations under the License.
  */
 package panama.core;
 
@@ -51,6 +51,7 @@ import panama.exceptions.ForceTargetException;
 import panama.exceptions.HttpErrorException;
 import panama.exceptions.NoSuchActionException;
 import panama.log.SimpleLogger;
+import panama.util.Configuration;
 import panama.util.TestTimer;
 
 import com.avaje.ebeaninternal.server.lib.ShutdownManager;
@@ -67,11 +68,13 @@ public class Dispatcher implements Filter {
 
 	public final static String PREFIX = "panama";
 
-	/* key for app name (i.e. filtername) in application context */
+	/* key for app name (i.e. context name without leading slash) in application context */
 	public final static String APP_NAME_KEY = PREFIX+"_application_name";
 
 	public final static String PARAM_LANGUAGES = PREFIX+".languages";
 	public final static String PARAM_MAXFILEUPLOADSIZE = PREFIX+".maxfileuploadsize";
+
+	private static final String SYSTEM_PROPERTY_VELOCITY_PROPS_SUFFIX = ".velocity.configuration";
 
 	/* keys for objects put in request context */
 	public final static String CONTEXT_KEY = "context";
@@ -120,7 +123,10 @@ public class Dispatcher implements Filter {
 	public void init(FilterConfig filterConfig) {
 		System.out.println(Version.LOGO_ASCIIART);
 		applicationContext = filterConfig.getServletContext();
-		applicationContext.setAttribute(APP_NAME_KEY, applicationContext.getContextPath());
+		String appName = applicationContext.getContextPath().replace("/", "");
+		applicationContext.setAttribute(APP_NAME_KEY, appName);
+
+		Configuration.init(appName);
 
 		@SuppressWarnings("rawtypes")
 		Enumeration names = filterConfig.getInitParameterNames();
@@ -129,14 +135,21 @@ public class Dispatcher implements Filter {
 			initParams.put(key, filterConfig.getInitParameter(key));
 		}
 
-		/* init velocity */
+		/* init velocity
+		 * name of properties file is determined from
+		 * a) System Property <contextname>.velocity.configuration
+		 * b) System Property <PREFIX>.velocity.configuration
+		 * c) velocity.properties
+		 * d) default-fallback-velocity.properties
+		 */
 		try {
 			ClassLoader cl = this.getClass().getClassLoader();
-			Properties velocityProperties = new Properties();
-			try {
-				velocityProperties.load(cl.getResourceAsStream("velocity.properties"));
-			} catch (Exception e) {
-				log.warn("Error reading velocity.properties, using internal defaults instead");
+			Properties velocityProperties = Configuration.readProperties(
+					System.getProperty(appName + SYSTEM_PROPERTY_VELOCITY_PROPS_SUFFIX),
+					System.getProperty(PREFIX + SYSTEM_PROPERTY_VELOCITY_PROPS_SUFFIX),
+					"/velocity.properties");
+			if (velocityProperties.isEmpty()) {
+				velocityProperties = new Properties();
 				velocityProperties.load(cl.getResourceAsStream("default-fallback-velocity.properties"));
 			}
 			velocityEngine = new VelocityEngine(velocityProperties);
