@@ -24,6 +24,12 @@ Even `contextname.veclocity.configuration` is possible here and would affect onl
 
 By default, Logging reads its configuration from `simplelog.properties`. To make it use another file, set the system-property *`simplelog.configuration`*.
 
+=== Panama ===
+
+By default, Panama's Configuration class reads optional configurations from `panama.properties`. To make it use another file, set the system-property *`panama.configuration`*.
+
+Even `contextname.panama.configuration` is possible here and would affect only the web-application with the given contextname.
+
 === Quartz ===
 
 Quartz is not part of Panama but often used in web-applications.
