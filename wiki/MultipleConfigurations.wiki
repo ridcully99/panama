@@ -12,7 +12,7 @@ A relatively simple way to achieve this, is to have different properties files a
 
 By default, Ebean reads its configuration from `ebean.properties`. To make it use another file, set the system-property *`ebean.props.file`*
 
-To have different JNDI datasources, simply define multiple Datasource Resources in META-INF/context.xml (as described in Documentation#Ebean_ORM_with_JNDI) and specify the correct one in the appropriate ebean properties via `ebean.jndi.dataSourceJndiName`
+To have different JNDI datasources, simply define multiple Datasource Resources in META-INF/context.xml (as described in [Documentation#Ebean_ORM_with_JNDI]) and specify the correct one in the appropriate ebean properties via `ebean.jndi.dataSourceJndiName`
 
 === Velocity ===
 
