@@ -1,0 +1,10 @@
+#summary What's new in Release 3.7.
+#labels Phase-Design
+
+*Not final yet*
+
+  * FormData#applyTo() changed a bit
+  * Possibility to define name of velocity properties file to use via System-Property
+  * Support for optional additional configuration via panama.properties file.
+  * Possibility to define name of panama properties file to use via System-Property 
+  * ConfigReader is deprecated, use Configuration class and panama.properties instead.
