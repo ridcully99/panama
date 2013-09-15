@@ -4,7 +4,8 @@
 *Not final yet*
 
   * FormData#applyTo() changed a bit
-  * Possibility to define name of velocity properties file to use via System-Property
-  * Support for optional additional configuration via panama.properties file.
-  * Possibility to define name of panama properties file to use via System-Property 
+  * Name of velocity properties file to use can be defined via System-Property now.
+  * Standard way for custom configuration via Configuration class and panama.properties file.
+  * Name of panama properties file to use can be defined via System-Property. 
   * ConfigReader is deprecated, use Configuration class and panama.properties instead.
+  * Context's getParameter, getIntParameter, getLongParameter optionally take a default value now.
