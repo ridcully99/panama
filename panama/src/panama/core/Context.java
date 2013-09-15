@@ -248,6 +248,11 @@ public class Context {
 		String[] values = getParameterValues(key);
 		return values != null ? values[0] : null;
 	}
+	
+	public String getParameter(String key, String defaultValue) {
+		String v = getParameter(key);
+		return v != null ? v : defaultValue;
+	}
 
 	public void setParameter(String key, String value) {
 		getParameterMap().put(key, new Object[]{value});
@@ -304,6 +309,15 @@ public class Context {
 		}
 	}
 
+	public Integer getIntParameter(String key, Integer defaultValue) {
+		try {
+			Integer i = new Integer(getParameter(key));
+			return i != null ? i : defaultValue;
+		} catch (Exception e) {
+			return defaultValue;
+		}
+	}
+	
 	public Long getLongParameter(String key) {
 		try {
 			return new Long(getParameter(key));
@@ -312,6 +326,16 @@ public class Context {
 		}
 	}
 
+	public Long getLongParameter(String key, Long defaultValue) {
+		try {
+			Long l = new Long(getParameter(key));
+			return l != null ? l : defaultValue;
+		} catch (Exception e) {
+			return defaultValue;
+		}
+	}
+	
+	
 	/**
 	 * Builds parameter Map from list of parameter and value elements.
 	 * @param paramsAndValues a variable list of parameters and values, alternating like so: param1, value1, param2, value2...; These replace the original parameters during the execution of the action.
