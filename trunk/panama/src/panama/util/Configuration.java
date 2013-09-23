@@ -15,6 +15,8 @@
  */
 package panama.util;
 
+import java.io.File;
+import java.io.FileInputStream;
 import java.io.IOException;
 import java.io.InputStream;
 import java.util.Properties;
@@ -84,7 +86,7 @@ public class Configuration {
 //	}
 
 	/**
-	 * Tries to read properties from given fileNameOptions in given order.
+	 * Tries to read properties from given fileNameOptions in given order from filesystem and as resource.
 	 * As soon as properties could be read for a filename, those are returned.
 	 * If there are no properties for any of the fileNameOptions, null is returned.
 	 *
@@ -99,6 +101,14 @@ public class Configuration {
 			InputStream is = null;
 			try {
 				is = Configuration.class.getResourceAsStream(fileName);
+				if (is == null) {	// no resource file, try as regular file
+					log.info("could not read "+fileName+" as resource, going to try via file system now.");
+					try {
+						is = new FileInputStream(new File(fileName));
+					} catch (Exception e) {
+						log.warn("Error accessing "+fileName+" via file system: "+e.getMessage());
+					}
+				}
 				if (is == null) continue;
 				props.load(is);
 				break;
