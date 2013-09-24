@@ -15,18 +15,15 @@ package panama.log;
 // See the License for the specific language governing permissions and
 // limitations under the License.
 
-import panama.log.rollover.RolloverManager;
-
 import java.io.File;
 import java.io.FileWriter;
 import java.io.IOException;
 import java.io.InputStream;
 import java.io.OutputStreamWriter;
+import java.io.PrintStream;
 import java.io.PrintWriter;
 import java.io.StringWriter;
 import java.io.Writer;
-import java.io.UnsupportedEncodingException;
-import java.io.PrintStream;
 import java.lang.ref.Reference;
 import java.lang.ref.ReferenceQueue;
 import java.lang.ref.WeakReference;
@@ -35,7 +32,6 @@ import java.net.URI;
 import java.net.URISyntaxException;
 import java.net.URL;
 import java.net.URLConnection;
-import java.net.URLEncoder;
 import java.text.DateFormat;
 import java.text.FieldPosition;
 import java.text.Format;
@@ -47,11 +43,13 @@ import java.util.Date;
 import java.util.Enumeration;
 import java.util.Iterator;
 import java.util.List;
+import java.util.Map;
 import java.util.Properties;
+import java.util.Set;
 import java.util.Timer;
 import java.util.TimerTask;
-import java.util.Set;
-import java.util.Map;
+
+import panama.log.rollover.RolloverManager;
 
 /**
  * <p>Controls the configuration and formatting of a group of <code>SimpleLogger</code>s.</p>
@@ -61,8 +59,14 @@ import java.util.Map;
  * <code>SimpleLog</code> - just use the {@link SimpleLogger#SimpleLogger(Class) basic SimpleLogger
  * constructor} and you'll never even know nor care.</p>
  *
- * @version $Revision: 1.24 $
+ * 2013-09-24 Robert Brandner
+ *     Removed the need for prefix "file:" resp. "classpath:" when specifying properties file to use via system property simplelog.configuration
+ *     Now you simply specify the path and it's tried to find first in the classpath and if not found it's tried as a file-path -- analog to how panama.properties are treated.
+ *
+ *
+ * @version $Revision: 1.24 $ + modifications by Robert Brandner
  * @author $Author: grlea $
+ * @author robert.brandner
  */
 public final class
 SimpleLog
@@ -80,12 +84,6 @@ SimpleLog
 
    /** The name of the system property printing Simple Log stack traces. */
    private static final String DEV_STACKTRACES_PROPERTY = "simplelog.dev.printStackTraces";
-
-   /** The prefix used when the configuration is coming from a file. */
-   private static final String FILE_CONFIG_PREFIX = "file:";
-
-   /** The prefix used when the configuration is coming from the classpath. */
-   private static final String CLASSPATH_CONFIG_PREFIX = "classpath:";
 
    /** The default name of the properties file used to configure a <code>SimpleLog</code>. */
    private static final String DEFAULT_PROPERTIES_FILE_NAME = "simplelog.properties";
@@ -190,7 +188,7 @@ SimpleLog
    private static final String LINE_SEP = System.getProperty("line.separator");
 
    /** The class name of the RolloverManager. */
-   private static final String ROLLOVER_WRITER_CLASS = "org.grlea.log.rollover.RolloverManager";
+   private static final String ROLLOVER_WRITER_CLASS = "panama.log.rollover.RolloverManager";
 
    // Default Message Formats
    //..........................................................................................
@@ -1023,46 +1021,21 @@ SimpleLog
       URL propertiesUrl = null;
       if (propertiesDefinition != null)
       {
-         // File
-         if (propertiesDefinition.startsWith(FILE_CONFIG_PREFIX))
-         {
-            String propertiesLocation =
-               propertiesDefinition.substring(FILE_CONFIG_PREFIX.length());
+         String propertiesLocation = propertiesDefinition;
 
+         // First try in Classpath
+         propertiesUrl = SimpleLog.class.getClassLoader().getResource(propertiesLocation);
+
+         // Second, try from filesystem
+         if (propertiesUrl == null) {
             File propertiesFile = new File(propertiesLocation);
-
-            if (propertiesFile.exists())
-            {
-               try
-               {
-                  propertiesUrl = propertiesFile.toURL();
-               }
-               catch (MalformedURLException e)
-               {
-                  printError("Error creating URL from filename '" + propertiesLocation + "'", e,
-                             false);
+            if (propertiesFile.exists()) {
+               try {
+                  propertiesUrl = propertiesFile.toURI().toURL();
+               } catch (MalformedURLException e) {
+                  printError("Error creating URL from filename '" + propertiesLocation + "'", e, false);
                }
             }
-            else
-            {
-               printError("Properties file not found at '" + propertiesLocation + "'");
-            }
-         }
-         // Classpath
-         else if (propertiesDefinition.startsWith(CLASSPATH_CONFIG_PREFIX))
-         {
-            String propertiesLocation =
-               propertiesDefinition.substring(CLASSPATH_CONFIG_PREFIX.length());
-
-            propertiesUrl = SimpleLog.class.getClassLoader().getResource(propertiesLocation);
-            if (propertiesUrl == null)
-               printError("Properties not found in classpath at '" + propertiesLocation + "'");
-         }
-         // Junk
-         else
-         {
-            printError(CONFIG_PROPERTY + " property must begin with '" + FILE_CONFIG_PREFIX +
-                       "' or '" + CLASSPATH_CONFIG_PREFIX + "' ('" + propertiesDefinition + "')");
          }
       }
 
