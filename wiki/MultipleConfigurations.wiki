@@ -6,7 +6,7 @@ For the test- and production servers you'll probably want different configuratio
 
 == System Properties ==
 
-A relatively simple way to achieve this, is to have different properties files and to tell the web-application which to use via System properties (add those to the launch command of the Java VM via `-Dpropertyname=value`.
+A relatively simple way to achieve this, is to have different properties files and to tell the web-application which to use via System properties (add those to the launch command of the Java VM via `-Dpropertyname=value`..
 
 To keep different sets of properties-files within your project, create packages like conf.test and conf.production to hold the respective properties files. Note, that you have to replace the '.' by slashes and add a leading slash to the system properties names then. E.g. ebean.props.file = /conf/production/ebean.properties
 
