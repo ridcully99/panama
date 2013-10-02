@@ -32,7 +32,6 @@ import panama.core.Context;
 import panama.exceptions.NoSuchFieldException;
 import panama.exceptions.PropertyNotFoundException;
 import panama.exceptions.ValidatorException;
-import panama.exceptions.WrongValueTypeException;
 import panama.log.SimpleLogger;
 import panama.util.DynaBeanUtils;
 
@@ -156,7 +155,7 @@ public class FormData {
 		setInput(bean);
 		return this;
 	}
-	
+
 	/**
 	 * Sets the input value for one field
 	 *
@@ -224,8 +223,8 @@ public class FormData {
 		}
 		applyTo(bean, propertiesToSet);
 	}
-	
-	
+
+
 	/**
 	 * Applies current input-data to the specified bean, restricted to specified fields
 	 * The field names must match the property names for this method to work as expected.
@@ -239,14 +238,14 @@ public class FormData {
 		}
 		applyTo(bean, fieldsToUse);
 	}
-	
+
 
 	/**
 	 * Applies current input-data to the specified bean, restricted to specified fields
 	 * The field names must match the property names for this method to work as expected.
 	 * @param bean The bean, the input should be applied to.
 	 * @param fieldsToUse what fields/properties to set.
-	 */	
+	 */
 	protected void applyTo(Object bean, List<String> fieldsToUse) {
 		if (fieldsToUse == null) return;
 		if (input == null) {
@@ -272,12 +271,11 @@ public class FormData {
 					DynaBeanUtils.setProperty(bean, propertyName, getValue(propertyName));
 				}
 			} catch (PropertyNotFoundException pne) {
-				log.debug("applyTo: failed to apply value of field "+propertyName+" to object of type "+bean.getClass().getName()+".");
-				pne.printStackTrace();
+				log.debug("applyTo: Did not apply value of field "+propertyName+" to object of type "+bean.getClass().getName()+" - either there is no such property or the value-type doesn't match.");
 			} catch (Exception e) {
 				/* NOP - continue; the error is already added to the errors-list. */
 			}
-		}		
+		}
 	}
 
 	// ----------------------------------------------------------------------------
@@ -546,7 +544,7 @@ public class FormData {
 			}
 		} catch (ValidatorException ve) {
 			errors.put(f.getName(), ve);
-			return (Object[])values;
+			return null;	// 2013-10-01: was (Object[])values but that results in execeptions when trying to set the property value (e.g. DateField with invalid date, we'd return the invalid date as a string here, and would then try to assign that string to a Date variable
 		}
 	}
 

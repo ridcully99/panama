@@ -1,50 +1,54 @@
-/*
- *  Copyright 2004-2012 Robert Brandner (robert.brandner@gmail.com) 
- *  
- *  Licensed under the Apache License, Version 2.0 (the "License"); 
- *  you may not use this file except in compliance with the License. 
- *  You may obtain a copy of the License at 
- *  
- *  http://www.apache.org/licenses/LICENSE-2.0 
- *  
- *  Unless required by applicable law or agreed to in writing, software 
- *  distributed under the License is distributed on an "AS IS" BASIS, 
- *  WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied. 
- *  See the License for the specific language governing permissions and 
- *  limitations under the License. 
+/**
+ *
  */
 package panama.form;
 
+import java.text.DateFormat;
 import java.text.ParseException;
 import java.text.SimpleDateFormat;
 import java.util.Date;
 
+import panama.form.Field;
+
 /**
+ * More flexible and localizable by allowing to pass DateFormt object to use.
  * @author Robert
- * 
+ *
  */
 public class DateField extends Field {
 
-	private String dateFormat = "dd.MM.yyyy";
-	
+	private DateFormat dateFormat;
+
 	public DateField(String name) {
 		this(name, false);
 	}
-	
+
 	/**
 	 * @param name
 	 * @param notEmpty
 	 */
 	public DateField(String name, boolean notEmpty) {
-		this(name, notEmpty, "dd.MM.yyyy");
+		this(name, notEmpty, DateFormat.getDateInstance());
+	}
+
+	/**
+	 * For backward compatibility. If you have a format that depends on a Locale, better use
+	 * the constructor with the DateFormat parameter.
+	 * @param name
+	 * @param notEmpty
+	 * @param simplePattern for a {@link SimpleDateFormat}
+	 */
+	public DateField(String name, boolean notEmpty, String simplePattern) {
+		super(name, Date.class, notEmpty);
+		setDateFormat(new SimpleDateFormat(simplePattern));
 	}
 
 	/**
 	 * @param name
 	 * @param notEmpty
-	 * @param dateFormat See SimpleDateFormat
+	 * @param dateFormat
 	 */
-	public DateField(String name, boolean notEmpty, String dateFormat) {
+	public DateField(String name, boolean notEmpty, DateFormat dateFormat) {
 		super(name, Date.class, notEmpty);
 		setDateFormat(dateFormat);
 	}
@@ -57,10 +61,8 @@ public class DateField extends Field {
 	 * @throws ParseException
 	 */
 	protected Object stringToValue(String valueString) throws ParseException {
-		SimpleDateFormat fmttr = new SimpleDateFormat();
-		fmttr.applyPattern(getDateFormat());
-		return fmttr.parse(valueString);
-	}	
+		return dateFormat.parse(valueString);
+	}
 
 	/**
 	 * This converts the given value into a string representation
@@ -68,18 +70,16 @@ public class DateField extends Field {
 	 * @param value
 	 * @return A String
 	 * @throws ParseException
-	 */	
+	 */
 	public String valueToString(Object value) throws ParseException {
-		SimpleDateFormat fmttr = new SimpleDateFormat();
-		fmttr.applyPattern(getDateFormat());
-		return fmttr.format(value);		
+		return dateFormat.format(value);
 	}
-	
-	public String getDateFormat() {
+
+	public DateFormat getDateFormat() {
 		return dateFormat;
 	}
-	
-	public void setDateFormat(String dateFormat) {
+
+	public void setDateFormat(DateFormat dateFormat) {
 		this.dateFormat = dateFormat;
 	}
 }
