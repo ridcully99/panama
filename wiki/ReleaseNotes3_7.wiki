@@ -3,11 +3,11 @@
 
 *Not final yet*
 
-  * FormData#applyTo() changed a bit
+  * `FormData#applyTo()` changed a bit
   * Name of velocity properties file to use can be defined via System-Property now.
-  * Standard way for custom configuration via Configuration class and panama.properties file.
+  * Standard way for custom configuration via `Configuration` class and `panama.properties` file.
   * Name of panama properties file to use can be defined via System-Property.
   * Name of simplelog properties file to use can be defined via System-Property.
-  * ConfigReader is deprecated, use Configuration class and panama.properties instead.
-  * Context's getParameter, getIntParameter, getLongParameter optionally take a default value now.
-  * DateField has constructor with actual DateFormat object now (before, you could just pass a SimpleDateFormat - format-string), so you can specify e.g. the Locale to use etc.
+  * `ConfigReader` is deprecated, use Configuration class and panama.properties instead.
+  * `Context`'s `getParameter`, `getIntParameter`, `getLongParameter` optionally take a default value now.
+  * `DateField` has constructor now, where you can pass an actual `DateFormat` parameter, e.g. to provide a `Locale` to use. Before, you could only pass a format-string.
