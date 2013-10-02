@@ -10,3 +10,4 @@
   * Name of simplelog properties file to use can be defined via System-Property.
   * ConfigReader is deprecated, use Configuration class and panama.properties instead.
   * Context's getParameter, getIntParameter, getLongParameter optionally take a default value now.
+  * DateField has constructor with actual DateFormat object now (before, you could just pass a SimpleDateFormat - format-string), so you can specify e.g. the Locale to use etc.
