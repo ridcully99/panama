@@ -26,7 +26,7 @@ import com.avaje.ebean.Query;
 
 /**
  * Implementation of {@link ListModel} interface for use with Ebean on persisted data.
- * 
+ *
  * @author ridcully
  *
  */
@@ -71,7 +71,7 @@ public class QueryListModel implements ListModel, Serializable {
 
 	/**
 	 * Creates a _new_ Query from the specified Query and the filters as defined in Table.
-	 * 
+	 *
 	 * @param query
 	 * @return a new Query object (even if no filters exist)
 	 */
@@ -81,7 +81,6 @@ public class QueryListModel implements ListModel, Serializable {
 			return q;
 		}
 		for (Map.Entry<String, Filter> e : table.getFilters().entrySet()) {
-			String k = e.getKey();
 			Filter f = e.getValue();
 			q.where(f.asExpression(q));
 		}
