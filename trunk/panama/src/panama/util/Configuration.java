@@ -31,6 +31,10 @@ import panama.log.SimpleLogger;
  * The system-property must either be named <code>&lt;context&gt;.panama.configuration</code> to only apply to a single web-application in given context
  * or simply <code>panama.configuration</code> in which case it will be used by all panama web applications.
  *
+ * <b>Important:</b>
+ * This class provides properties only after it's init() method has been invoked. This is done by Panama automatically during startup.
+ * If you use this class in a different way (e.g. Unit Tests), make sure you invoke {@link #init(String)}, before trying to retrieve any configuration settings.
+ *
  * @author robert.brandner
  */
 public class Configuration {
@@ -86,6 +90,16 @@ public class Configuration {
 //	}
 
 	/**
+	 * Returns complete configuration
+	 * @return Properties object containing all configuration
+	 */
+	public static Properties getAll() {
+		return panamaProperties;
+	}
+
+	/**
+	 * For internal use only. Use {@link #getAll()} to retrieve all current configuration.
+	 *
 	 * Tries to read properties from given fileNameOptions in given order from filesystem and as resource.
 	 * As soon as properties could be read for a filename, those are returned.
 	 * If there are no properties for any of the fileNameOptions, null is returned.
