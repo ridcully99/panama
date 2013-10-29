@@ -45,6 +45,15 @@ public class DateField extends Field {
 
 	/**
 	 * @param name
+	 * @param dateFormat
+	 */
+	public DateField(String name, DateFormat dateFormat) {
+		super(name, Date.class, false);
+		setDateFormat(dateFormat);
+	}
+
+	/**
+	 * @param name
 	 * @param notEmpty
 	 * @param dateFormat
 	 */
