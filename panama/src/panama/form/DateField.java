@@ -63,6 +63,16 @@ public class DateField extends Field {
 	}
 
 	/**
+	 * @param name
+	 * @param dateFormat
+	 * @param notEmpty
+	 */
+	public DateField(String name, DateFormat dateFormat, boolean notEmpty) {
+		super(name, Date.class, notEmpty);
+		setDateFormat(dateFormat);
+	}
+
+	/**
 	 * This converts the given string into the value itself
 	 * @see Field#stringToValue(String)
 	 * @param valueString
