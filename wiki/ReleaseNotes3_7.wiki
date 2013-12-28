@@ -1,5 +1,5 @@
 #summary What's new in Release 3.7.
-#labels Phase-Design
+#labels Phase-Design,Featured
 
   * `FormData#applyTo()` changed a bit
   * Name of velocity properties file to use can be defined via System-Property now.
