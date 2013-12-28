@@ -1,5 +1,5 @@
 #summary What is new in version 3.6
-#labels Phase-Design,Featured
+#labels Phase-Design
 
 *Warning:* Release 3.6 contains some API changes due to consolitations and simplifications of the framework. This may result in compiler errors when you switch to panama-3.6.0. See the relative items below on how to handle API changes - mosten times it's just fixing the import statements.
 
