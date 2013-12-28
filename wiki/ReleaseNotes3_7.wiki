@@ -1,8 +1,6 @@
 #summary What's new in Release 3.7.
 #labels Phase-Design
 
-*Not final yet*
-
   * `FormData#applyTo()` changed a bit
   * Name of velocity properties file to use can be defined via System-Property now.
   * Standard way for custom configuration via `Configuration` class and `panama.properties` file.
