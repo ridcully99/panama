@@ -1,0 +1,1 @@
+For the new Panama logo, I used the free font [TheRoots](http://www.fontspace.com/manfred-klein/theroots) by Manfred Klein.

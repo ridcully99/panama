@@ -1,0 +1,49 @@
+# Introduction #
+
+Security is extremly important for any application. This page explains how you can implement the different aspects of security with Panama.
+
+# Authentification #
+
+## `beforeAction()` ##
+
+Many web application have restricted areas, only users with proper permissions should have access to. To achieve this in Panama, there's a single method: `BaseController#beforeAction()`. This method is invoked always before an action of the controller is invoked. Although the default implementation of the `BaseController` does nothing, you can easily implement this method in your controllers to check if a user is logged in and has the proper rights to execute the requested action.
+
+A simple implementation, based on container based security as provided by e.g. Tomcat, could look like this:
+
+```
+public void beforeAction(String actionName) throws ForceTargetException, AuthorizationException {
+    // the login action is an action allowed for everyone
+    if (actionName.equals("login")) {	
+        return;
+    }
+	
+    // supposing that every logged in user has role 'user' 
+    if (!context.getRequest().isUserInRole("user")) {
+        // not logged in? simply render the login-form.
+        throw new ForceTargetException(new TemplateTarget("login.vm"));
+    } 
+		
+    // check if currently logged in user has 'access-all-areas' role
+    if (!context.getRequest().isUserInRole("access-all-areas")) {
+        // if not, create a 403 (Access Denied) HTTP Error
+        throw new AuthorizationException();
+    }
+}
+```
+
+As  you can see, the basic idea is to make some checks and -- if needed -- change the normal course of events (executing the action) by throwing exceptions. There are two different exceptions you can throw:
+
+### `ForceTargetException` ###
+
+By throwing a `ForceTargetException` you can force the user to a target of your liking. You can pass any type of `Target` when creating the exception. In our example we'll just render a login page, but you could also provide an instance of `RedirectTarget` or any other kind of target. You should use this, if you want to give the user a chance to provide some credentials, etc.
+
+**Hint:** _As for the `RedirectTarget`, instead of creating one yourself, you can use the result of one of the `redirectToAction()` methods as well, which might be better readable. E.g. `throw new ForceTargetException(redirectToAction("login"))`._
+
+### `AuthorizationException` ###
+
+Throwing an `AuthorizationException` simply creates a 403 (Access Forbidden) HTTP Error.
+
+
+# XSS (Cross Site Scripting) Protection #
+
+Panama provides support for tokens that allow for detection of cross site scripting. See the SecureGuestbook example of the _panama-examples_ project.

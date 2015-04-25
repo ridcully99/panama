@@ -1,0 +1,85 @@
+A working example of a guestbook. Entries consist of a message and a date and - for simplicity's sake - are kept in a static list instead of a database. The template shows an input form for entering a message, and a list of previous messages, sorted by date.
+
+![http://panama.googlecode.com/svn/trunk/panama-examples/src/panama/examples/tinyguestbook/screenshot.png](http://panama.googlecode.com/svn/trunk/panama-examples/src/panama/examples/tinyguestbook/screenshot.png)
+
+## Controller ##
+```
+@Controller(alias="tinyguestbook", defaultAction="list")
+public class TinyGuestbookController extends BaseController {
+
+    private static List<GuestbookEntry> entries = new ArrayList<GuestbookEntry>();
+    private static ListModel model = new SimpleListModel(entries);
+
+    private final static Form form = new Form(GuestbookEntry.class);
+
+    public TinyGuestbookController() {
+        registerTable(new DefaultTable("tinyguestbookentries", model).setSortBy("date", Table.SORT_DESC));
+    }
+
+    @Action
+    public Target list() {
+        return render("guestbook.vm");
+    }
+
+    @Action(alias="add")
+    public Target addEntry() {
+        FormData fd = new FormData(form).withDataFromRequest(context);
+        GuestbookEntry entry = new GuestbookEntry();
+        fd.applyTo(entry);
+        entry.setDate(new Date());
+        entries.add(entry);
+        return redirectToAction("list");
+    }
+}
+```
+
+## Model ##
+
+```
+public class GuestbookEntry {
+    public String text;
+    public Date date;
+
+    public String getText() {
+        return text;
+    }
+    public void setText(String message) {
+        this.text = message;
+    }
+    public Date getDate() {
+        return date;
+    }
+    public void setDate(Date date) {
+        this.date = date;
+    }
+}
+```
+
+## Template ##
+```
+<html>
+<head>
+    <title>Panama Examples - Tiny Guestbook</title>
+</head>
+<body>
+    <h3>Your comment</h3>
+    <form name="fm" method="POST" action="add">
+        <textarea name="text"></textarea><br />
+        <input type="submit" value="Submit" />
+    </form>
+    <h3>Previous comments</h3>
+    <table>
+        <tr>
+            <th>Date</th>
+            <th>Comment</th>
+        </tr>
+        #foreach($entry in $tinyguestbookentries.rows)
+        <tr>
+            <td>$entry.date</td>
+            <td>$entry.text</td>
+        </tr>
+        #end
+    </table>
+</body>
+</html>
+```

@@ -1,0 +1,72 @@
+# Introduction #
+
+For production environments, it is quite common to have an Apache server at port 80 that routes requests to the actual Application server. As there are a lot of wrong examples on how to configure the Apache correctly, here a some - tested to be correct - examples.
+
+# Supposed Setup #
+
+For our examples, we suppose you have one web server, running the Apache on port 80 (which is accessible from the internet via http://www.example.com) and a Tomcat Application server on port 8080 (not accessible from the internet) running our application as 'myapp'.
+
+# Configurations #
+## One Web Application only ##
+
+As you know, running on the Application server, the URLs for any application (except the for the root application) contain the name of the application, e.g. http://localhost:8080/myapp/controller/action.
+
+If we have only one application running on the Application server, it would be nice, if we could get rid off those context-part and get URLs like http://www.example.com/controller/action.
+
+To do so, in your Apache configuration (httpd.conf file), make sure, the following modules are loaded:
+
+  * mod\_headers
+  * mod\_proxy
+  * mod\_proxy\_ajp <-- only required, if you want to use the AJP connector
+  * mod\_proxy\_http
+
+And now add the following lines at the end of httpd.conf (outside of all Directory and other blocks:
+
+```
+ProxyPass / http://localhost:8080/myapp/
+ProxyPassReverse / http://localhost:8080/myapp/
+ProxyPassReverseCookiePath /myapp /
+```
+
+or, if you want to use the AJP connector:
+
+```
+ProxyPass / ajp://localhost:8009/myapp/
+ProxyPassReverse / http://localhost/myapp/
+ProxyPassReverseCookiePath /myapp /
+```
+
+Make sure, you do not forget the trailing slashes, and when using the AJP connector, make sure, that the ProxyPassReverse statement does **not** have the port 8080 part in the localhost-URL.
+
+## More than one Web Application ##
+
+If you have more than one application, you will want to access them via http://www.example.com/app1/controller/action, http://www.example.com/app2/controller/action ...
+
+For this to happen, you need a ProxyPass configuration for each of you applications:
+
+```
+ProxyPass /app1 http://localhost:8080/app1
+ProxyPassReverse /app1 http://localhost:8080/app1
+
+ProxyPass /app2 http://localhost:8080/app2-has-a-strange-internal-name
+ProxyPassReverse /app2 http://localhost:8080/app2-has-a-strange-internal-name
+ProxyPassReverseCookiePath /app2-has-a-strange-internal-name /app2
+```
+
+Note, that here are no trailing slashes. You can specify a different name than the actual application name (see app2 example). In that case you will need the ProxyPassReverseCookiePath statement. If the names are the same (like with app1) you do not need that statement.
+
+AJP configuration would be like so:
+
+```
+ProxyPass /app1 ajp://localhost:8009/app1
+ProxyPassReverse /app1 http://localhost/app1
+
+ProxyPass /app2 ajp://localhost:8009/app2-has-a-strange-internal-name
+ProxyPassReverse /app2 http://localhost/app2-has-a-strange-internal-name
+ProxyPassReverseCookiePath /app2-has-a-strange-internal-name /app2
+```
+
+# Explanations #
+
+The tricky part is the ProxyPassReverse part. This is mainly used to rewrite redirect requests (hence mod\_headers is required) coming from the Application server.
+And, if you're using the AJP connector, these redirect requests, the Application server sends, do not contain the port 8080, because in that case, the Application server believes it's running on port 80 which it does not add to the URL, therefore we have to write http://localhost/app1 without a port specified.

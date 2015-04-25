@@ -1,0 +1,40 @@
+Often you'll have your web application developed locally on your machine and then deployed to a test-server and a production-server.
+
+For the test- and production servers you'll probably want different configurations (database, logging, caching, ...).
+
+## System Properties ##
+
+A relatively simple way to achieve this, is to have different properties files and to tell the web-application which to use via System properties (add those to the launch command of the Java VM via `-Dpropertyname=value`. For the Apache Tomcat for example edit catalina.sh and right after the comments at the top add `export CATALINA_OPTS="-D..."` or for Windows edit catalina.bat and add `set CATALINA_OPTS="-D..."`.
+
+To keep different sets of properties-files within your project, create packages like conf.test and conf.production to hold the respective properties files. Note, that you have to replace the '.' by slashes and add a leading slash to the system properties names then. E.g. ebean.props.file = /conf/production/ebean.properties
+
+You also can specify properties-files on external locations. In this case you'll have to specify the absolute path to the respective file like so: ebean.props.file = /absolute/path/to/ebean.properties
+
+### Ebean ###
+
+By default, Ebean reads its configuration from `ebean.properties`. To make it use another file, set the system-property **`ebean.props.file`**
+
+To have different JNDI datasources, simply define multiple Datasource Resources in META-INF/context.xml (as described in [Documentation#Ebean\_ORM\_with\_JNDI](Documentation#Ebean_ORM_with_JNDI.md)) and specify the correct one in the appropriate ebean properties via `ebean.jndi.dataSourceJndiName`
+
+### Velocity ###
+
+By default, Velocity reads its configuration from `velocity.properties`. To make it use another file, set the system-property **`panama.velocity.configuration`**.
+
+Even `contextname.veclocity.configuration` is possible here and would affect only the web-application with the given contextname.
+
+### Logging ###
+
+By default, Logging reads its configuration from `simplelog.properties`. To make it use another file, set the system-property **`simplelog.configuration`**.
+
+### Panama ###
+
+By default, Panama's Configuration class reads optional configurations from `panama.properties`. To make it use another file, set the system-property **`panama.configuration`**.
+
+Even `contextname.panama.configuration` is possible here and would affect only the web-application with the given contextname.
+
+### Quartz ###
+
+Quartz is not part of Panama but often used in web-applications.
+By default, Quartz reads its configuration from `quartz.properties`. To make it use another file, set the system-property **`org.quartz.properties`**.
+
+Note that quartz cannot read configurations from external files.
