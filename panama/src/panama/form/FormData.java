@@ -1,5 +1,5 @@
 /*
- *  Copyright 2004-2013 Robert Brandner (robert.brandner@gmail.com)
+ *  Copyright 2004-2012 Robert Brandner (robert.brandner@gmail.com)
  *
  *  Licensed under the Apache License, Version 2.0 (the "License");
  *  you may not use this file except in compliance with the License.
@@ -37,17 +37,21 @@ import panama.util.DynaBeanUtils;
 
 
 /**
- * <p>This class represents the data contained in the form passed to the constructor.
+ * This class represents the data contained in the form passed to the constructor.
  * The form itself is just a description of a form and it's field and resides in the
  * application scope. It must never be changed by this class.
  *
- * <p>This FormData class contains the data and normally resides in request or session scope.
- * <p>Validation is done during getting the values from the form.
- * <p>For creating a FormData with data from current request, you normally do this:<br/>
- * <code>FormData fd = new FormData(form).withDataFromRequest(context);</code>
+ * This FormData class contains the data and normally resides in request or session scope.
  *
- * <p>This class provides getters for common types. On error (cast etc.) they simply return null.<br/>
- * For how to get values of other types see {@link #getValue(String)} resp. {@link #getValues(String)}
+ * Validation is done during getting the values from the form.
+ *
+ * This class does not support Multipart Fileuploads, instead,
+ * please use the FileItem methods of Context class to access uploaded files.
+ *
+ * This class provides getters for common types. On error (cast etc.) they simply return null
+ * For how to get values of other types
+ * @see FormData#getValue(String)
+ * @see FormData#getValues(String)
  *
  * @author Ridcully
  *
