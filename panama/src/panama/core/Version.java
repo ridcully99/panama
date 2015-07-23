@@ -39,7 +39,8 @@ public class Version {
 
 
 	/* 	History
-	 * ---------------------------------------------------------------------------------
+	 * ---------------------------------------------------------------------------------------------
+	 * 3.8.0    2015-07-23 Changed UUID generator for PersistentBean -> faster & shorter
 	 * 3.7.0    2013-09-xx See https://code.google.com/p/panama/wiki/ReleaseNotes3_7
 	 * 3.6.0    2013-08-xx See https://code.google.com/p/panama/wiki/ReleaseNotes3_6
 	 * 3.5.0    2013-03-01 Made Filters and FilterExtensions serializable to avoid nasty Exceptions when we have them in a Table and Tomcat stops/restarts
