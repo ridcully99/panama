@@ -16,7 +16,6 @@
 package panama.persistence;
 
 import java.io.Serializable;
-import java.rmi.dgc.VMID;
 import java.util.Date;
 
 import javax.persistence.Column;
@@ -25,6 +24,8 @@ import javax.persistence.MappedSuperclass;
 import javax.persistence.Version;
 
 import com.avaje.ebean.Ebean;
+
+import panama.util.UUIDGenerator;
 
 
 /**
@@ -38,11 +39,10 @@ public class PersistentBean implements Serializable {
 	private static final long serialVersionUID = 1L;
 
 	/**
-	 * We use an assigned ID to avoid having to build equals/hashCode methods for each entity class
-	 * VMID() contains an ID unique accross all Java Virtual Machines
+	 * We use an assigned ID to avoid having to build equals/hashCode methods for each entity class.
 	 */
-	@Id @Column(length=64)
-	protected String id = new VMID().toString().replace(':', 'x');	// replacing colons as they are not allowed for id attributes in HTML tags.
+	@Id @Column(length=24)
+	protected String id = UUIDGenerator.getUUID();
 
 	/**
 	 * A version field
