@@ -27,7 +27,7 @@ public class Version {
 	// b: Revision (increases when cool new features are added)
 	// c: Minor	(increases when updates or fixes are made - even numbers mark stable releases)
 
-	public final static String VERSION = "3.7.0";
+	public final static String VERSION = "3.8.0";
 
 	public final static String LOGO_ASCIIART =
 	" ______ _______ _______ _______ _______ _______ \n"+
