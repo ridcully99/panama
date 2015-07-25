@@ -1,17 +1,17 @@
 /*
- *  Copyright 2004-2015 Robert Brandner (robert.brandner@gmail.com) 
- *  
- *  Licensed under the Apache License, Version 2.0 (the "License"); 
- *  you may not use this file except in compliance with the License. 
- *  You may obtain a copy of the License at 
- *  
- *  http://www.apache.org/licenses/LICENSE-2.0 
- *  
- *  Unless required by applicable law or agreed to in writing, software 
- *  distributed under the License is distributed on an "AS IS" BASIS, 
- *  WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied. 
- *  See the License for the specific language governing permissions and 
- *  limitations under the License. 
+ *  Copyright 2004-2015 Robert Brandner (robert.brandner@gmail.com)
+ *
+ *  Licensed under the Apache License, Version 2.0 (the "License");
+ *  you may not use this file except in compliance with the License.
+ *  You may obtain a copy of the License at
+ *
+ *  http://www.apache.org/licenses/LICENSE-2.0
+ *
+ *  Unless required by applicable law or agreed to in writing, software
+ *  distributed under the License is distributed on an "AS IS" BASIS,
+ *  WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
+ *  See the License for the specific language governing permissions and
+ *  limitations under the License.
  */
 package panama.tests;
 
@@ -29,27 +29,29 @@ import panama.util.UUIDGenerator;
 public class UUIDTest extends TestCase {
 
 	private final static int TIMES = 10000;
-	
+
 	public void testPerformance() {
 		long vmidMillis = doVMID();
 		long uuidGeneratorMillis = doUUIDGenerator();
 		System.out.println(vmidMillis);
 		System.out.println(uuidGeneratorMillis);
 	}
-	
+
 	public void testUUIDGenerator() {
 		for (int i = 0; i < 10; i++) {
 			System.out.println(i + " : " + UUIDGenerator.getUUID());
 		}
 	}
-	
+
 	public void testUUIDGenerator_Uniqueness() {
 		Set<String> values = new HashSet<String>();
-		for (int i = 0; i < TIMES * 1000; i++) {
+		final int n = TIMES * 100;
+		for (int i = 0; i < n; i++) {
 			String uuid = UUIDGenerator.getUUID();
 			assertFalse(values.contains(uuid));
 			values.add(uuid);
 		}
+		System.out.println(n + " generated - all unique");
 	}
 
 	private long doVMID() {
