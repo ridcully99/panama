@@ -13,8 +13,8 @@ import java.util.UUID;
  */
 public class UUIDGenerator {
 
-	private static final String ALPHABET = "abcdefghijklmnopqrstuvwxyzABCDEFGHIJKLMNOPQRSTUVWXYZ123456789";
-	private static final char SPECIAL = '0';
+	private static final String ALPHABET = "abcdefghijklmnopqrstuvwxyzABCDEFGHIJKLMNOPQRSTUVWXYZ012345678";
+	private static final char SPECIAL = '9';
 
 	public static final int BASE = ALPHABET.length();
 
@@ -23,13 +23,12 @@ public class UUIDGenerator {
 	public static String getUUID() {
 		final UUID uuid = UUID.randomUUID();
 		StringBuilder sb = new StringBuilder();
-		append(sb, uuid.getLeastSignificantBits());
-		append(sb, uuid.getMostSignificantBits());
-		while(sb.length() < 24) sb.append(SPECIAL);
+		append(sb, uuid.getLeastSignificantBits(), 12);
+		append(sb, uuid.getMostSignificantBits(), 24);
 		return sb.toString();
 	}
 
-	public static void append(StringBuilder sb, long i) {
+	public static void append(StringBuilder sb, long i, int length) {
 		if (i < 0) {
 			sb.append(SPECIAL);
 			i = Math.abs(i);
@@ -39,5 +38,6 @@ public class UUIDGenerator {
 			sb.append(ALPHABET.charAt(rem));
 			i /= BASE;
 		}
+		while(sb.length() < length) sb.append(SPECIAL);
 	}
 }
