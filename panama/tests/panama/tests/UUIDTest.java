@@ -45,13 +45,14 @@ public class UUIDTest extends TestCase {
 
 	public void testUUIDGenerator_Uniqueness() {
 		Set<String> values = new HashSet<String>();
-		final int n = TIMES * 100;
-		for (int i = 0; i < n; i++) {
-			String uuid = UUIDGenerator.getUUID();
-			assertFalse(values.contains(uuid));
-			values.add(uuid);
+		for (int a = 1; a <= 1000; a++) {
+			for (int i = 0; i < TIMES; i++) {
+				String uuid = UUIDGenerator.getUUID();
+				assertFalse(values.contains(uuid));
+				values.add(uuid);
+			}
+			System.out.println(a * TIMES + " generated - all unique");
 		}
-		System.out.println(n + " generated - all unique");
 	}
 
 	private long doVMID() {
