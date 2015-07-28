@@ -19,15 +19,28 @@ public class UUIDGenerator {
 
 	private UUIDGenerator() {}
 
+	/**
+	 * Provides UUID.
+	 *
+	 * @return
+	 */
 	public static String getUUID() {
 		final UUID uuid = UUID.randomUUID();
 		StringBuilder sb = new StringBuilder();
-		append(sb, uuid.getLeastSignificantBits(), 12);
-		append(sb, uuid.getMostSignificantBits(), 24);
+		appendBaseN(sb, uuid.getLeastSignificantBits(), 12);
+		appendBaseN(sb, uuid.getMostSignificantBits(), 24);
 		return sb.toString();
 	}
 
-	public static void append(StringBuilder sb, long i, int length) {
+	/**
+	 * Base61-encodes given i. Negative values are prepended by special character not in encoding and encoded
+	 * as positive value. Result is padded at the end with special character to given length.
+	 *
+	 * @param sb
+	 * @param i
+	 * @param length
+	 */
+	public static void appendBaseN(StringBuilder sb, long i, int length) {
 		if (i < 0) {
 			sb.append(SPECIAL);
 			i = Math.abs(i);

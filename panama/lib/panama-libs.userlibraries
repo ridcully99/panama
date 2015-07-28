@@ -1,7 +1,7 @@
 <?xml version="1.0" encoding="UTF-8" standalone="no"?>
 <eclipse-userlibraries version="2">
     <library name="panama-dependencies" systemlibrary="false">
-        <archive path="/panama/lib/commons-beanutils.jar"/>
+        <archive path="/panama/lib/commons-beanutils-1.9.2.jar"/>
         <archive path="/panama/lib/commons-collections-3.2.1.jar"/>
         <archive path="/panama/lib/commons-digester.jar"/>
         <archive path="/panama/lib/commons-logging-1.1.jar"/>

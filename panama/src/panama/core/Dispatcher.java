@@ -16,6 +16,7 @@
 package panama.core;
 
 import java.io.IOException;
+import java.lang.annotation.Annotation;
 import java.lang.reflect.InvocationTargetException;
 import java.lang.reflect.Method;
 import java.util.Arrays;
@@ -47,11 +48,13 @@ import org.scannotation.WarUrlFinder;
 
 import panama.annotations.Action;
 import panama.annotations.Controller;
+import panama.annotations.Param;
 import panama.exceptions.ForceTargetException;
 import panama.exceptions.HttpErrorException;
 import panama.exceptions.NoSuchActionException;
 import panama.log.SimpleLogger;
 import panama.util.Configuration;
+import panama.util.DynaBeanUtils;
 import panama.util.TestTimer;
 
 import com.avaje.ebeaninternal.server.lib.ShutdownManager;
@@ -113,6 +116,9 @@ public class Dispatcher implements Filter {
 	private VelocityEngine velocityEngine;
 	private ViewToolManager velocityToolManager;
 
+	/** Parameter converter */
+	private ParamConvertUtil paramConvertUtil;
+
 	/** Startup time */
 	private Date startupAt = new Date();
 
@@ -173,6 +179,8 @@ public class Dispatcher implements Filter {
 			}
 		}
 		supportedLanguages = Arrays.asList(supported);
+
+		paramConvertUtil = new ParamConvertUtil();
 
 		try {
 			collectControllers();
@@ -367,7 +375,7 @@ public class Dispatcher implements Filter {
 		String defaultActionKey = clazz.getName()+"#";
 
 		for (Method m : clazz.getMethods()) {
-			if (m.isAnnotationPresent(Action.class) && m.getParameterTypes().length == 0) {
+			if (m.isAnnotationPresent(Action.class) /*&& m.getParameterTypes().length == 0*/) {
 				Class<?> returnType = m.getReturnType();
 				while (returnType != null) {
 					if (returnType.equals(Target.class)) {
@@ -544,7 +552,8 @@ public class Dispatcher implements Filter {
 	 */
 	private Target executeActionMethod(BaseController controller, Method method) {
 		try {
-			return (Target)method.invoke(controller);
+			Object[] values = buildArguments(method, controller.context);
+			return (Target)method.invoke(controller, values);
 		} catch (ForceTargetException e) {
 			throw(e);
 		} catch (InvocationTargetException e) {
@@ -559,6 +568,56 @@ public class Dispatcher implements Filter {
 			log.errorException(e);
 		}
 		return new NullTarget();
+	}
+
+	/**
+	 * Builds arguments for all parameters of given method.
+	 * For parameters annotated with @Param tries to find value from context's parameters.
+	 * For all other parameters safe null values are used.
+	 *
+	 * @param method
+	 * @param context
+	 * @return
+	 */
+	private Object[] buildArguments(Method method, Context context) {
+		Class<?>[] parameterTypes = method.getParameterTypes();
+		Annotation[][] annotations = method.getParameterAnnotations();
+		Object[] values = new Object[parameterTypes.length];
+		for (int i = 0; i < parameterTypes.length; i++) {
+			Class<?> type = parameterTypes[i];
+			Object value = null;
+			// Check if there is a Param annotation which's value is the name of parameter in context parameters we want
+			String name = getParamAnnotationValue(annotations[i]);
+			if (name != null) {
+				if (type.isArray()) {
+					String[] paramValues = context.getParameterValues(name);
+					value = paramValues == null ? null : paramConvertUtil.convert(paramValues, type);
+				} else {
+					String paramValue = context.getParameter(name);
+					value = paramConvertUtil.convert(paramValue, type);
+				}
+			}
+			if (value == null && type.isPrimitive()) { // if still null and a primitive, use primitive null value, else value stays null
+				value = DynaBeanUtils.getNullValueForPrimitive(type);
+			}
+			values[i] = value;
+		}
+		return values;
+	}
+
+	/**
+	 * Finds @Param annotation in given annotations and returns its value.
+	 * @param annotations
+	 * @return value or null
+	 */
+	private String getParamAnnotationValue(Annotation[] annotations) {
+		if (annotations == null || annotations.length == 0) return null;
+		for (Annotation a : annotations) {
+			if (a instanceof Param) {
+				return ((Param)a).value();
+			}
+		}
+		return null;
 	}
 
 	/**

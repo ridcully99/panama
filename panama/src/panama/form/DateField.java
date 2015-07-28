@@ -11,7 +11,7 @@ import java.util.Date;
 import panama.form.Field;
 
 /**
- * More flexible and localizable by allowing to pass DateFormt object to use.
+ * More flexible and localizable by allowing to pass DateFormat object to use.
  * @author Robert
  *
  */
