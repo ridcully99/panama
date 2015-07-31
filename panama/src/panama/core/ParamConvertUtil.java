@@ -15,14 +15,13 @@
  */
 package panama.core;
 
-import java.io.File;
 import java.sql.Timestamp;
 import java.util.Calendar;
 
 import org.apache.commons.beanutils.ConvertUtilsBean;
 import org.apache.commons.beanutils.converters.CalendarConverter;
 import org.apache.commons.beanutils.converters.DateConverter;
-import org.apache.commons.beanutils.converters.FileConverter;
+import org.apache.commons.beanutils.converters.DateTimeConverter;
 import org.apache.commons.beanutils.converters.SqlDateConverter;
 import org.apache.commons.beanutils.converters.SqlTimeConverter;
 import org.apache.commons.beanutils.converters.SqlTimestampConverter;
@@ -30,6 +29,10 @@ import org.apache.commons.beanutils.converters.SqlTimestampConverter;
 /**
  * Converts string values to all kinds of other types.
  * Used to map parameters to action method arguments.
+ *
+ * For date and time values, this class supports all kinds of ISO patterns defined by {@link #DATE_TIME_PATTERNS}.
+ * Also see http://docs.oracle.com/javase/7/docs/api/java/text/SimpleDateFormat.html about the patterns.
+ *
  * This is only one-way, so cannot be used for Fields etc.
  *
  * @author ridcully
@@ -37,16 +40,32 @@ import org.apache.commons.beanutils.converters.SqlTimestampConverter;
  */
 public class ParamConvertUtil extends ConvertUtilsBean {
 
+	public final static String[] DATE_TIME_PATTERNS = new String[] {
+		"yyyy-MM-dd",
+		"yyyy-MM-dd HH:mm",
+		"yyyy-MM-dd HH:mm:ss",
+		"HH:mm",
+		"HH:mm:ss",
+		"yyyy-MM-dd'T'HH:mm:ss.SSSXXX" // ISO 8601 with Timezone
+	};
+
 	public ParamConvertUtil() {
 		register(false, true, 0); // don't throw exceptions, use default values
 
-//		// re-register converters for all date related types and allow only millisecond values as valid pattern
-//        register(java.util.Date.class, throwException ? new DateConverter()        : new DateConverter(null));
-//        register(Calendar.class,      throwException ? new CalendarConverter()     : new CalendarConverter(null));
-//        register(File.class,          throwException ? new FileConverter()         : new FileConverter(null));
-//        register(java.sql.Date.class, throwException ? new SqlDateConverter()      : new SqlDateConverter(null));
-//        register(java.sql.Time.class, throwException ? new SqlTimeConverter()      : new SqlTimeConverter(null));
-//        register(Timestamp.class,     throwException ? new SqlTimestampConverter() : new SqlTimestampConverter(null));
+		registerDateTimeConverter(java.util.Date.class, new DateConverter(null));
+		registerDateTimeConverter(Calendar.class, new CalendarConverter(null));
+		registerDateTimeConverter(java.sql.Date.class, new SqlDateConverter(null));
+		registerDateTimeConverter(java.sql.Time.class, new SqlTimeConverter(null));
+		registerDateTimeConverter(Timestamp.class, new SqlTimestampConverter(null));
 	}
 
+	/**
+	 * Registers given converter for given clazz with support for all of DATE_TIME_PATTERNS.
+	 * @param clazz
+	 * @param converter
+	 */
+	private void registerDateTimeConverter(Class<?> clazz, DateTimeConverter converter) {
+		converter.setPatterns(DATE_TIME_PATTERNS);
+		register(converter, clazz);
+	}
 }

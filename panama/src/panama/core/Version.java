@@ -27,7 +27,7 @@ public class Version {
 	// b: Revision (increases when cool new features are added)
 	// c: Minor	(increases when updates or fixes are made - even numbers mark stable releases)
 
-	public final static String VERSION = "3.9.0a";
+	public final static String VERSION = "3.9.0b";
 
 	public final static String LOGO_ASCIIART =
 	" ______ _______ _______ _______ _______ _______ \n"+
@@ -40,7 +40,7 @@ public class Version {
 
 	/* 	History
 	 * ---------------------------------------------------------------------------------------------
-	 * 3.9.0a   2015-07-28 Allow params for action methods and fill the ones annotated with @Param("queryname") with values from request parameters
+	 * 3.9.0b   2015-07-30 Allow params for action methods and fill the ones annotated with @RequestParam("queryname") with values from request parameters
 	 * 3.8.0    2015-07-23 Changed UUID generator for PersistentBean -> faster & shorter
 	 * 3.7.0    2013-09-xx See https://code.google.com/p/panama/wiki/ReleaseNotes3_7
 	 * 3.6.0    2013-08-xx See https://code.google.com/p/panama/wiki/ReleaseNotes3_6

@@ -48,7 +48,7 @@ import org.scannotation.WarUrlFinder;
 
 import panama.annotations.Action;
 import panama.annotations.Controller;
-import panama.annotations.Param;
+import panama.annotations.RequestParam;
 import panama.exceptions.ForceTargetException;
 import panama.exceptions.HttpErrorException;
 import panama.exceptions.NoSuchActionException;
@@ -613,8 +613,8 @@ public class Dispatcher implements Filter {
 	private String getParamAnnotationValue(Annotation[] annotations) {
 		if (annotations == null || annotations.length == 0) return null;
 		for (Annotation a : annotations) {
-			if (a instanceof Param) {
-				return ((Param)a).value();
+			if (a instanceof RequestParam) {
+				return ((RequestParam)a).value();
 			}
 		}
 		return null;
