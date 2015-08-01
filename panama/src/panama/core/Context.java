@@ -88,6 +88,7 @@ public class Context {
 
 	private Map parameterMap;
 	private Locale defaultLocale;	// locale as derived from supported languages and accepted languages from browser - this is the default as long as no setLocale() has set an explicit locale in the session.
+	private ParamConvertUtil paramConvertUtil = new ParamConvertUtil();
 
 	/**
 	 * Static creator - created Context is stored in threadlocal variable and
@@ -217,11 +218,11 @@ public class Context {
 			if (bundle.containsKey(key)) {
 				return MessageFormat.format(bundle.getString(key), args);
 			} else {
-				return "???"+key+"???";
+				return "???" + key + "/" + getLocale().getLanguage() + "???";
 			}
 		} catch (Exception e) {
 			log.errorException(e);
-			return "??!"+key+"??!";
+			return "???" + key + "/" + getLocale().getLanguage() + " -> " + e.getMessage() + "???";
 		}
 	}
 
@@ -248,7 +249,7 @@ public class Context {
 		String[] values = getParameterValues(key);
 		return values != null ? values[0] : null;
 	}
-	
+
 	public String getParameter(String key, String defaultValue) {
 		String v = getParameter(key);
 		return v != null ? v : defaultValue;
@@ -302,40 +303,84 @@ public class Context {
 	}
 
 	public Integer getIntParameter(String key) {
-		try {
-			return new Integer(getParameter(key));
-		} catch (Exception e) {
-			return null;
-		}
+		return getParameter(key, Integer.class, null);
 	}
 
 	public Integer getIntParameter(String key, Integer defaultValue) {
-		try {
-			Integer i = new Integer(getParameter(key));
-			return i != null ? i : defaultValue;
-		} catch (Exception e) {
-			return defaultValue;
-		}
+		return getParameter(key, Integer.class, defaultValue);
 	}
-	
+
+	public Integer[] getIntArrayParameter(String key) {
+		return getParameter(key, Integer[].class, null);
+	}
+
 	public Long getLongParameter(String key) {
-		try {
-			return new Long(getParameter(key));
-		} catch (Exception e) {
-			return null;
-		}
+		return getParameter(key, Long.class, null);
 	}
 
 	public Long getLongParameter(String key, Long defaultValue) {
-		try {
-			Long l = new Long(getParameter(key));
-			return l != null ? l : defaultValue;
-		} catch (Exception e) {
-			return defaultValue;
+		return getParameter(key, Long.class, defaultValue);
+	}
+
+	public Long[] getLongArrayParameter(String key) {
+		return getParameter(key, Long[].class, null);
+	}
+
+	public Boolean getBooleanParameter(String key) {
+		return getParameter(key, Boolean.class, null);
+	}
+
+	public Boolean getBooleanParameter(String key, Boolean defaultValue) {
+		return getParameter(key, Boolean.class, defaultValue);
+	}
+
+	public Boolean[] getBooleanArrayParameter(String key) {
+		return getParameter(key, Boolean[].class, null);
+	}
+
+	/**
+	 * For date parameters that match any of {@link ParamConvertUtil#DATE_TIME_PATTERNS}.
+	 */
+	public Date getDateParameter(String key) {
+		return getParameter(key, Date.class, null);
+	}
+
+	/**
+	 * For date parameters that match any of {@link ParamConvertUtil#DATE_TIME_PATTERNS}.
+	 */
+	public Date getDateParameter(String key, Date defaultValue) {
+		return getParameter(key, Date.class, defaultValue);
+	}
+
+	/**
+	 * For date parameters that match any of {@link ParamConvertUtil#DATE_TIME_PATTERNS}.
+	 */
+	public Date[] getDateArrayParameter(String key) {
+		return getParameter(key, Date[].class, null);
+	}
+
+	/**
+	 * Gets parameter value(s) for key, converted to given type.
+	 * Normally this is not used directly, instead use the various get&lt;Type&gt;Parameter() methods.
+	 *
+	 * @param key
+	 * @param type
+	 * @param defaultValue value to return as default value
+	 * @return
+	 */
+	public <T> T getParameter(String key, Class<T> type, T defaultValue) {
+		if (type.isArray()) {
+			String[] paramValues = getParameterValues(key);
+			if (paramValues == null || paramValues.length == 0) return defaultValue;
+			return (T)paramConvertUtil.convert(paramValues, type);
+		} else {
+			String paramValue = getParameter(key);
+			if (paramValue == null) return defaultValue;
+			return (T)paramConvertUtil.convert(paramValue, type);
 		}
 	}
-	
-	
+
+
 	/**
 	 * Builds parameter Map from list of parameter and value elements.
 	 * @param paramsAndValues a variable list of parameters and values, alternating like so: param1, value1, param2, value2...; These replace the original parameters during the execution of the action.
@@ -354,8 +399,8 @@ public class Context {
 			}
 		}
 		return parameterMap;
-	}	
-	
+	}
+
 	// -------------------------------------------------------------------------------------
 	// FileItem methods (return null for non-MultipartServletRequests)
 	// Normally you'd not use these methods directly, but use the FileItemField class

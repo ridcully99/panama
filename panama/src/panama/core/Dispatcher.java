@@ -15,7 +15,10 @@
  */
 package panama.core;
 
+import java.io.File;
+import java.io.FileInputStream;
 import java.io.IOException;
+import java.io.InputStream;
 import java.lang.annotation.Annotation;
 import java.lang.reflect.InvocationTargetException;
 import java.lang.reflect.Method;
@@ -48,7 +51,7 @@ import org.scannotation.WarUrlFinder;
 
 import panama.annotations.Action;
 import panama.annotations.Controller;
-import panama.annotations.RequestParam;
+import panama.annotations.ContextParam;
 import panama.exceptions.ForceTargetException;
 import panama.exceptions.HttpErrorException;
 import panama.exceptions.NoSuchActionException;
@@ -66,8 +69,6 @@ import com.avaje.ebeaninternal.server.lib.ShutdownManager;
  * @author Robert
  */
 public class Dispatcher implements Filter {
-
-	private static final long serialVersionUID = 1L;
 
 	public final static String PREFIX = "panama";
 
@@ -150,7 +151,7 @@ public class Dispatcher implements Filter {
 		 */
 		try {
 			ClassLoader cl = this.getClass().getClassLoader();
-			Properties velocityProperties = Configuration.readProperties(
+			Properties velocityProperties = Dispatcher.readProperties(
 					System.getProperty(appName + SYSTEM_PROPERTY_VELOCITY_PROPS_SUFFIX),
 					System.getProperty(PREFIX + SYSTEM_PROPERTY_VELOCITY_PROPS_SUFFIX),
 					"/velocity.properties");
@@ -572,7 +573,7 @@ public class Dispatcher implements Filter {
 
 	/**
 	 * Builds arguments for all parameters of given method.
-	 * For parameters annotated with @Param tries to find value from context's parameters.
+	 * For parameters annotated with {@link ContextParam} tries to find value from context's parameters.
 	 * For all other parameters safe null values are used.
 	 *
 	 * @param method
@@ -586,14 +587,13 @@ public class Dispatcher implements Filter {
 		for (int i = 0; i < parameterTypes.length; i++) {
 			Class<?> type = parameterTypes[i];
 			Object value = null;
-			// Check if there is a Param annotation which's value is the name of parameter in context parameters we want
-			String name = getParamAnnotationValue(annotations[i]);
-			if (name != null) {
+			String paramName = getParamAnnotationValue(annotations[i]);
+			if (paramName != null) {
 				if (type.isArray()) {
-					String[] paramValues = context.getParameterValues(name);
-					value = paramValues == null ? null : paramConvertUtil.convert(paramValues, type);
+					String[] paramValues = context.getParameterValues(paramName);
+					value = paramConvertUtil.convert(paramValues, type);
 				} else {
-					String paramValue = context.getParameter(name);
+					String paramValue = context.getParameter(paramName);
 					value = paramConvertUtil.convert(paramValue, type);
 				}
 			}
@@ -606,15 +606,15 @@ public class Dispatcher implements Filter {
 	}
 
 	/**
-	 * Finds @Param annotation in given annotations and returns its value.
+	 * Finds {@link ContextParam} annotation in given annotations and returns its value, which is the name of the parameter.
 	 * @param annotations
 	 * @return value or null
 	 */
 	private String getParamAnnotationValue(Annotation[] annotations) {
 		if (annotations == null || annotations.length == 0) return null;
 		for (Annotation a : annotations) {
-			if (a instanceof RequestParam) {
-				return ((RequestParam)a).value();
+			if (a instanceof ContextParam) {
+				return ((ContextParam)a).value();
 			}
 		}
 		return null;
@@ -713,5 +713,46 @@ public class Dispatcher implements Filter {
 		s.append(minutes<10?"0":"").append(minutes).append(":");
 		s.append(seconds<10?"0":"").append(seconds);
 		return s.toString();
+	}
+
+	/**
+	 * Tries to read properties from given fileNameOptions in given order from filesystem and as resource.
+	 * As soon as properties could be read for a filename, those are returned.
+	 * If there are no properties for any of the fileNameOptions, null is returned.
+	 *
+	 * @param fileNameOptions a list of filenames to be tried in given order
+	 * @return Properties (will be empty if none of the filenames could be read)
+	 */
+	public static Properties readProperties(String... fileNameOptions) {
+		Properties props = new Properties();
+		for (String fileName : fileNameOptions) {
+			if (fileName == null) continue;
+			InputStream is = null;
+			try {
+				is = Dispatcher.class.getResourceAsStream(fileName);
+				if (is == null) {	// no resource file, try as regular file
+					log.info("could not read "+fileName+" as resource, going to try via file system now.");
+					try {
+						is = new FileInputStream(new File(fileName));
+					} catch (Exception e) {
+						log.warn("Error accessing "+fileName+" via file system: "+e.getMessage());
+					}
+				}
+				if (is == null) continue;
+				props.load(is);
+				break;
+			} catch (Exception e) {
+				log.warn("Could not read properties from "+fileName+": "+e.getMessage());
+			} finally {
+				if (is != null) {
+					try {
+						is.close();
+					} catch (IOException e) {
+						// NOOP
+					}
+				}
+			}
+		}
+		return props;
 	}
 }

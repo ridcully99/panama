@@ -59,6 +59,15 @@ public class ParamConvertUtil extends ConvertUtilsBean {
 		registerDateTimeConverter(Timestamp.class, new SqlTimestampConverter(null));
 	}
 
+	/* (non-Javadoc)
+	 * @see org.apache.commons.beanutils.ConvertUtilsBean#convert(java.lang.String[], java.lang.Class)
+	 */
+	@Override
+	public Object convert(String[] values, Class<?> clazz) {
+		if (values == null) return null;
+		return super.convert(values, clazz);
+	}
+
 	/**
 	 * Registers given converter for given clazz with support for all of DATE_TIME_PATTERNS.
 	 * @param clazz

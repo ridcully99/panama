@@ -15,11 +15,9 @@
  */
 package panama.util;
 
-import java.io.File;
-import java.io.FileInputStream;
-import java.io.IOException;
-import java.io.InputStream;
 import java.util.Properties;
+
+import org.apache.commons.lang.StringUtils;
 
 import panama.core.Dispatcher;
 import panama.log.SimpleLogger;
@@ -39,8 +37,11 @@ import panama.log.SimpleLogger;
  */
 public class Configuration {
 
+	public final static String[] BOOLEAN_TRUE = new String[] {"true", "yes", "1"};
+	public final static String[] BOOLEAN_FALSE = new String[] {"false", "no", "0"};
+
 	/** Simply! Logging */
-	protected static SimpleLogger log = new SimpleLogger(Configuration.class);
+	private static SimpleLogger log = new SimpleLogger(Configuration.class);
 
 	// prevent instantiation
 	private Configuration() {}
@@ -54,14 +55,15 @@ public class Configuration {
 	 * @param appName
 	 */
 	public static synchronized void init(String appName) {
-		panamaProperties = readProperties(
+		panamaProperties = Dispatcher.readProperties(
 				System.getProperty(appName + "." + Dispatcher.PREFIX + ".configuration"),
 				System.getProperty(Dispatcher.PREFIX + ".configuration"),
-				"/panama.properties");
+				"/panama.properties",
+				"/default-fallback-panama.properties");
 	}
 
 	/**
-	 * returns value for specified property name from the properties file.
+	 * Returns value for specified property name from the properties file.
 	 * @param key
 	 * @return the value as string or null if key is null or no entry found
 	 */
@@ -69,25 +71,52 @@ public class Configuration {
 		return panamaProperties.getProperty(key);
 	}
 
-//	/**
-//	 * returns Map of all properties where key matches one of the given prefixes
-//	 * @param prefix list of prefixes
-//	 * @return
-//	 */
-//	public static Map<String, String> getAll(String... prefix) {
-//		Map<String, String> values = new HashMap<String, String>();
-//		Enumeration<String> keys = bundle.getKeys();
-//		while (keys.hasMoreElements()) {
-//			String k = keys.nextElement();
-//			for (String p : prefix) {
-//				if (k.startsWith(p)) {
-//					values.put(k, getString(k));
-//					break;
-//				}
-//			}
-//		}
-//		return values;
-//	}
+	/**
+	 * Returns value for specified property name from the properties file.
+	 * @param key
+	 * @param defaultValue
+	 * @return the value as string or defaultValue if key is null or no entry found
+	 */
+	public static String getString(String key, String defaultValue) {
+		String value = getString(key);
+		return value == null ? defaultValue : value;
+	}
+
+	/**
+	 * Returns int value for given property name from properties file.
+	 * @param key
+	 * @param defaultValue
+	 * @return the value as int or defaultValue if property not found or value of property cannot be converted to an integer
+	 */
+	public static int getInt(String key, int defaultValue) {
+		String value = getString(key);
+		if (StringUtils.isEmpty(value)) return defaultValue;
+		try {
+			return Integer.parseInt(value);
+		} catch (Exception e) {
+			return defaultValue;
+		}
+	}
+
+	/**
+	 * Returns boolean value for given property name from properties file.
+	 * Supported values for boolean properties are {@link #BOOLEAN_TRUE} and {@link #BOOLEAN_FALSE}, case insensitive.
+	 *
+	 * @param key
+	 * @param defaultValue
+	 * @return the value as boolean or defaultValue if property not found or value of property cannot be interpreted as boolean
+	 */
+	public static boolean getBoolean(String key, boolean defaultValue) {
+		String value = getString(key);
+		if (StringUtils.isEmpty(value)) return defaultValue;
+		for (String s : BOOLEAN_TRUE) {
+			if (s.equalsIgnoreCase(value)) return true;
+		}
+		for (String s : BOOLEAN_FALSE) {
+			if (s.equalsIgnoreCase(value)) return false;
+		}
+		return defaultValue;
+	}
 
 	/**
 	 * Returns complete configuration
@@ -95,49 +124,5 @@ public class Configuration {
 	 */
 	public static Properties getAll() {
 		return panamaProperties;
-	}
-
-	/**
-	 * For internal use only. Use {@link #getAll()} to retrieve all current configuration.
-	 *
-	 * Tries to read properties from given fileNameOptions in given order from filesystem and as resource.
-	 * As soon as properties could be read for a filename, those are returned.
-	 * If there are no properties for any of the fileNameOptions, null is returned.
-	 *
-	 * @param classLoader
-	 * @param fileNameOptions a list of filenames to be tried in given order
-	 * @return Properties (will be empty if none of the filenames could be read)
-	 */
-	public static Properties readProperties(String... fileNameOptions) {
-		Properties props = new Properties();
-		for (String fileName : fileNameOptions) {
-			if (fileName == null) continue;
-			InputStream is = null;
-			try {
-				is = Configuration.class.getResourceAsStream(fileName);
-				if (is == null) {	// no resource file, try as regular file
-					log.info("could not read "+fileName+" as resource, going to try via file system now.");
-					try {
-						is = new FileInputStream(new File(fileName));
-					} catch (Exception e) {
-						log.warn("Error accessing "+fileName+" via file system: "+e.getMessage());
-					}
-				}
-				if (is == null) continue;
-				props.load(is);
-				break;
-			} catch (Exception e) {
-				log.warn("Could not read properties from "+fileName+": "+e.getMessage());
-			} finally {
-				if (is != null) {
-					try {
-						is.close();
-					} catch (IOException e) {
-						// NOOP
-					}
-				}
-			}
-		}
-		return props;
 	}
 }
