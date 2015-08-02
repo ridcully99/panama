@@ -43,7 +43,7 @@ public class UUIDTest extends TestCase {
 		}
 	}
 
-	public void testUUIDGenerator_Uniqueness() {
+	public void _testUUIDGenerator_Uniqueness() {
 		Set<String> values = new HashSet<String>();
 		for (int a = 1; a <= 1000; a++) {
 			for (int i = 0; i < TIMES; i++) {

@@ -55,6 +55,7 @@ import panama.annotations.ContextParam;
 import panama.exceptions.ForceTargetException;
 import panama.exceptions.HttpErrorException;
 import panama.exceptions.NoSuchActionException;
+import panama.log.DebugLevel;
 import panama.log.SimpleLogger;
 import panama.util.Configuration;
 import panama.util.DynaBeanUtils;
@@ -80,6 +81,9 @@ public class Dispatcher implements Filter {
 
 	private static final String SYSTEM_PROPERTY_VELOCITY_PROPS_SUFFIX = ".velocity.configuration";
 
+	/** Key for default controller class (if specified) in controllerClasses -- value is crafted in a way never to collide with a normal alias or FQCN */
+	private final static String DEFAULT_CONTROLLER_KEY = "/default/controller/class/";
+
 	/* keys for objects put in request context */
 	public final static String CONTEXT_KEY = "context";
 	public final static String ACTION_INVOCATION_MODE_KEY = PREFIX+"action_invocation_mode";
@@ -96,13 +100,61 @@ public class Dispatcher implements Filter {
 	/** Simply! Logging */
 	protected static SimpleLogger log = new SimpleLogger(Dispatcher.class);
 
-	/** Mapping controller alias or FQCN to Class itself; filled in init(), later on only read from */
-	private Map<String, Class<? extends BaseController>> controllerClasses = new HashMap<String, Class<? extends BaseController>>();
-	/** Key for default controller class (if specified) in controllerClasses -- value is crafted in a way never to collide with a normal alias or FQCN */
-	private final static String DEFAULT_CONTROLLER_KEY = "/default/controller/class/";
+	// ------------------------------------------------------------------------------ Inner classes
 
-	/** Mapping Controller-FQCN#actionName to Method; ; filled in init(), later on only read from */
-	private Map<String, Method> actionMethods = new HashMap<String, Method>();
+
+	class ActionInfo {
+
+		class Parameter {
+			Class<?> type;
+			String contextParamName;
+		}
+
+		Method method;
+		Parameter[] parameters;
+
+		public ActionInfo(Method method) {
+			this.method = method;
+			Class<?>[] parameterTypes = method.getParameterTypes(); // never null
+			Annotation[][] annotations = method.getParameterAnnotations(); // never null
+			parameters = new Parameter[parameterTypes.length];
+			for (int i = 0; i < parameters.length; i++) {
+				Parameter arg = new Parameter();
+				arg.type = parameterTypes[i];
+				arg.contextParamName = getContextParamAnnotationValue(annotations[i]);
+				parameters[i] = arg;
+			}
+		}
+
+		/**
+		 * Finds {@link ContextParam} annotation in given annotations and returns its value,
+		 * which is the name of the parameter.
+		 *
+		 * @param annotations
+		 * @return value or null
+		 */
+		private String getContextParamAnnotationValue(Annotation[] annotations) {
+			if (annotations == null || annotations.length == 0) return null;
+			for (Annotation a : annotations) {
+				if (a instanceof ContextParam) {
+					return ((ContextParam)a).value();
+				}
+			}
+			return null;
+		}
+	}
+
+	class ControllerInfo {
+		Class<? extends BaseController> controllerClass;
+		String defaultActionName;
+		Map<String, ActionInfo> actions = new HashMap<>();
+	}
+
+	/** Mapping controller alias and FQCN to same ControllerInfo instance; filled in init(), later on only read from */
+	private Map<String, ControllerInfo> controllers = new HashMap<>();
+
+//	/** Mapping Controller-FQCN#actionName to Method; ; filled in init(), later on only read from */
+//	private Map<String, Method> actionMethods = new HashMap<String, Method>();
 
 	/** Configuration (from FilterConfig.InitParameters) */
 	private Map<String, String> initParams = new HashMap<String, String>();
@@ -200,16 +252,16 @@ public class Dispatcher implements Filter {
 				HttpServletRequest httpReq = (HttpServletRequest)req;
 				HttpServletResponse httpRes = (HttpServletResponse)res;
 				String url = httpReq.getContextPath()+httpReq.getServletPath();
-				url = url+"/";
+				url = url + "/";
 				if (!StringUtils.isEmpty(httpReq.getQueryString())) {
-					url = url+"?"+httpReq.getQueryString();
+					url = url + "?" + httpReq.getQueryString();
 				}
 				httpRes.sendRedirect(httpRes.encodeRedirectURL(url));
 				return;
 				}
 			case CAN_HANDLE_REQUEST_REDIRECT_TO_DEFAULT_CONTROLLER:
 				{
-				Class<?> controllerClass = controllerClasses.get(DEFAULT_CONTROLLER_KEY);
+				Class<?> controllerClass = controllers.get(DEFAULT_CONTROLLER_KEY).controllerClass;
 				Controller annotation = controllerClass.getAnnotation(Controller.class);
 				String ctrlName = annotation != null && !StringUtils.isEmpty(annotation.alias()) ? annotation.alias() : controllerClass.getName();
 				String url = ctrlName + "/";	// relative url; by appending the '/' this targets the default action for the controller; otherwise we'd get another redirect that adds just the / (see above)
@@ -232,25 +284,26 @@ public class Dispatcher implements Filter {
 	 *
 	 * @param req
 	 * @param res
-	 * @return wether we can handle this request, a redirect is required or it should be passed along the filter chain.
+	 * @return whether we can handle this request, a redirect is required or it should be passed along the filter chain.
 	 */
 	private int canHandleRequest(ServletRequest req, ServletResponse res) {
 		if (!(req instanceof HttpServletRequest && res instanceof HttpServletResponse)) {
 			return CAN_HANDLE_REQUEST_NO;
 		}
 		String path = ((HttpServletRequest)req).getServletPath();
-		if ((path == null || path.length() == 0 || path.equals("/")) && controllerClasses.containsKey(DEFAULT_CONTROLLER_KEY)) {
+		if ((path == null || path.length() == 0 || path.equals("/")) && controllers.containsKey(DEFAULT_CONTROLLER_KEY)) {
 			return CAN_HANDLE_REQUEST_REDIRECT_TO_DEFAULT_CONTROLLER;
 		}
 		int result = CAN_HANDLE_REQUEST_NO;
 		String[] ca = extractControllerAndActionNames(path);
 		String ctrlName = ca[0];
-		if (!controllerClasses.containsKey(ctrlName)) {
+		String actionName = ca[1];
+		ControllerInfo controllerInfo = controllers.get(ctrlName);
+		if (controllerInfo == null) {
 			result = CAN_HANDLE_REQUEST_NO;
 		} else {
-			String actionName = ca[1];
 			if (StringUtils.isEmpty(actionName)) {
-				if (StringUtils.isEmpty(getDefaultActionName(controllerClasses.get(ctrlName)))) {
+				if (StringUtils.isEmpty(controllerInfo.defaultActionName)) {
 					result = CAN_HANDLE_REQUEST_NO;
 				} else if (path.trim().endsWith("/")) {
 					result = CAN_HANDLE_REQUEST_YES;
@@ -258,9 +311,7 @@ public class Dispatcher implements Filter {
 					result = CAN_HANDLE_REQUEST_REDIRECT;
 				}
 			} else {
-				StringBuffer actionKey = new StringBuffer(controllerClasses.get(ctrlName).getName()).append("#").append(actionName);
-				Method method = actionMethods.get(actionKey.toString());
-				result = (method != null) ? CAN_HANDLE_REQUEST_YES : CAN_HANDLE_REQUEST_NO;
+				result = controllerInfo.actions.containsKey(actionName) ? CAN_HANDLE_REQUEST_YES : CAN_HANDLE_REQUEST_NO;
 			}
 		}
 		return result;
@@ -325,78 +376,78 @@ public class Dispatcher implements Filter {
 
 		Set<String> ctrls = adb.getAnnotationIndex().get(Controller.class.getName());
 
-		for (String n : ctrls) {
-			Class<? extends BaseController> c = null;
+		for (String fqcn : ctrls) {
+			Class<? extends BaseController> clazz = null;
 			try {
-				c = (Class<? extends BaseController>) Class.forName(n);
+				clazz = (Class<? extends BaseController>) Class.forName(fqcn);
 			} catch (Exception e) {
-				log.warn("Class "+n+" not found or not derived from Controller class. Ignoring it.");
+				log.warn("Class "+fqcn+" not found or not derived from Controller class. Ignoring it.");
 				continue;
 			}
-			controllerClasses.put(n, c);
-			log.debug(c+" -> "+c);
-			if (c.getAnnotation(Controller.class).isDefaultController()) {
-				controllerClasses.put(DEFAULT_CONTROLLER_KEY, c);
-				log.debug(DEFAULT_CONTROLLER_KEY+ "-> "+c);
+			Controller controllerAnnotation = clazz.getAnnotation(Controller.class);
+
+			ControllerInfo controllerInfo = new ControllerInfo();
+			controllerInfo.controllerClass = clazz;
+			controllerInfo.defaultActionName = controllerAnnotation.defaultAction();
+
+			controllers.put(fqcn, controllerInfo);
+			boolean isDefaultController = clazz.getAnnotation(Controller.class).isDefaultController();
+			if (isDefaultController) {
+				controllers.put(DEFAULT_CONTROLLER_KEY, controllerInfo);
 			}
-			collectActions(c);
-			String alias = c.getAnnotation(Controller.class).alias();
+
+			String alias = controllerAnnotation.alias();
 			if 	(StringUtils.isNotEmpty(alias)) {
 				alias = alias.trim();
 				if (alias.contains("/")) {
 					log.warn("Controller alias '"+alias+"' contains illegal characters. Ignoring alias.");
-					continue;
+					alias = null;
+				} else if (controllers.containsKey(alias)) {
+					log.warn("Duplicate Controller alias '"+alias+"' detected. Used by "+fqcn+
+							" and " + controllers.get(alias).controllerClass.getName() + ". Using alias only for the latter.");
+					alias = null;
+				} else {
+					controllers.put(alias, controllerInfo);
 				}
-				if (controllerClasses.containsKey(alias)) {
-					log.warn("Duplicate Controller alias '"+alias+"' detected. Used by "+n+
-							" and "+controllerClasses.get(alias).getName()+". Using alias only for the latter.");
-					continue;
-				}
-				controllerClasses.put(alias, c);
-				log.debug(alias+" -> "+n);
 			}
+			log.debug((StringUtils.isNotEmpty(alias) ? alias + ", " : "") + fqcn + " -> " + fqcn + (isDefaultController ? " (default controller)" : ""));
+
+			collectActions(controllerInfo);
 		}
 	}
 
 	/**
-	 * Collect all actions of specified controller and put them in actionMethods map.
-	 * Uses classname and method-name for key. If alias is provided a second entry using alias in the key is made.
-	 * If controller has a default action specified use empty string for method part of key.
+	 * Collects all actions of specified controller.
 	 *
-	 * @param controllerName
-	 * @param clazz
+	 * @param controllerInfo
 	 */
-	private void collectActions(Class<? extends BaseController> clazz) {
-		String defaultActionName = getDefaultActionName(clazz);
-		String defaultActionKey = clazz.getName()+"#";
+	private void collectActions(ControllerInfo controllerInfo) {
+		String defaultActionName = controllerInfo.defaultActionName;
 
-		for (Method m : clazz.getMethods()) {
-			if (m.isAnnotationPresent(Action.class) /*&& m.getParameterTypes().length == 0*/) {
-				Class<?> returnType = m.getReturnType();
+		for (Method method : controllerInfo.controllerClass.getMethods()) {
+			if (method.isAnnotationPresent(Action.class)) {
+				Class<?> returnType = method.getReturnType();
 				while (returnType != null) {
 					if (returnType.equals(Target.class)) {
-						String key = clazz.getName()+"#"+m.getName();
-						actionMethods.put(key, m);
-						log.debug(key+" -> "+m.getName());
-						if (m.getName().equals(defaultActionName)) {
-							actionMethods.put(defaultActionKey, m);
-							log.debug(defaultActionKey+" -> "+m.getName()+" (default action)");
-						}
-						String alias = m.getAnnotation(Action.class).alias();
+						ActionInfo actionInfo = new ActionInfo(method);
+						String methodName = method.getName();
+						controllerInfo.actions.put(methodName, actionInfo);
+						String alias = method.getAnnotation(Action.class).alias();
 						if (!StringUtils.isEmpty(alias)) {
 							alias = alias.trim();
 							if (alias.contains("/")) {
-								log.warn("Action alias '"+alias+"' in "+clazz.getName()+" contains illegal characters. Ignoring alias.");
+								log.warn("Action alias '"+alias+"' in " + controllerInfo.controllerClass.getName() + " contains illegal character '/'. Ignoring alias.");
+								alias = null;
 							} else {
-								key = clazz.getName()+"#"+alias;
-								actionMethods.put(key, m);
-								log.debug(key+" -> "+m.getName());
-								if (alias.equals(defaultActionName)) {
-									actionMethods.put(defaultActionKey, m);
-									log.debug(defaultActionKey+" -> "+alias+" (default action)");
-								}
+								// same ActionInfo instance
+								controllerInfo.actions.put(alias, actionInfo);
 							}
 						}
+						log.debug("    "
+								+ (!StringUtils.isEmpty(alias) ? alias + ", " : "") + methodName
+								+ " -> "
+								+ method.getName() + "()"
+								+ ((alias != null && alias.equals(defaultActionName)) || methodName.equals(defaultActionName) ? " (defaultAction)" : ""));
 						break;
 					}
 					returnType = returnType.getSuperclass();
@@ -405,10 +456,6 @@ public class Dispatcher implements Filter {
 		}
 	}
 
-	private String getDefaultActionName(Class<? extends BaseController> clazz) {
-		Controller ctrlAnnotation = clazz.getAnnotation(Controller.class);
-		return ctrlAnnotation != null ? ctrlAnnotation.defaultAction() : null;
-	}
 
 	/**
 	 * Creates a new instance for the controller specified by nameOrAlias
@@ -418,14 +465,17 @@ public class Dispatcher implements Filter {
 	 */
 	public BaseController getController(String nameOrAlias) {
 		BaseController ctrl = null;
-		Class<? extends BaseController> clazz = controllerClasses.get(nameOrAlias);
-		if (clazz == null) {
+		ControllerInfo controllerInfo = controllers.get(nameOrAlias);
+
+		if (controllerInfo == null) {
 			throw new RuntimeException("No controller class found for name or alias '"+nameOrAlias+"'");
 		} else {
 			try {
-				ctrl = clazz.getDeclaredConstructor().newInstance();
+				ctrl = controllerInfo.controllerClass.getDeclaredConstructor().newInstance();
 			} catch (Exception e) {
-				throw new RuntimeException("Error creating instance of controller class "+clazz.getName(), e);
+				throw new RuntimeException("Error creating instance of controller class "
+						+ controllerInfo.controllerClass.getName(),
+						e);
 			}
 		}
 		return ctrl;
@@ -451,22 +501,19 @@ public class Dispatcher implements Filter {
 		String ctrlName = ca[0];
 		String actionName = ca[1];
 
-		/* create new instance of controller for specified ctrlName */
-		BaseController ctrl = getController(ctrlName);
-
 		TestTimer timer = new TestTimer("execute");
 		try {
-			return executeAction(ctx, ctrl, actionName);
+			return executeAction(ctx, ctrlName, actionName);
 		} catch (NoSuchActionException nme) {
-			log.warn("no such action: \""+ctrl.getClass().getName()+"/"+actionName+"\"");
+			log.warn(nme.getMessage());
 			ctx.getResponse().sendError(HttpServletResponse.SC_NOT_FOUND);
 			return null;
 		} catch (HttpErrorException hee) {
-			log.warn("HttpErrorException "+hee.getStatusCode()+" :\""+ctrl.getClass().getName()+"/"+actionName+"\"");
+			log.warn("HttpErrorException " + hee.getStatusCode() + " :\"" + ctrlName + "/" + actionName + "\"");
 			ctx.getResponse().sendError(hee.getStatusCode());
 			return null;
 		} catch (Exception e) {
-			String msg = "error doing action \""+actionName+"\"";
+			String msg = "error doing action \"" + actionName + "\"";
 			log.fatal(msg);
 			log.fatalException(e);
 			ctx.getResponse().sendError(HttpServletResponse.SC_INTERNAL_SERVER_ERROR);
@@ -513,9 +560,26 @@ public class Dispatcher implements Filter {
 		return handleAction(ctx, path, ACTION_INVOCATION_PROGRAMATICALLY);
 	}
 
-	public Target executeAction(Context ctx, BaseController ctrl, String actionName) throws NoSuchActionException {
+	/**
+	 * Executes action.
+	 * @param ctx
+	 * @param ctrlName
+	 * @param actionName
+	 * @return
+	 * @throws NoSuchActionException
+	 */
+	public Target executeAction(Context ctx, String ctrlName, String actionName) throws NoSuchActionException {
+
+		ControllerInfo controllerInfo = controllers.get(ctrlName);
+		if (controllerInfo == null) {
+			throw new NoSuchActionException(ctrlName + "/" + actionName);
+		}
+
+		/* create new instance of controller for specified ctrlName */
+		BaseController ctrl = getController(ctrlName);
+
 		if (StringUtils.isEmpty(actionName)) {
-			actionName = getDefaultActionName(ctrl.getClass());
+			actionName = controllerInfo.defaultActionName;
 		}
 		try {
 			/* allow pre-processing */
@@ -523,13 +587,12 @@ public class Dispatcher implements Filter {
 
 			/* find and invoke action */
 			Target target = null;
-			StringBuffer actionKey = new StringBuffer(ctrl.getClass().getName()).append("#").append(actionName);
-			Method method = actionMethods.get(actionKey.toString());
-			if (method == null) {
-				throw new NoSuchActionException(actionName);
-			} else {
-				target = executeActionMethod(ctrl, method);
+			ActionInfo actionInfo = controllerInfo.actions.get(actionName);
+			if (actionInfo == null) {
+				throw new NoSuchActionException(ctrlName + "/" + actionName);
 			}
+			target = executeActionMethod(ctrl, actionInfo);
+
 			/* allow post-processing */
 			ctrl.afterAction(actionName, target);
 
@@ -543,12 +606,13 @@ public class Dispatcher implements Filter {
 	/**
 	 * Executes action method
 	 * @param controller
-	 * @param method
+	 * @param actionInfo
 	 * @return a target to continue with
 	 */
-	private Target executeActionMethod(BaseController controller, Method method) {
+	private Target executeActionMethod(BaseController controller, ActionInfo actionInfo) {
+		Method method = actionInfo.method;
 		try {
-			Object[] values = buildArguments(method, controller.context);
+			Object[] values = buildArguments(actionInfo, controller.context);
 			return (Target)method.invoke(controller, values);
 		} catch (ForceTargetException e) {
 			throw(e);
@@ -567,53 +631,36 @@ public class Dispatcher implements Filter {
 	}
 
 	/**
-	 * Builds arguments for all parameters of given method.
+	 * Builds arguments for all parameters of given actionInfo.
 	 * For parameters annotated with {@link ContextParam} tries to find value from context's parameters.
 	 * For all other parameters safe null values are used.
 	 *
-	 * @param method
+	 * @param actionInfo
 	 * @param context
 	 * @return
 	 */
-	private Object[] buildArguments(Method method, Context context) {
-		Class<?>[] parameterTypes = method.getParameterTypes();
-		Annotation[][] annotations = method.getParameterAnnotations();
-		Object[] values = new Object[parameterTypes.length];
-		for (int i = 0; i < parameterTypes.length; i++) {
-			Class<?> type = parameterTypes[i];
+	private Object[] buildArguments(ActionInfo actionInfo, Context context) {
+		Object[] values = new Object[actionInfo.parameters.length];
+		for (int i = 0; i < actionInfo.parameters.length; i++) {
+			ActionInfo.Parameter param = actionInfo.parameters[i];
 			Object value = null;
-			String paramName = getParamAnnotationValue(annotations[i]);
-			if (paramName != null) {
+			if (param.contextParamName != null) {
 				// use contexts paramConvertUtil instance to be sure to be thread safe
-				if (type.isArray()) {
-					String[] paramValues = context.getParameterValues(paramName);
-					value = context.paramConvertUtil.convert(paramValues, type);
+				if (param.type.isArray()) {
+					String[] paramValues = context.getParameterValues(param.contextParamName);
+					value = context.paramConvertUtil.convert(paramValues, param.type);
 				} else {
-					String paramValue = context.getParameter(paramName);
-					value = context.paramConvertUtil.convert(paramValue, type);
+					String paramValue = context.getParameter(param.contextParamName);
+					value = context.paramConvertUtil.convert(paramValue, param.type);
 				}
 			}
-			if (value == null && type.isPrimitive()) { // if (still) null and a primitive, apply safe primitive 'null' value
-				value = DynaBeanUtils.getNullValueForPrimitive(type);
+			// if (still) null and a primitive, apply safe primitive 'null' value
+			if (value == null && param.type.isPrimitive()) {
+				value = DynaBeanUtils.getNullValueForPrimitive(param.type);
 			}
 			values[i] = value;
 		}
 		return values;
-	}
-
-	/**
-	 * Finds {@link ContextParam} annotation in given annotations and returns its value, which is the name of the parameter.
-	 * @param annotations
-	 * @return value or null
-	 */
-	private String getParamAnnotationValue(Annotation[] annotations) {
-		if (annotations == null || annotations.length == 0) return null;
-		for (Annotation a : annotations) {
-			if (a instanceof ContextParam) {
-				return ((ContextParam)a).value();
-			}
-		}
-		return null;
 	}
 
 	/**

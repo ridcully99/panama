@@ -1,17 +1,17 @@
 /*
- *  Copyright 2004-2012 Robert Brandner (robert.brandner@gmail.com) 
- *  
- *  Licensed under the Apache License, Version 2.0 (the "License"); 
- *  you may not use this file except in compliance with the License. 
- *  You may obtain a copy of the License at 
- *  
- *  http://www.apache.org/licenses/LICENSE-2.0 
- *  
- *  Unless required by applicable law or agreed to in writing, software 
- *  distributed under the License is distributed on an "AS IS" BASIS, 
- *  WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied. 
- *  See the License for the specific language governing permissions and 
- *  limitations under the License. 
+ *  Copyright 2004-2012 Robert Brandner (robert.brandner@gmail.com)
+ *
+ *  Licensed under the Apache License, Version 2.0 (the "License");
+ *  you may not use this file except in compliance with the License.
+ *  You may obtain a copy of the License at
+ *
+ *  http://www.apache.org/licenses/LICENSE-2.0
+ *
+ *  Unless required by applicable law or agreed to in writing, software
+ *  distributed under the License is distributed on an "AS IS" BASIS,
+ *  WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
+ *  See the License for the specific language governing permissions and
+ *  limitations under the License.
  */
 package panama.core;
 
@@ -42,12 +42,12 @@ import panama.log.SimpleLogger;
 public class BaseController {
 
 	/** Key used to store DefaultTable-Map in Session-Scope */
-	public final static String TABLEMAP_KEY = Dispatcher.PREFIX + "tablemap";	
-	
+	public final static String TABLEMAP_KEY = Dispatcher.PREFIX + "tablemap";
+
 	/** Key used to store DefaultTree-Map in Session-Scope */
 	public final static String TREEMAP_KEY = Dispatcher.PREFIX + "treemap";
 
-	
+
 	/** Logging */
 	protected static SimpleLogger log = new SimpleLogger(BaseController.class);
 
@@ -171,7 +171,7 @@ public class BaseController {
 		}
 		return new RedirectTarget(url.toString()).setParameters(parameterMap);
 	}
-	
+
 	/**
 	 * Creates a TemplateTarget for the specified templateName (building absolute path is a relativ path was provided)
 	 *
@@ -215,14 +215,14 @@ public class BaseController {
 		try {
 			Map<Object, Object> parameterMap = context.buildParameterMap(optionalParamsAndValues);
 			context.setParameterMap(parameterMap);
-			return context.getCore().executeAction(context, this, actionName);
+			return context.getCore().executeAction(context, this.getClass().getName(), actionName);
 		} finally {
 			context.setParameterMap(originalParameters);
 		}
 	}
 
 	// --- Methods for using Tables and Trees -----------------------------------------------------
-	
+
 	/**
 	 * If no table with specified key exists in current session, a new entry with the specified initialTable is created
 	 * and returned, otherwise the already existing table is returned.
@@ -246,7 +246,7 @@ public class BaseController {
 		context.put(table.getKey(), table);
 		return table;
 	}
-		
+
 	/**
 	 * Gets a table from the table-map in session scope.
 	 * @param tableId Unique ID
@@ -263,11 +263,11 @@ public class BaseController {
 		if (map == null) {
 			/* create map if not already there */
 			map = new HashMap<String, Table>();
-			Context.getInstance().session.put(TABLEMAP_KEY, map);			
+			Context.getInstance().session.put(TABLEMAP_KEY, map);
 		}
 		return map;
 	}
-	
+
 	/**
 	 * If no tree with specified key exists in current session, a new entry with the specified initialTree is created
 	 * and returned, otherwise the already existing tree is returned.
@@ -288,8 +288,8 @@ public class BaseController {
 			}
 		}
 		return tree;
-	}	
-	
+	}
+
 	/**
 	 * Gets a tree from the tree-map in session scope.
 	 * @param treeId Unique ID
@@ -306,8 +306,8 @@ public class BaseController {
 		if (map == null) {
 			/* create map if not already there */
 			map = new HashMap<String, Tree>();
-			Context.getInstance().session.put(TREEMAP_KEY, map);			
+			Context.getInstance().session.put(TREEMAP_KEY, map);
 		}
 		return map;
-	}		
+	}
 }
