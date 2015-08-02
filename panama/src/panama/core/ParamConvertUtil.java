@@ -30,7 +30,7 @@ import org.apache.commons.beanutils.converters.SqlTimestampConverter;
  * Converts string values to all kinds of other types.
  * Used to map parameters to action method arguments.
  *
- * For date and time values, this class supports all kinds of ISO patterns defined by {@link #DATE_TIME_PATTERNS}.
+ * For date and time values, this class supports all kinds of ISO patterns defined by {@link #DEFAULT_DATE_TIME_PATTERNS}.
  * Also see http://docs.oracle.com/javase/7/docs/api/java/text/SimpleDateFormat.html about the patterns.
  *
  * This is only one-way, so cannot be used for Fields etc.
@@ -40,7 +40,7 @@ import org.apache.commons.beanutils.converters.SqlTimestampConverter;
  */
 public class ParamConvertUtil extends ConvertUtilsBean {
 
-	public final static String[] DATE_TIME_PATTERNS = new String[] {
+	public final static String[] DEFAULT_DATE_TIME_PATTERNS = new String[] {
 		"yyyy-MM-dd",
 		"yyyy-MM-dd HH:mm",
 		"yyyy-MM-dd HH:mm:ss",
@@ -74,7 +74,7 @@ public class ParamConvertUtil extends ConvertUtilsBean {
 	 * @param converter
 	 */
 	private void registerDateTimeConverter(Class<?> clazz, DateTimeConverter converter) {
-		converter.setPatterns(DATE_TIME_PATTERNS);
+		converter.setPatterns(DEFAULT_DATE_TIME_PATTERNS);
 		register(converter, clazz);
 	}
 }

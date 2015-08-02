@@ -117,9 +117,6 @@ public class Dispatcher implements Filter {
 	private VelocityEngine velocityEngine;
 	private ViewToolManager velocityToolManager;
 
-	/** Parameter converter */
-	private ParamConvertUtil paramConvertUtil;
-
 	/** Startup time */
 	private Date startupAt = new Date();
 
@@ -180,8 +177,6 @@ public class Dispatcher implements Filter {
 			}
 		}
 		supportedLanguages = Arrays.asList(supported);
-
-		paramConvertUtil = new ParamConvertUtil();
 
 		try {
 			collectControllers();
@@ -546,7 +541,7 @@ public class Dispatcher implements Filter {
 	}
 
 	/**
-	 * Execute action method
+	 * Executes action method
 	 * @param controller
 	 * @param method
 	 * @return a target to continue with
@@ -589,15 +584,16 @@ public class Dispatcher implements Filter {
 			Object value = null;
 			String paramName = getParamAnnotationValue(annotations[i]);
 			if (paramName != null) {
+				// use contexts paramConvertUtil instance to be sure to be thread safe
 				if (type.isArray()) {
 					String[] paramValues = context.getParameterValues(paramName);
-					value = paramConvertUtil.convert(paramValues, type);
+					value = context.paramConvertUtil.convert(paramValues, type);
 				} else {
 					String paramValue = context.getParameter(paramName);
-					value = paramConvertUtil.convert(paramValue, type);
+					value = context.paramConvertUtil.convert(paramValue, type);
 				}
 			}
-			if (value == null && type.isPrimitive()) { // if still null and a primitive, use primitive null value, else value stays null
+			if (value == null && type.isPrimitive()) { // if (still) null and a primitive, apply safe primitive 'null' value
 				value = DynaBeanUtils.getNullValueForPrimitive(type);
 			}
 			values[i] = value;

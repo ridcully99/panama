@@ -54,6 +54,7 @@ public class Context {
 	public SessionWrapper session = new SessionWrapper();
 	public ApplicationWrapper application = new ApplicationWrapper();
 	public TokenWrapper tokens = new TokenWrapper();
+	public ParamConvertUtil paramConvertUtil = new ParamConvertUtil();
 
 	/*
 	 * getters for wrappers to have the same effect in velocity templates
@@ -88,7 +89,6 @@ public class Context {
 
 	private Map parameterMap;
 	private Locale defaultLocale;	// locale as derived from supported languages and accepted languages from browser - this is the default as long as no setLocale() has set an explicit locale in the session.
-	private ParamConvertUtil paramConvertUtil = new ParamConvertUtil();
 
 	/**
 	 * Static creator - created Context is stored in threadlocal variable and
@@ -339,21 +339,21 @@ public class Context {
 	}
 
 	/**
-	 * For date parameters that match any of {@link ParamConvertUtil#DATE_TIME_PATTERNS}.
+	 * For date parameters that match any of {@link ParamConvertUtil#DEFAULT_DATE_TIME_PATTERNS}.
 	 */
 	public Date getDateParameter(String key) {
 		return getParameter(key, Date.class, null);
 	}
 
 	/**
-	 * For date parameters that match any of {@link ParamConvertUtil#DATE_TIME_PATTERNS}.
+	 * For date parameters that match any of {@link ParamConvertUtil#DEFAULT_DATE_TIME_PATTERNS}.
 	 */
 	public Date getDateParameter(String key, Date defaultValue) {
 		return getParameter(key, Date.class, defaultValue);
 	}
 
 	/**
-	 * For date parameters that match any of {@link ParamConvertUtil#DATE_TIME_PATTERNS}.
+	 * For date parameters that match any of {@link ParamConvertUtil#DEFAULT_DATE_TIME_PATTERNS}.
 	 */
 	public Date[] getDateArrayParameter(String key) {
 		return getParameter(key, Date[].class, null);
