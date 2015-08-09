@@ -24,7 +24,11 @@ public class PlainTextTarget extends Target {
 	private String text;
 
 	public PlainTextTarget(String text) {
-		super();
+		this(0, text);
+	}
+	
+	public PlainTextTarget(int statusCode, String text) {
+		super(statusCode);
 		this.text = text;
 	}
 

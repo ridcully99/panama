@@ -27,14 +27,22 @@ public class JsonTarget extends Target {
 	private String text;
 
 	public JsonTarget(JSONObject json) {
-		super();
+		this(0, json);
+	}
+
+	public JsonTarget(JSONArray json) {
+		this(0, json);
+	}
+
+	public JsonTarget(int statusCode, JSONObject json) {
+		super(statusCode);
 		if (json != null) {
 			this.text = json.toString();
 		}
 	}
 
-	public JsonTarget(JSONArray json) {
-		super();
+	public JsonTarget(int statusCode, JSONArray json) {
+		super(statusCode);
 		if (json != null) {
 			this.text = json.toString();
 		}

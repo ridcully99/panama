@@ -25,22 +25,16 @@ import javax.servlet.ServletException;
  * The dispatcher of the application container (e. g. tomcat) is used to invoke the correct class for rendering.
  * @author Robert
  */
-public class ExternalTemplateTarget extends Target {
-
-	private String template;
+public class ExternalTemplateTarget extends TemplateTarget {
 
 	public ExternalTemplateTarget(String template) {
-		super();
-		setTemplate(template);
+		super(template);
 	}
 
-	public String getTemplate() {
-		return template;
+	public ExternalTemplateTarget(int statusCode, String template) {
+		super(statusCode, template);
 	}
-	public void setTemplate(String template) {
-		this.template = template;
-	}
-
+	
 	public void go() throws ServletException, IOException {
 
 		applyStatusCode();

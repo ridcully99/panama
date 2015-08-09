@@ -29,21 +29,31 @@ abstract public class Target {
 
 	protected static SimpleLogger log = new SimpleLogger(Target.class);
 
-	protected int statusCode = 0;
+	// a value of 0 makes the target _not_ set the status in the go() method, thus allowing
+	// direct modification of the context.response (for backward compatibility and special usecases)
+	protected int statusCode = 0; 
 
 	public Target() {
 	}
 
 	/**
-	 * Sets status code for the target to set in response.
+	 * Creates target with given status code for the target to set in response.
 	 *
 	 * @param statusCode status codes as defined by {@link HttpServletResponse}.
 	 * 			E.g. SC_ACCEPTED (202), SC_NOT_FOUND (404) etc.
 	 */
+	public Target(int statusCode) {
+		this.statusCode = statusCode;
+	}	
+	
 	public void setStatusCode(int statusCode) {
 		this.statusCode = statusCode;
 	}
-
+	
+	public int getStatusCode() {
+		return statusCode;
+	}
+	
 	/**
 	 * Applies status code set with {@link #setStatusCode(int)} when actually going to target.
 	 * Make sure to invoke this in your implementation of {@link #go()}.

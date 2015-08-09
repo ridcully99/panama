@@ -31,13 +31,18 @@ public class TemplateTarget extends Target {
 	private String template;
 
 	public TemplateTarget(String template) {
-		super();
-		setTemplate(template);
+		this(0, template);
 	}
 
+	public TemplateTarget(int statusCode, String template) {
+		super(statusCode);
+		setTemplate(template);
+	}
+	
 	public String getTemplate() {
 		return template;
 	}
+
 	public void setTemplate(String template) {
 		this.template = template;
 	}
@@ -57,7 +62,6 @@ public class TemplateTarget extends Target {
 			key = e.nextElement();
 			velocityContext.put(key, ctx.getRequest().getAttribute(key));
 		}
-		// TODO ? put all from application- and session- scope into context too. Rather not.
 		Template template = null;
 		template = engine.getTemplate(this.template, "UTF-8");
 		template.merge(velocityContext, ctx.getResponse().getWriter());

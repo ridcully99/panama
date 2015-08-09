@@ -17,7 +17,6 @@ package panama.core;
 
 import java.io.IOException;
 import java.io.UnsupportedEncodingException;
-import java.lang.reflect.Array;
 import java.net.URLEncoder;
 import java.util.HashMap;
 import java.util.Iterator;
@@ -35,10 +34,14 @@ public class RedirectTarget extends Target {
 	private String anchor;
 
 	public RedirectTarget(String url) {
-		super();
-		setBaseUrl(url);
+		this(0, url);
 	}
 
+	public RedirectTarget(int statusCode, String url) {
+		super(statusCode);
+		setBaseUrl(url);
+	}
+	
 	/**
 	 * Set parameters
 	 *
@@ -72,7 +75,7 @@ public class RedirectTarget extends Target {
 		try {
 			if (parameterMap != null && !parameterMap.isEmpty()) {
 				boolean first = true;
-				for (Iterator it = parameterMap.entrySet().iterator(); it.hasNext(); ) {
+				for (Iterator<?> it = parameterMap.entrySet().iterator(); it.hasNext(); ) {
 					Map.Entry entry = (Map.Entry)it.next();
 					String encodedKey = URLEncoder.encode(entry.getKey().toString(), "UTF-8");
 					if (entry.getValue() != null) {

@@ -29,6 +29,10 @@ public class NullTarget extends Target {
 		super();
 	}
 
+	public NullTarget(int statusCode) {
+		super(statusCode);
+	}
+	
 	public void go() throws Exception {
 		applyStatusCode();
 		return;
