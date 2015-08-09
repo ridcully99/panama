@@ -1,19 +1,21 @@
 /*
- *  Copyright 2004-2012 Robert Brandner (robert.brandner@gmail.com) 
- *  
- *  Licensed under the Apache License, Version 2.0 (the "License"); 
- *  you may not use this file except in compliance with the License. 
- *  You may obtain a copy of the License at 
- *  
- *  http://www.apache.org/licenses/LICENSE-2.0 
- *  
- *  Unless required by applicable law or agreed to in writing, software 
- *  distributed under the License is distributed on an "AS IS" BASIS, 
- *  WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied. 
- *  See the License for the specific language governing permissions and 
- *  limitations under the License. 
+ *  Copyright 2004-2012 Robert Brandner (robert.brandner@gmail.com)
+ *
+ *  Licensed under the Apache License, Version 2.0 (the "License");
+ *  you may not use this file except in compliance with the License.
+ *  You may obtain a copy of the License at
+ *
+ *  http://www.apache.org/licenses/LICENSE-2.0
+ *
+ *  Unless required by applicable law or agreed to in writing, software
+ *  distributed under the License is distributed on an "AS IS" BASIS,
+ *  WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
+ *  See the License for the specific language governing permissions and
+ *  limitations under the License.
  */
 package panama.core;
+
+import javax.servlet.http.HttpServletResponse;
 
 import panama.log.SimpleLogger;
 
@@ -23,15 +25,40 @@ import panama.log.SimpleLogger;
  * The target is interpreted by the Dispatcher
  * @author Robert
  */
-public abstract class Target {
-	
-	protected static SimpleLogger log = new SimpleLogger(Target.class);	
-	
+abstract public class Target {
+
+	protected static SimpleLogger log = new SimpleLogger(Target.class);
+
+	protected int statusCode = 0;
+
 	public Target() {
 	}
-	
+
 	/**
-	 * Goes to the target
+	 * Sets status code for the target to set in response.
+	 *
+	 * @param statusCode status codes as defined by {@link HttpServletResponse}.
+	 * 			E.g. SC_ACCEPTED (202), SC_NOT_FOUND (404) etc.
 	 */
-	public abstract void go() throws Exception;
+	public void setStatusCode(int statusCode) {
+		this.statusCode = statusCode;
+	}
+
+	/**
+	 * Applies status code set with {@link #setStatusCode(int)} when actually going to target.
+	 * Make sure to invoke this in your implementation of {@link #go()}.
+	 */
+	protected void applyStatusCode() {
+		Context ctx = Context.getInstance();
+		if (ctx != null && ctx.getResponse() != null && statusCode != 0) {
+			ctx.getResponse().setStatus(statusCode);
+		}
+	}
+
+	/**
+	 * Goes to the target.
+	 *
+	 * Make sure to call {@link #applyStatusCode()} in your implementation of this method.
+	 */
+	abstract public void go() throws Exception;
 }

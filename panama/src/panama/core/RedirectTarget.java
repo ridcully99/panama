@@ -107,6 +107,7 @@ public class RedirectTarget extends Target {
 	}
 
 	public void go() throws IOException {
+		applyStatusCode();
 		Context ctx = Context.getInstance();
 		ctx.getResponse().sendRedirect(getCompleteUrl());
 	}

@@ -42,6 +42,7 @@ public class JsonTarget extends Target {
 
 	@Override
 	public void go() throws Exception {
+		applyStatusCode();
 		Context ctx = Context.getInstance();
 		ctx.getResponse().setContentType("application/json; charset=UTF-8");
 		ctx.getResponse().getWriter().write(text);

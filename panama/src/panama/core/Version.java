@@ -27,7 +27,7 @@ public class Version {
 	// b: Revision (increases when cool new features are added)
 	// c: Minor	(increases when updates or fixes are made - even numbers mark stable releases)
 
-	public final static String VERSION = "3.9.0";
+	public final static String VERSION = "3.9.1";
 
 	public final static String LOGO_ASCIIART =
 	" ______ _______ _______ _______ _______ _______ \n"+
@@ -40,6 +40,7 @@ public class Version {
 
 	/* 	History
 	 * ---------------------------------------------------------------------------------------------
+	 * 3.9.1    2015-08-09 Added Target#setStatusCode() method
 	 * 3.9.0    2015-08-01 Annotation auf ContextParam umbenannt weil die Params auch programmatisch gesetzt werden können und ja aus Context stammen und nicht notwendigerweise aus Request.
 	 *                     Context um diverse get<Type>Parameter erweitert unter Verwendung von ParamConvertUtil
 	 *                     Configuration um getInt() und getBoolean() erweitert, sowie getString() mit Defaultwert
