@@ -616,9 +616,13 @@ public class Dispatcher implements Filter {
 			return (Target)method.invoke(controller, values);
 		} catch (ForceTargetException e) {
 			throw(e);
+		} catch (HttpErrorException e) {
+			throw(e);
 		} catch (InvocationTargetException e) {
 			if (e.getTargetException() instanceof ForceTargetException) {
 				throw (ForceTargetException)(e.getTargetException());
+			} else if (e.getTargetException() instanceof HttpErrorException) {
+				throw (HttpErrorException)(e.getTargetException());
 			} else {
 				log.error("could not invoke method '"+method.getName()+"'");
 				log.errorException(e);
