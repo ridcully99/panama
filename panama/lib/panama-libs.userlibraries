@@ -9,13 +9,12 @@
         <archive path="/panama/lib/javax.persistence.jar"/>
         <archive path="/panama/lib/jta.jar"/>
         <archive path="/panama/lib/scannotation-1.0.2.jar"/>
-        <archive path="/panama/lib/servlet-api.jar"/>
         <archive path="/panama/lib/velocity-tools-view-2.0.jar"/>
         <archive path="/panama/lib/velocity-1.7.jar"/>
         <archive path="/panama/lib/commons-fileupload-1.2.2.jar"/>
         <archive path="/panama/lib/commons-io-2.4.jar"/>
         <archive path="/panama/lib/commons-lang-2.6.jar"/>
-        <archive path="/panama/lib/avaje-ebeanorm-3.2.1.jar" source="D:/avaje-ebeanorm-avaje-ebeanorm-3.2.1"/>
+        <archive path="/panama/lib/avaje-ebeanorm-3.2.1.jar"/>
         <archive path="/panama/lib/slf4j-api-1.7.5.jar"/>
     </library>
 </eclipse-userlibraries>

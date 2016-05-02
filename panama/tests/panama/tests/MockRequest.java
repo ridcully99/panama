@@ -1,17 +1,17 @@
 /*
- *  Copyright 2004-2012 Robert Brandner (robert.brandner@gmail.com) 
- *  
- *  Licensed under the Apache License, Version 2.0 (the "License"); 
- *  you may not use this file except in compliance with the License. 
- *  You may obtain a copy of the License at 
- *  
- *  http://www.apache.org/licenses/LICENSE-2.0 
- *  
- *  Unless required by applicable law or agreed to in writing, software 
- *  distributed under the License is distributed on an "AS IS" BASIS, 
- *  WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied. 
- *  See the License for the specific language governing permissions and 
- *  limitations under the License. 
+ *  Copyright 2004-2012 Robert Brandner (robert.brandner@gmail.com)
+ *
+ *  Licensed under the Apache License, Version 2.0 (the "License");
+ *  you may not use this file except in compliance with the License.
+ *  You may obtain a copy of the License at
+ *
+ *  http://www.apache.org/licenses/LICENSE-2.0
+ *
+ *  Unless required by applicable law or agreed to in writing, software
+ *  distributed under the License is distributed on an "AS IS" BASIS,
+ *  WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
+ *  See the License for the specific language governing permissions and
+ *  limitations under the License.
  */
 package panama.tests;
 
@@ -19,16 +19,26 @@ import java.io.BufferedReader;
 import java.io.IOException;
 import java.io.UnsupportedEncodingException;
 import java.security.Principal;
+import java.util.Collection;
 import java.util.Enumeration;
 import java.util.HashMap;
 import java.util.Locale;
 import java.util.Map;
 
+import javax.servlet.AsyncContext;
+import javax.servlet.DispatcherType;
 import javax.servlet.RequestDispatcher;
+import javax.servlet.ServletContext;
+import javax.servlet.ServletException;
 import javax.servlet.ServletInputStream;
+import javax.servlet.ServletRequest;
+import javax.servlet.ServletResponse;
 import javax.servlet.http.Cookie;
 import javax.servlet.http.HttpServletRequest;
+import javax.servlet.http.HttpServletResponse;
 import javax.servlet.http.HttpSession;
+import javax.servlet.http.HttpUpgradeHandler;
+import javax.servlet.http.Part;
 
 /**
  * @author robert.brandner
@@ -38,7 +48,7 @@ public class MockRequest implements HttpServletRequest {
 
 	private Map<String, Object> attributes = new HashMap<String, Object>();
 	private Map<String, String[]> parameters = new HashMap<String, String[]>();
-	
+
 	/* (non-Javadoc)
 	 * @see javax.servlet.ServletRequest#getAttribute(java.lang.String)
 	 */
@@ -523,6 +533,141 @@ public class MockRequest implements HttpServletRequest {
 	public boolean isUserInRole(String arg0) {
 		// Auto-generated method stub
 		return false;
+	}
+
+	/* (non-Javadoc)
+	 * @see javax.servlet.ServletRequest#getAsyncContext()
+	 */
+	@Override
+	public AsyncContext getAsyncContext() {
+		// TODO Auto-generated method stub
+		return null;
+	}
+
+	/* (non-Javadoc)
+	 * @see javax.servlet.ServletRequest#getContentLengthLong()
+	 */
+	@Override
+	public long getContentLengthLong() {
+		// TODO Auto-generated method stub
+		return 0;
+	}
+
+	/* (non-Javadoc)
+	 * @see javax.servlet.ServletRequest#getDispatcherType()
+	 */
+	@Override
+	public DispatcherType getDispatcherType() {
+		// TODO Auto-generated method stub
+		return null;
+	}
+
+	/* (non-Javadoc)
+	 * @see javax.servlet.ServletRequest#getServletContext()
+	 */
+	@Override
+	public ServletContext getServletContext() {
+		// TODO Auto-generated method stub
+		return null;
+	}
+
+	/* (non-Javadoc)
+	 * @see javax.servlet.ServletRequest#isAsyncStarted()
+	 */
+	@Override
+	public boolean isAsyncStarted() {
+		// TODO Auto-generated method stub
+		return false;
+	}
+
+	/* (non-Javadoc)
+	 * @see javax.servlet.ServletRequest#isAsyncSupported()
+	 */
+	@Override
+	public boolean isAsyncSupported() {
+		// TODO Auto-generated method stub
+		return false;
+	}
+
+	/* (non-Javadoc)
+	 * @see javax.servlet.ServletRequest#startAsync()
+	 */
+	@Override
+	public AsyncContext startAsync() throws IllegalStateException {
+		// TODO Auto-generated method stub
+		return null;
+	}
+
+	/* (non-Javadoc)
+	 * @see javax.servlet.ServletRequest#startAsync(javax.servlet.ServletRequest, javax.servlet.ServletResponse)
+	 */
+	@Override
+	public AsyncContext startAsync(ServletRequest arg0, ServletResponse arg1) throws IllegalStateException {
+		// TODO Auto-generated method stub
+		return null;
+	}
+
+	/* (non-Javadoc)
+	 * @see javax.servlet.http.HttpServletRequest#authenticate(javax.servlet.http.HttpServletResponse)
+	 */
+	@Override
+	public boolean authenticate(HttpServletResponse arg0) throws IOException, ServletException {
+		// TODO Auto-generated method stub
+		return false;
+	}
+
+	/* (non-Javadoc)
+	 * @see javax.servlet.http.HttpServletRequest#changeSessionId()
+	 */
+	@Override
+	public String changeSessionId() {
+		// TODO Auto-generated method stub
+		return null;
+	}
+
+	/* (non-Javadoc)
+	 * @see javax.servlet.http.HttpServletRequest#getPart(java.lang.String)
+	 */
+	@Override
+	public Part getPart(String arg0) throws IOException, ServletException {
+		// TODO Auto-generated method stub
+		return null;
+	}
+
+	/* (non-Javadoc)
+	 * @see javax.servlet.http.HttpServletRequest#getParts()
+	 */
+	@Override
+	public Collection<Part> getParts() throws IOException, ServletException {
+		// TODO Auto-generated method stub
+		return null;
+	}
+
+	/* (non-Javadoc)
+	 * @see javax.servlet.http.HttpServletRequest#login(java.lang.String, java.lang.String)
+	 */
+	@Override
+	public void login(String arg0, String arg1) throws ServletException {
+		// TODO Auto-generated method stub
+
+	}
+
+	/* (non-Javadoc)
+	 * @see javax.servlet.http.HttpServletRequest#logout()
+	 */
+	@Override
+	public void logout() throws ServletException {
+		// TODO Auto-generated method stub
+
+	}
+
+	/* (non-Javadoc)
+	 * @see javax.servlet.http.HttpServletRequest#upgrade(java.lang.Class)
+	 */
+	@Override
+	public <T extends HttpUpgradeHandler> T upgrade(Class<T> arg0) throws IOException, ServletException {
+		// TODO Auto-generated method stub
+		return null;
 	}
 
 }

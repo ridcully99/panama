@@ -18,21 +18,16 @@ package panama.core;
 import java.io.BufferedReader;
 import java.io.IOException;
 import java.io.UnsupportedEncodingException;
-import java.security.Principal;
 import java.util.ArrayList;
 import java.util.Collections;
 import java.util.Enumeration;
 import java.util.HashMap;
 import java.util.Iterator;
 import java.util.List;
-import java.util.Locale;
 import java.util.Map;
 
-import javax.servlet.RequestDispatcher;
-import javax.servlet.ServletInputStream;
-import javax.servlet.http.Cookie;
 import javax.servlet.http.HttpServletRequest;
-import javax.servlet.http.HttpSession;
+import javax.servlet.http.HttpServletRequestWrapper;
 
 import org.apache.commons.fileupload.FileItem;
 import org.apache.commons.fileupload.FileUploadException;
@@ -48,7 +43,7 @@ import panama.log.SimpleLogger;
  * @author Ridcully
  *
  */
-public class HttpMultipartServletRequest implements HttpServletRequest {
+public class HttpMultipartServletRequest extends HttpServletRequestWrapper {
 
 	protected HttpServletRequest request;
 	protected Map parameters = new HashMap();
@@ -65,6 +60,7 @@ public class HttpMultipartServletRequest implements HttpServletRequest {
 	 * @param sizeThreshold maximum file size in bytes for keeping files in memory (-1 for default of 10KB)
 	 */
 	public HttpMultipartServletRequest(HttpServletRequest request, int sizeMax, int sizeThreshold) {
+		super(request);
 		this.request = request;
 		DiskFileItemFactory factory = new DiskFileItemFactory();
 		factory.setSizeThreshold(sizeThreshold == -1 ? 1024 * 10 : sizeThreshold);
@@ -224,374 +220,6 @@ public class HttpMultipartServletRequest implements HttpServletRequest {
 		throw new IllegalStateException("Cannot get Reader for multipart/form-data type request");
 	}
 
-	// ========================================================================
-	// Direct Proxy of HttpServletRequest Methods
-	// ========================================================================
-
-	/**
-	 * Calls same method on the underlying HttpServletRequest.
-	 * Refer to Servlet API for information about this method.
-	 */
-	public String getAuthType() {
-		return request.getAuthType();
-	}
-
-	/**
-	 * Calls same method on the underlying HttpServletRequest.
-	 * Refer to Servlet API for information about this method.
-	 */
-	public Cookie[] getCookies() {
-		return request.getCookies();
-	}
-
-	/**
-	 * Calls same method on the underlying HttpServletRequest.
-	 * Refer to Servlet API for information about this method.
-	 */
-	public long getDateHeader(String name) {
-		return request.getDateHeader(name);
-	}
-
-	/**
-	 * Calls same method on the underlying HttpServletRequest.
-	 * Refer to Servlet API for information about this method.
-	 */
-	public String getHeader(String name) {
-		return request.getHeader(name);
-	}
-
-	/**
-	 * Calls same method on the underlying HttpServletRequest.
-	 * Refer to Servlet API for information about this method.
-	 */
-	public Enumeration getHeaders(String name) {
-		return request.getHeaders(name);
-	}
-
-	/**
-	 * Calls same method on the underlying HttpServletRequest.
-	 * Refer to Servlet API for information about this method.
-	 */
-	public Enumeration getHeaderNames() {
-		return request.getHeaderNames();
-	}
-
-
-	/**
-	 * Calls same method on the underlying HttpServletRequest.
-	 * Refer to Servlet API for information about this method.
-	 */
-	public int getIntHeader(String name) {
-		return request.getIntHeader(name);
-	}
-
-	/**
-	 * Calls same method on the underlying HttpServletRequest.
-	 * Refer to Servlet API for information about this method.
-	 */
-	public String getMethod() {
-		return request.getMethod();
-	}
-
-	/**
-	 * Calls same method on the underlying HttpServletRequest.
-	 * Refer to Servlet API for information about this method.
-	 */
-	public String getPathInfo() {
-		return request.getPathInfo();
-	}
-
-	/**
-	 * Calls same method on the underlying HttpServletRequest.
-	 * Refer to Servlet API for information about this method.
-	 */
-	public String getPathTranslated() {
-		return request.getPathTranslated();
-	}
-
-	/**
-	 * Calls same method on the underlying HttpServletRequest.
-	 * Refer to Servlet API for information about this method.
-	 */
-	public String getContextPath() {
-		return request.getContextPath();
-	}
-
-	/**
-	 * Calls same method on the underlying HttpServletRequest.
-	 * Refer to Servlet API for information about this method.
-	 */
-	public String getQueryString() {
-		return request.getQueryString();
-	}
-
-	/**
-	 * Calls same method on the underlying HttpServletRequest.
-	 * Refer to Servlet API for information about this method.
-	 */
-	public String getRemoteUser() {
-		return request.getRemoteUser();
-	}
-
-	/**
-	 * Calls same method on the underlying HttpServletRequest.
-	 * Refer to Servlet API for information about this method.
-	 */
-	public boolean isUserInRole(String role) {
-		return request.isUserInRole(role);
-	}
-
-	/**
-	 * Calls same method on the underlying HttpServletRequest.
-	 * Refer to Servlet API for information about this method.
-	 */
-	public Principal getUserPrincipal() {
-		return request.getUserPrincipal();
-	}
-
-	/**
-	 * Calls same method on the underlying HttpServletRequest.
-	 * Refer to Servlet API for information about this method.
-	 */
-	public String getRequestedSessionId() {
-		return request.getRequestedSessionId();
-	}
-
-	/**
-	 * Calls same method on the underlying HttpServletRequest.
-	 * Refer to Servlet API for information about this method.
-	 */
-	public String getRequestURI() {
-		return request.getRequestURI();
-	}
-
-	/**
-	 * Calls same method on the underlying HttpServletRequest.
-	 * Refer to Servlet API for information about this method.
-	 */
-	public String getServletPath() {
-		return request.getServletPath();
-	}
-
-	/**
-	 * Calls same method on the underlying HttpServletRequest.
-	 * Refer to Servlet API for information about this method.
-	 */
-	public HttpSession getSession(boolean create) {
-		return request.getSession(create);
-	}
-
-	/**
-	 * Calls same method on the underlying HttpServletRequest.
-	 * Refer to Servlet API for information about this method.
-	 */
-	public HttpSession getSession() {
-		return request.getSession();
-	}
-
-	/**
-	 * Calls same method on the underlying HttpServletRequest.
-	 * Refer to Servlet API for information about this method.
-	 */
-	public boolean isRequestedSessionIdValid() {
-		return request.isRequestedSessionIdValid();
-	}
-
-	/**
-	 * Calls same method on the underlying HttpServletRequest.
-	 * Refer to Servlet API for information about this method.
-	 */
-	public boolean isRequestedSessionIdFromCookie() {
-		return request.isRequestedSessionIdFromCookie();
-	}
-
-	/**
-	 * Calls same method on the underlying HttpServletRequest.
-	 * Refer to Servlet API for information about this method.
-	 */
-	public boolean isRequestedSessionIdFromURL() {
-		return request.isRequestedSessionIdFromURL();
-	}
-
-	/**
-	 * Calls same method on the underlying HttpServletRequest.
-	 * Refer to Servlet API for information about this method.
-	 * @deprecated
-	 */
-	public boolean isRequestedSessionIdFromUrl() {
-		return request.isRequestedSessionIdFromUrl();
-	}
-
-	/**
-	 * Calls same method on the underlying HttpServletRequest.
-	 * Refer to Servlet API for information about this method.
-	 */
-	public Object getAttribute(String name) {
-		return request.getAttribute(name);
-	}
-
-	/**
-	 * Calls same method on the underlying HttpServletRequest.
-	 * Refer to Servlet API for information about this method.
-	 */
-	public Enumeration getAttributeNames() {
-		return request.getAttributeNames();
-	}
-
-	/**
-	 * Calls same method on the underlying HttpServletRequest.
-	 * Refer to Servlet API for information about this method.
-	 */
-	public String getCharacterEncoding() {
-		return request.getCharacterEncoding();
-	}
-
-	/**
-	 * Calls same method on the underlying HttpServletRequest.
-	 * Refer to Servlet API for information about this method.
-	 */
-	public int getContentLength() {
-		return request.getContentLength();
-	}
-
-	/**
-	 * Calls same method on the underlying HttpServletRequest.
-	 * Refer to Servlet API for information about this method.
-	 */
-	public String getContentType() {
-		return request.getContentType();
-	}
-
-	/**
-	 * Calls same method on the underlying HttpServletRequest.
-	 * Refer to Servlet API for information about this method.
-	 */
-	public String getProtocol() {
-		return request.getProtocol();
-	}
-
-	/**
-	 * Calls same method on the underlying HttpServletRequest.
-	 * Refer to Servlet API for information about this method.
-	 */
-	public String getScheme() {
-		return request.getScheme();
-	}
-
-	/**
-	 * Calls same method on the underlying HttpServletRequest.
-	 * Refer to Servlet API for information about this method.
-	 */
-	public String getServerName() {
-		return request.getServerName();
-	}
-
-	/**
-	 * Calls same method on the underlying HttpServletRequest.
-	 * Refer to Servlet API for information about this method.
-	 */
-	public int getServerPort() {
-		return request.getServerPort();
-	}
-
-	/**
-	 * Calls same method on the underlying HttpServletRequest.
-	 * Refer to Servlet API for information about this method.
-	 */
-	public ServletInputStream getInputStream() throws IOException {
-		return request.getInputStream();
-	}
-
-	/**
-	 * Calls same method on the underlying HttpServletRequest.
-	 * Refer to Servlet API for information about this method.
-	 */
-	public String getRemoteAddr() {
-		return request.getRemoteAddr();
-	}
-
-	/**
-	 * Calls same method on the underlying HttpServletRequest.
-	 * Refer to Servlet API for information about this method.
-	 */
-	public String getRemoteHost() {
-		return request.getRemoteHost();
-	}
-
-	/**
-	 * Calls same method on the underlying HttpServletRequest.
-	 * Refer to Servlet API for information about this method.
-	 */
-	public void setAttribute(String name, Object o) {
-		request.setAttribute(name, o);
-	}
-
-	/**
-	 * Calls same method on the underlying HttpServletRequest.
-	 * Refer to Servlet API for information about this method.
-	 */
-	public void removeAttribute(String name) {
-		request.removeAttribute(name);
-	}
-
-	/**
-	 * Calls same method on the underlying HttpServletRequest.
-	 * Refer to Servlet API for information about this method.
-	 */
-	public Locale getLocale() {
-		return request.getLocale();
-	}
-
-	/**
-	 * Calls same method on the underlying HttpServletRequest.
-	 * Refer to Servlet API for information about this method.
-	 */
-	public Enumeration getLocales() {
-		return request.getLocales();
-	}
-
-	/**
-	 * Calls same method on the underlying HttpServletRequest.
-	 * Refer to Servlet API for information about this method.
-	 */
-	public boolean isSecure() {
-		return request.isSecure();
-	}
-
-	/**
-	 * Calls same method on the underlying HttpServletRequest.
-	 * Refer to Servlet API for information about this method.
-	 */
-	public RequestDispatcher getRequestDispatcher(String path) {
-		return request.getRequestDispatcher(path);
-	}
-
-	/**
-	 * Calls same method on the underlying HttpServletRequest.
-	 * Refer to Servlet API for information about this method.
-	 * @deprecated
-	 */
-	public String getRealPath(String path) {
-		return request.getRealPath(path);
-	}
-
-	/**
-	 * Calls same method on the underlying HttpServletRequest.
-	 * Refer to Servlet API for information about this method.
-	 */
-	public StringBuffer getRequestURL() {
-		return request.getRequestURL();
-	}
-
-	/**
-	 * Calls same method on the underlying HttpServletRequest.
-	 * Refer to Servlet API for information about this method.
-	 */
-	public void setCharacterEncoding(String encoding)
-			throws java.io.UnsupportedEncodingException {
-		request.setCharacterEncoding(encoding);
-	}
-
 	/**
 	 * Helper function to convert the values of the map which are all lists to arrays.
 	 * @param map
@@ -638,25 +266,5 @@ public class HttpMultipartServletRequest implements HttpServletRequest {
 		FileItem[] result = new FileItem[list.size()];
 		list.toArray(result);
 		return result;
-	}
-
-	public String getLocalAddr() {
-		// TODO Auto-generated method stub
-		return null;
-	}
-
-	public String getLocalName() {
-		// TODO Auto-generated method stub
-		return null;
-	}
-
-	public int getLocalPort() {
-		// TODO Auto-generated method stub
-		return 0;
-	}
-
-	public int getRemotePort() {
-		// TODO Auto-generated method stub
-		return 0;
 	}
 }
