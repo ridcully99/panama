@@ -51,6 +51,13 @@ bintray {
     }
 }
 
+task myJavadocs(type: Javadoc) {
+  group = "documentation"
+  source = sourceSets.main.allJava
+  description = "Weniger streng"
+  failOnError = false
+}
+
 dependencies {
     compile 'org.avaje.ebeanorm:avaje-ebeanorm:7.12.2'
     compile 'org.avaje.ebeanorm:avaje-ebeanorm-agent:4.10.1'
