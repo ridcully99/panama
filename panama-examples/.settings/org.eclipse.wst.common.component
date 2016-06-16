@@ -2,9 +2,6 @@
     <wb-module deploy-name="panama-examples">
         <wb-resource deploy-path="/" source-path="/web"/>
         <wb-resource deploy-path="/WEB-INF/classes" source-path="/src"/>
-        <dependent-module archiveName="panama.jar" deploy-path="/WEB-INF/lib" handle="module:/resource/panama/panama">
-            <dependency-type>uses</dependency-type>
-        </dependent-module>
         <property name="java-output-path"/>
         <property name="context-root" value="panama-examples"/>
     </wb-module>

@@ -18,11 +18,12 @@ package panama.examples.issuetracker;
 import java.util.List;
 import java.util.Set;
 
+import com.avaje.ebean.Ebean;
+
 import panama.annotations.Action;
 import panama.annotations.Controller;
 import panama.collections.QueryListModel;
 import panama.collections.QueryTable;
-import panama.collections.Table;
 import panama.core.BaseController;
 import panama.core.Target;
 import panama.examples.issuetracker.entities.Issue;
@@ -34,8 +35,6 @@ import panama.form.PersistentBeanField;
 import panama.form.ValidatorFactory;
 import panama.persistence.PersistentBean;
 
-import com.avaje.ebean.Ebean;
-
 /**
  * @author ridcully
  */
@@ -44,18 +43,15 @@ public class IssueTrackerController extends BaseController {
 
 	public final static String FORMDATA_KEY = "formdata";
 
-	private Table table;
-
 	private final static Form form = new Form(Issue.class).except("createdAt");
 	static {
-		// TODO reactivate and fix NPE
-//		form.getField("title").addValidator(ValidatorFactory.getNotEmptyValidator());
-//		form.addField(new PersistentBeanField("tags", Tag.class));
+		form.getField("title").addValidator(ValidatorFactory.getNotEmptyValidator());
+		form.addField(new PersistentBeanField("tags", Tag.class));
 	}
 
 	public IssueTrackerController() {
 		createTagsIfNeeded();
-		table = registerTable(new QueryTable("issuetable", new QueryListModel(Ebean.createQuery(Issue.class))));
+		registerTable(new QueryTable("issuetable", new QueryListModel(Ebean.createQuery(Issue.class))));
 	}
 
 	@Action
@@ -104,9 +100,7 @@ public class IssueTrackerController extends BaseController {
 	public Target delete() {
 		String id = context.getParameter("id");
 		if (id != null) {
-			Issue e = Ebean.find(Issue.class, id);
-			Ebean.deleteManyToManyAssociations(e, "tags");
-			int is = Ebean.delete(Issue.class, id);
+			Ebean.delete(Issue.class, id);
 		}
 		return redirectToAction("list");
 	}

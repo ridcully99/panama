@@ -27,9 +27,9 @@ import panama.persistence.PersistentBean;
 @Entity
 public class Tag extends PersistentBean {
 
-	@Id
-	private String lang;
-	
+//	@Id
+//	private String lang;
+
 	private String name;
 
 //  !! BUG in Ebean 2.7.7 breaks this bidirectional many-to-many relation!
