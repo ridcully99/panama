@@ -88,7 +88,7 @@ dependencies {
     compile "commons-validator:commons-validator:1.5.0"
     compile "org.javassist:javassist:3.20.0-GA"
     compile "javax.persistence:persistence-api:1.0.2"
-    compile "javax.servlet:servlet-api:2.5"
+    compileOnly "javax.servlet:servlet-api:2.5"
     compile "javax.transaction:jta:1.1"
     compile "org.scannotation:scannotation:1.0.3"
     compile "org.slf4j:slf4j-api:1.7.21"
