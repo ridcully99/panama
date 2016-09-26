@@ -12,14 +12,14 @@ plugins {
     id "com.jfrog.bintray" version "1.7"
 }
 
+sourceCompatibility = 1.7
+targetCompatibility = 1.7
+
 def groupName = "panama"
-def versionName = "4.0.0"
+def versionName = "4.0.1"
 
 group = groupName
 version = versionName
-
-println "test:" + "${bintray_user}"
-println "test2:" + "${artifactory_user}"
 
 repositories {
     jcenter()
@@ -88,14 +88,15 @@ dependencies {
     compile "commons-validator:commons-validator:1.5.0"
     compile "org.javassist:javassist:3.20.0-GA"
     compile "javax.persistence:persistence-api:1.0.2"
+    compile "javax.servlet:servlet-api:2.5"
     compile "javax.transaction:jta:1.1"
-	compile "org.apache.tomcat:servlet-api:6.0.44"
     compile "org.scannotation:scannotation:1.0.3"
     compile "org.slf4j:slf4j-api:1.7.21"
     compile "org.apache.velocity:velocity:1.7"
     compile ("org.apache.velocity:velocity-tools:2.0") {
         exclude group: "org.apache.struts"
     }
+
 
     testCompile "junit:junit:4.12"
 }
