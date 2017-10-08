@@ -17,7 +17,6 @@ package panama.collections;
 
 import java.io.Serializable;
 import java.lang.reflect.Method;
-import java.rmi.dgc.VMID;
 import java.util.ArrayList;
 import java.util.Collections;
 import java.util.Comparator;
@@ -33,8 +32,7 @@ import panama.core.Context;
 import panama.log.SimpleLogger;
 import panama.util.DynaBeanUtils;
 import panama.util.TableController;
-
-
+import panama.util.UUIDGenerator;
 
 
 /**
@@ -58,7 +56,7 @@ public class DefaultTable implements Table, Comparator<Object>, Serializable {
 	protected transient ListModel model = null;
 	protected Set<? extends Object> selected = new HashSet();
 	protected Map<String, Filter> filters = new HashMap<String, Filter>();
-	protected String cacheCode = new VMID().toString();		/* a unique identifier */
+	protected String cacheCode = UUIDGenerator.getUUID();		/* a unique identifier */
 	private String isSorted = cacheCode + "_isSorted";		/* another one */
 	private String isFiltered = cacheCode + "_isFiltered";	/* and another one */
 
