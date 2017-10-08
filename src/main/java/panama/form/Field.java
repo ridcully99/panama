@@ -15,17 +15,14 @@
  */
 package panama.form;
 
+import java.lang.reflect.Constructor;
 import java.text.ParseException;
 import java.util.ArrayList;
 import java.util.List;
 
-import javax.swing.text.DefaultFormatter;
-
-
 import panama.exceptions.ValidatorException;
 import panama.log.SimpleLogger;
 import panama.util.DynaBeanUtils;
-
 
 
 /**
@@ -41,7 +38,6 @@ public class Field {
 	private String name;
 	private List<Validator> validators = new ArrayList<Validator>();
 	private Class<?> valueClass;
-	private DefaultFormatter fmttr = new DefaultFormatter();
 	protected static SimpleLogger log = new SimpleLogger(Form.class);
 
 
@@ -141,8 +137,25 @@ public class Field {
 				throw new ParseException(nfe.getMessage(), 0);
 			}
 		} else {
-			fmttr.setValueClass(getValueClass());
-			return fmttr.stringToValue(valueString);
+			Class<?> vc = getValueClass();
+			Constructor cons;
+
+            try {
+                cons = vc.getConstructor(new Class[] { String.class });
+
+            } catch (NoSuchMethodException nsme) {
+                cons = null;
+            }
+
+            if (cons != null) {
+                try {
+                    return cons.newInstance(new Object[] { valueString });
+                } catch (Throwable ex) {
+                    throw new ParseException("Error creating instance", 0);
+                }
+            }
+            
+            return valueString;
 		}
 	}
 
@@ -171,8 +184,10 @@ public class Field {
 	 * @return A string representation of the given value
 	 */
 	public synchronized String valueToString(Object value) throws ParseException {
-		fmttr.setValueClass(getValueClass());
-		return fmttr.valueToString(value);
+		if (value == null) {
+			return "";
+		}
+		return value.toString();
 	}
 
 	/**

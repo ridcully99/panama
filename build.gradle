@@ -16,13 +16,17 @@ sourceCompatibility = 1.7
 targetCompatibility = 1.7
 
 def groupName = "panama"
-def versionName = "4.0.1"
+def versionName = "4.0.2"
 
 group = groupName
 version = versionName
 
 repositories {
     jcenter()
+}
+
+tasks.withType(Jar) {
+    destinationDir = file("$rootDir")
 }
 
 publishing {

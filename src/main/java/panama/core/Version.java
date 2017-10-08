@@ -27,7 +27,7 @@ public class Version {
 	// b: Revision (increases when cool new features are added)
 	// c: Minor	(increases when updates or fixes are made - even numbers mark stable releases)
 
-	public final static String VERSION = "4.0.1";
+	public final static String VERSION = "4.0.2";
 
 	public final static String LOGO_ASCIIART =
 	" ______ _______ _______ _______ _______ _______ \n"+
@@ -40,6 +40,7 @@ public class Version {
 
 	/* 	History
 	 * ---------------------------------------------------------------------------------------------
+	 * 4.0.2    2017-10-08 Removed swing dependency (sneaked in in Field defaultFormatter)
 	 * 4.0.1    2016-09-26 Switched to Java 1.7 for better compatibility
 	 * 4.0.0    2106-xx-yy Get rid off servlet.jar, switch to dynamic ebean enhancement, switch to gradle build
 	 * 3.9.2    2015-12-26 Throwing HttpErrorException from within method did not work properly. Fixed.
