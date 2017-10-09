@@ -181,11 +181,8 @@ public class Dispatcher implements Filter {
 
 		Configuration.init(appName);
 
-		// init ebean via Agent
-		if (!AgentLoader.loadAgentFromClasspath("avaje-ebeanorm-agent","debug=1")) {
-		    log.error("avaje-ebeanorm-agent not found in classpath - not dynamically loaded");
-		}
-
+		initPersistence();
+		
 		@SuppressWarnings("rawtypes")
 		Enumeration names = filterConfig.getInitParameterNames();
 		while(names.hasMoreElements()) {
@@ -237,6 +234,17 @@ public class Dispatcher implements Filter {
 		} catch (Exception e) {
 			log.error("Collecting Controllers and Actions failed.");
 			log.errorException(e);
+		}
+	}
+
+	/**
+	 * Called from init(), initializes persistence.
+	 * The default implementation inits Ebean, but you can override this.
+	 */
+	protected void initPersistence() {
+		// init ebean via Agent
+		if (!AgentLoader.loadAgentFromClasspath("avaje-ebeanorm-agent","debug=1")) {
+		    log.error("avaje-ebeanorm-agent not found in classpath - not dynamically loaded");
 		}
 	}
 
